@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sample</title>
+<meta name="description" content="sample">
+<!--
+  Harness page template (US-14.1). One self-contained file: every style, script, and
+  diagram is inline, and nothing is loaded from the network.
+
+  The :root and .dark blocks are the shadcn Luma palette, verbatim (US-14.1 design.md
+  Appendix A, under openspec/changes/archive/ once archived). scripts/validate-html-page.sh checks every token and its value, so do
+  not edit them. Components use var(--token) only; never a literal colour.
+
+  Replace every sample, keep the components you need, delete the rest, and
+  add one <section id> per topic, linked from the table of contents. A page that
+  reports repository status MUST keep section#sources.
+-->
+<script>
+  /* Theme before first paint: stored choice, else the system preference. */
+  (function () {
+    var stored = null;
+    try { stored = localStorage.getItem("theme"); } catch (e) {}
+    var dark = stored ? stored === "dark"
+                      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.toggle("dark", dark);
+  })();
+</script>
+<style>
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.488 0.243 264.376);
+  --primary-foreground: oklch(0.97 0.014 254.604);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.845 0.143 164.978);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.596 0.145 163.225);
+  --chart-4: oklch(0.508 0.118 165.612);
+  --chart-5: oklch(0.432 0.095 166.913);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.546 0.245 262.881);
+  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.424 0.199 265.638);
+  --primary-foreground: oklch(0.97 0.014 254.604);
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.845 0.143 164.978);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.596 0.145 163.225);
+  --chart-4: oklch(0.508 0.118 165.612);
+  --chart-5: oklch(0.432 0.095 166.913);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.623 0.214 259.815);
+  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ---- Base ------------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: light; scroll-behavior: smooth; scroll-padding-top: 5rem; }
+html.dark { color-scheme: dark; }
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--primary); text-underline-offset: 3px; }
+.dark a { color: var(--sidebar-primary); }
+code, pre, kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875em;
+}
+code { background: var(--muted); padding: 0.1em 0.35em; border-radius: calc(var(--radius) - 4px); }
+pre {
+  background: var(--muted); color: var(--foreground); padding: 1rem;
+  border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* ---- Layout ---------------------------------------------------------------- */
+.header {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: color-mix(in oklch, var(--background) 85%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; }
+.brand-mark {
+  width: 1.6rem; height: 1.6rem; border-radius: calc(var(--radius) - 2px);
+  background: var(--primary); color: var(--primary-foreground);
+  display: grid; place-items: center; font-size: 0.8rem;
+}
+.main { max-width: 64rem; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.hero { padding: 1.5rem 0 1rem; }
+.hero h1 { font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
+.lead { color: var(--muted-foreground); font-size: 1.05rem; margin: 0; max-width: 46rem; }
+.meta { color: var(--muted-foreground); font-size: 0.8rem; margin-top: 0.75rem; }
+section { padding-top: 2.25rem; }
+section > h2 {
+  font-size: 1.35rem; letter-spacing: -0.01em; margin: 0 0 0.25rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+}
+section > p.section-lead { color: var(--muted-foreground); margin-top: 0.5rem; }
+h3 { font-size: 1.05rem; margin: 1.5rem 0 0.5rem; }
+
+/* ---- Theme toggle ---------------------------------------------------------- */
+.toggle {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  height: 2rem; padding: 0 0.75rem;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--background); color: var(--foreground);
+  font: inherit; font-size: 0.85rem; cursor: pointer;
+}
+.toggle:hover { background: var(--accent); color: var(--accent-foreground); }
+.toggle .icon-sun, .dark .toggle .icon-moon { display: none; }
+.dark .toggle .icon-sun { display: inline; }
+
+/* ---- Table of contents ----------------------------------------------------- */
+.toc {
+  background: var(--sidebar); color: var(--sidebar-foreground);
+  border: 1px solid var(--sidebar-border); border-radius: var(--radius);
+  padding: 1rem 1.25rem; margin: 1.5rem 0 0;
+}
+.toc-title {
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted-foreground); margin: 0 0 0.5rem;
+}
+.toc ol { margin: 0; padding-left: 1.25rem; columns: 2 16rem; column-gap: 2rem; }
+.toc li { break-inside: avoid; padding: 0.15rem 0; }
+.toc a { color: var(--sidebar-foreground); text-decoration: none; }
+.toc a:hover { color: var(--sidebar-primary); text-decoration: underline; }
+
+/* ---- Cards, stats, badges -------------------------------------------------- */
+.card {
+  background: var(--card); color: var(--card-foreground);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.25rem; box-shadow: 0 1px 2px color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+.stat-label { color: var(--muted-foreground); font-size: 0.8rem; }
+.stat-value { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; }
+.stat-note { color: var(--muted-foreground); font-size: 0.75rem; }
+.badge {
+  display: inline-flex; align-items: center; height: 1.35rem; padding: 0 0.5rem;
+  border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+  background: var(--secondary); color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+}
+.badge-primary { background: var(--primary); color: var(--primary-foreground); border-color: transparent; }
+.badge-success { background: color-mix(in oklch, var(--chart-3) 18%, transparent); color: var(--foreground); border-color: color-mix(in oklch, var(--chart-3) 45%, transparent); }
+.badge-danger { background: color-mix(in oklch, var(--destructive) 15%, transparent); color: var(--destructive); border-color: color-mix(in oklch, var(--destructive) 40%, transparent); }
+.progress { height: 0.5rem; background: var(--muted); border-radius: 999px; overflow: hidden; margin-top: 0.5rem; }
+.progress > span { display: block; height: 100%; background: var(--chart-2); border-radius: inherit; }
+
+/* ---- Tables ---------------------------------------------------------------- */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); margin: 1rem 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+caption { text-align: left; padding: 0.6rem 0.9rem; color: var(--muted-foreground); font-size: 0.8rem; caption-side: bottom; border-top: 1px solid var(--border); }
+th, td { text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--muted); color: var(--muted-foreground); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.02em; }
+tbody tr:nth-child(even) { background: color-mix(in oklch, var(--muted) 50%, transparent); }
+tbody tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td code { white-space: nowrap; }
+td { min-width: 6rem; }
+td.num { min-width: 0; }
+
+/* ---- Lists ----------------------------------------------------------------- */
+.list { margin: 0.75rem 0; padding-left: 1.25rem; }
+.list li { margin: 0.3rem 0; }
+.list li::marker { color: var(--primary); }
+.checklist { list-style: none; padding-left: 0; }
+.checklist li { display: flex; gap: 0.5rem; align-items: baseline; }
+.checklist li::before { content: "✓"; color: var(--chart-3); font-weight: 700; }
+.steps { counter-reset: step; list-style: none; padding-left: 0; }
+.steps li { counter-increment: step; position: relative; padding-left: 2.25rem; margin: 0.75rem 0; }
+.steps li::before {
+  content: counter(step); position: absolute; left: 0; top: 0.05rem;
+  width: 1.5rem; height: 1.5rem; border-radius: 999px; display: grid; place-items: center;
+  background: var(--primary); color: var(--primary-foreground); font-size: 0.75rem; font-weight: 600;
+}
+
+/* ---- Callouts -------------------------------------------------------------- */
+.callout {
+  border: 1px solid var(--border); border-left: 3px solid var(--primary);
+  background: var(--card); border-radius: var(--radius); padding: 0.85rem 1rem; margin: 1rem 0;
+}
+.callout-title { font-weight: 600; margin: 0 0 0.25rem; }
+.callout-danger { border-left-color: var(--destructive); }
+
+/* ---- Figures, SVG, overlays ------------------------------------------------ */
+.figure {
+  position: relative; margin: 1rem 0;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem;
+}
+.figure svg { display: block; width: 100%; height: auto; }
+.figure figcaption { color: var(--muted-foreground); font-size: 0.8rem; margin-top: 0.5rem; }
+/* SVG classes: every fill and stroke is a token, so diagrams switch with the theme. */
+.svg-node    { fill: var(--card); stroke: var(--border); stroke-width: 1.25; }
+.svg-node-primary { fill: var(--primary); stroke: var(--primary); }
+.svg-node-muted { fill: var(--muted); stroke: var(--border); stroke-width: 1.25; }
+.svg-zone    { fill: color-mix(in oklch, var(--muted) 45%, transparent); stroke: var(--ring); stroke-width: 1.25; stroke-dasharray: 6 5; }
+.svg-edge    { fill: none; stroke: var(--muted-foreground); stroke-width: 1.5; }
+.svg-edge-dash { fill: none; stroke: var(--muted-foreground); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.svg-edge-primary { fill: none; stroke: var(--primary); stroke-width: 1.75; }
+.svg-text    { fill: var(--foreground); font: 600 13px ui-sans-serif, system-ui, sans-serif; }
+.svg-text-sm { fill: var(--muted-foreground); font: 11.5px ui-sans-serif, system-ui, sans-serif; }
+.svg-text-on-primary { fill: var(--primary-foreground); font: 600 13px ui-sans-serif, system-ui, sans-serif; }
+.svg-mono    { fill: var(--foreground); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.svg-mono-sm { fill: var(--muted-foreground); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.svg-er-head { fill: var(--secondary); stroke: var(--border); stroke-width: 1.25; }
+.svg-er-body { fill: var(--card); stroke: var(--border); stroke-width: 1.25; }
+.svg-badge-pk { fill: var(--primary); }
+.svg-badge-fk { fill: var(--chart-3); }
+.svg-badge-text { fill: var(--primary-foreground); font: 700 9px ui-sans-serif, system-ui, sans-serif; }
+.svg-arrow   { fill: var(--muted-foreground); }
+.svg-arrow-primary { fill: var(--primary); }
+.svg-pin     { fill: var(--primary); }
+.svg-pin-text { fill: var(--primary-foreground); font: 700 11px ui-sans-serif, system-ui, sans-serif; }
+/* Overlay: a <details> control reveals callouts over the diagram. It opens without
+   script, and the callouts are real text, readable by assistive technology.
+   .figure-canvas wraps exactly the SVG, so a note's --x / --y percentages are its
+   pin's position in the viewBox: --x = cx / width, --y = cy / height. data-side puts
+   the note right (default), left, below, or above the pin, with a caret pointing at
+   it. The <details> itself is not positioned, so the layer covers the whole canvas. */
+.figure-canvas { position: relative; }
+.overlay-toggle > summary {
+  position: absolute; top: 0.25rem; right: 0.25rem; z-index: 3;
+  list-style: none; cursor: pointer; font-size: 0.78rem; font-weight: 600;
+  padding: 0.25rem 0.6rem; border-radius: var(--radius);
+  background: var(--primary); color: var(--primary-foreground);
+}
+.overlay-toggle > summary::-webkit-details-marker { display: none; }
+.overlay-toggle[open] > summary { box-shadow: 0 0 0 2px var(--ring); }
+.overlay-layer {
+  position: absolute; inset: 0; z-index: 2; border-radius: var(--radius); cursor: pointer;
+  background: color-mix(in oklch, var(--background) 55%, transparent);
+}
+.overlay-note {
+  position: absolute; left: var(--x, 50%); top: var(--y, 50%); margin: 0;
+  width: max-content; max-width: min(var(--note-w, 15rem), 15rem); font-size: 0.8rem; line-height: 1.4;
+  background: var(--popover); color: var(--popover-foreground);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 0.5rem 0.65rem; box-shadow: 0 4px 12px color-mix(in oklch, var(--foreground) 12%, transparent);
+  transform: translate(1.1rem, -50%);
+}
+.overlay-note[data-side="left"]  { transform: translate(calc(-100% - 1.1rem), -50%); }
+.overlay-note[data-side="below"] { transform: translate(-50%, 1.1rem); }
+.overlay-note[data-side="above"] { transform: translate(-50%, calc(-100% - 1.1rem)); }
+.overlay-note::before {
+  content: ""; position: absolute; width: 0.6rem; height: 0.6rem;
+  background: var(--popover); border: 1px solid var(--border); transform: rotate(45deg);
+  left: -0.36rem; top: calc(50% - 0.3rem); border-top: 0; border-right: 0;
+}
+.overlay-note[data-side="left"]::before  { left: auto; right: -0.36rem; border: 1px solid var(--border); border-bottom: 0; border-left: 0; }
+.overlay-note[data-side="below"]::before { top: -0.36rem; left: calc(50% - 0.3rem); border: 1px solid var(--border); border-bottom: 0; border-right: 0; }
+.overlay-note[data-side="above"]::before { top: auto; bottom: -0.36rem; left: calc(50% - 0.3rem); border: 1px solid var(--border); border-top: 0; border-left: 0; }
+.overlay-note b { display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border-radius: 999px; background: var(--primary); color: var(--primary-foreground); font-size: 0.7rem; margin-right: 0.3rem; }
+
+/* ---- Legend, footer, print ------------------------------------------------- */
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.8rem; color: var(--muted-foreground); margin-top: 0.5rem; }
+.legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.swatch { width: 0.8rem; height: 0.8rem; border-radius: 3px; display: inline-block; border: 1px solid var(--border); }
+.footer { color: var(--muted-foreground); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 3rem; padding-top: 1rem; }
+.figure-canvas.overlay-stacked .overlay-layer { position: static; background: none; padding-top: 0.5rem; }
+.figure-canvas.overlay-stacked .overlay-note,
+.figure-canvas.overlay-stacked .overlay-note[data-side] { position: static; transform: none; width: auto; max-width: none; margin: 0.5rem 0; }
+.figure-canvas.overlay-stacked .overlay-note::before { display: none; }
+@media (max-width: 40rem) {
+  .hero h1 { font-size: 1.6rem; }
+  /* Too narrow to float notes beside pins: list them under the diagram instead. */
+  .overlay-layer { position: static; background: none; backdrop-filter: none; padding-top: 0.5rem; }
+  .overlay-note, .overlay-note[data-side] { position: static; transform: none; width: auto; max-width: none; margin: 0.5rem 0; }
+  .overlay-note::before, .overlay-note[data-side]::before { display: none; }
+}
+@media print { .header, .overlay-toggle { display: none; } .figure, .card { break-inside: avoid; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+<!--> <link rel="stylesheet" href="https://cdn.example.com/x.css"> -->
+</head>
+<body>
+
+<header class="header">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">CH</span><span>sample</span></div>
+  <button id="theme-toggle" class="toggle" type="button" aria-label="Toggle light and dark theme">
+    <span class="icon-moon" aria-hidden="true">☾</span><span class="icon-sun" aria-hidden="true">☀</span>
+    <span>Theme</span>
+  </button>
+</header>
+
+<main class="main">
+
+  <div class="hero">
+    <h1>sample</h1>
+    <p class="lead">sample</p>
+    <p class="meta">Generated sample from sample · see <a href="#sources">Sources</a></p>
+  </div>
+
+  <nav class="toc" aria-labelledby="toc-title">
+    <p class="toc-title" id="toc-title">On this page</p>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#table">Table</a></li>
+      <li><a href="#lists">Lists</a></li>
+      <li><a href="#flow">Diagram with overlay</a></li>
+      <li><a href="#data-model">Entity-relationship diagram</a></li>
+      <li><a href="#infrastructure">Infrastructure diagram</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== Component: stats ===== -->
+  <section id="overview" data-component="stats">
+    <h2>Overview</h2>
+    <p class="section-lead">Headline figures. Every number cites the command it came from in Sources.</p>
+    <div class="stats">
+      <div class="card"><div class="stat-label">sample</div><div class="stat-value">sample</div><div class="stat-note">sample</div></div>
+      <div class="card"><div class="stat-label">sample</div><div class="stat-value">sample</div><div class="progress" role="progressbar" aria-valuenow="sample" aria-valuemin="0" aria-valuemax="100" aria-label="sample"><span style="width: sample%"></span></div></div>
+    </div>
+  </section>
+
+  <!-- ===== Component: table ===== -->
+  <section id="table" data-component="table">
+    <h2>Table</h2>
+    <div class="table-wrap">
+      <table>
+        <caption>sample</caption>
+        <thead><tr><th scope="col">Item</th><th scope="col">Status</th><th scope="col" class="num">Count</th></tr></thead>
+        <tbody>
+          <tr><td>sample</td><td><span class="badge badge-success">DONE</span></td><td class="num">sample</td></tr>
+          <tr><td>sample</td><td><span class="badge">READY</span></td><td class="num">sample</td></tr>
+          <tr><td>sample</td><td><span class="badge badge-danger">BLOCKED</span></td><td class="num">sample</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== Component: lists ===== -->
+  <section id="lists" data-component="list">
+    <h2>Lists</h2>
+    <ul class="list"><li>sample</li><li>sample</li></ul>
+    <ul class="list checklist"><li>sample</li><li>sample</li></ul>
+    <ol class="steps"><li>sample</li><li>sample</li><li>sample</li></ol>
+    <div class="callout"><p class="callout-title">sample</p><p>sample</p></div>
+  </section>
+
+  <!-- ===== Component: SVG diagram with an overlay ===== -->
+  <section id="flow" data-component="svg-overlay">
+    <h2>Diagram with overlay</h2>
+    <figure class="figure">
+      <div class="figure-canvas">
+      <svg viewBox="0 0 720 180" role="img" aria-labelledby="flow-title flow-desc">
+        <title id="flow-title">sample</title>
+        <desc id="flow-desc">sample</desc>
+        <defs>
+          <marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="svg-arrow"/></marker>
+        </defs>
+        <rect x="20"  y="60" width="150" height="60" rx="10" class="svg-node"/>
+        <text x="95"  y="95" text-anchor="middle" class="svg-text">sample</text>
+        <rect x="285" y="60" width="150" height="60" rx="10" class="svg-node-primary"/>
+        <text x="360" y="95" text-anchor="middle" class="svg-text-on-primary">sample</text>
+        <rect x="550" y="60" width="150" height="60" rx="10" class="svg-node"/>
+        <text x="625" y="95" text-anchor="middle" class="svg-text">sample</text>
+        <path d="M170,90 L283,90" class="svg-edge" marker-end="url(#flow-arrow)"/>
+        <path d="M435,90 L548,90" class="svg-edge" marker-end="url(#flow-arrow)"/>
+        <circle cx="95" cy="48" r="11" class="svg-pin"/><text x="95" y="52" text-anchor="middle" class="svg-pin-text">1</text>
+        <circle cx="360" cy="48" r="11" class="svg-pin"/><text x="360" y="52" text-anchor="middle" class="svg-pin-text">2</text>
+      </svg>
+      <!-- Each note sits beside its pin: --x = cx / 720, --y = cy / 180 (the viewBox). -->
+      <details class="overlay-toggle">
+        <summary>Explain</summary>
+        <div class="overlay-layer">
+          <p class="overlay-note" data-side="right" style="--x: 13.19%; --y: 26.67%"><b>1</b>sample</p>
+          <p class="overlay-note" data-side="right" style="--x: 50%; --y: 26.67%"><b>2</b>sample</p>
+        </div>
+      </details>
+      </div>
+      <figcaption>sample Select <em>Explain</em> to show the numbered notes; click anywhere else to close them.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ===== Component: SVG entity-relationship diagram ===== -->
+  <section id="data-model" data-component="svg-er">
+    <h2>Entity-relationship diagram</h2>
+    <figure class="figure">
+      <svg viewBox="0 0 720 230" role="img" aria-labelledby="er-title er-desc">
+        <title id="er-title">sample</title>
+        <desc id="er-desc">sample</desc>
+        <!-- Entity: one <g> per table. Header row, then one row per column. -->
+        <g>
+          <rect x="30" y="30" width="220" height="30" rx="8" class="svg-er-head"/>
+          <text x="45" y="50" class="svg-text">sample</text>
+          <rect x="30" y="60" width="220" height="90" class="svg-er-body"/>
+          <rect x="42" y="72" width="22" height="14" rx="3" class="svg-badge-pk"/><text x="53" y="82" text-anchor="middle" class="svg-badge-text">PK</text>
+          <text x="72" y="83" class="svg-mono">id</text><text x="238" y="83" text-anchor="end" class="svg-mono-sm">uuid</text>
+          <text x="72" y="111" class="svg-mono">sample</text><text x="238" y="111" text-anchor="end" class="svg-mono-sm">sample</text>
+          <text x="72" y="139" class="svg-mono">sample</text><text x="238" y="139" text-anchor="end" class="svg-mono-sm">sample</text>
+        </g>
+        <g>
+          <rect x="470" y="30" width="220" height="30" rx="8" class="svg-er-head"/>
+          <text x="485" y="50" class="svg-text">sample</text>
+          <rect x="470" y="60" width="220" height="90" class="svg-er-body"/>
+          <rect x="482" y="72" width="22" height="14" rx="3" class="svg-badge-pk"/><text x="493" y="82" text-anchor="middle" class="svg-badge-text">PK</text>
+          <text x="512" y="83" class="svg-mono">id</text><text x="678" y="83" text-anchor="end" class="svg-mono-sm">uuid</text>
+          <rect x="482" y="100" width="22" height="14" rx="3" class="svg-badge-fk"/><text x="493" y="110" text-anchor="middle" class="svg-badge-text">FK</text>
+          <text x="512" y="111" class="svg-mono">sample_id</text><text x="678" y="111" text-anchor="end" class="svg-mono-sm">uuid</text>
+          <text x="512" y="139" class="svg-mono">sample</text><text x="678" y="139" text-anchor="end" class="svg-mono-sm">sample</text>
+        </g>
+        <!-- Relationship: one (bar) to many (crow's foot). -->
+        <path d="M250,107 L470,107" class="svg-edge"/>
+        <path d="M262,99 L262,115" class="svg-edge"/>
+        <path d="M456,107 L470,99 M456,107 L470,115 M456,107 L470,107" class="svg-edge"/>
+        <text x="360" y="98" text-anchor="middle" class="svg-text-sm">1 — N</text>
+        <text x="360" y="200" text-anchor="middle" class="svg-text-sm">sample</text>
+      </svg>
+      <figcaption>sample <span class="badge badge-primary">PK</span> primary key · <span class="badge badge-success">FK</span> foreign key</figcaption>
+    </figure>
+  </section>
+
+  <!-- ===== Component: SVG infrastructure diagram ===== -->
+  <section id="infrastructure" data-component="svg-infra">
+    <h2>Infrastructure diagram</h2>
+    <figure class="figure">
+      <svg viewBox="0 0 720 260" role="img" aria-labelledby="infra-title infra-desc">
+        <title id="infra-title">sample</title>
+        <desc id="infra-desc">sample</desc>
+        <defs>
+          <marker id="infra-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="svg-arrow"/></marker>
+        </defs>
+        <!-- Trust boundary: a dashed zone with a label. -->
+        <rect x="200" y="20" width="500" height="220" rx="14" class="svg-zone"/>
+        <text x="216" y="42" class="svg-text-sm">sample</text>
+        <!-- Nodes: a type label above the name. -->
+        <rect x="20" y="100" width="140" height="60" rx="10" class="svg-node"/>
+        <text x="90" y="124" text-anchor="middle" class="svg-text-sm">client</text>
+        <text x="90" y="144" text-anchor="middle" class="svg-text">sample</text>
+        <rect x="250" y="100" width="160" height="60" rx="10" class="svg-node-primary"/>
+        <text x="330" y="124" text-anchor="middle" class="svg-text-on-primary">service</text>
+        <text x="330" y="144" text-anchor="middle" class="svg-text-on-primary">sample</text>
+        <rect x="520" y="60" width="160" height="56" rx="10" class="svg-node-muted"/>
+        <text x="600" y="83" text-anchor="middle" class="svg-text-sm">store</text>
+        <text x="600" y="102" text-anchor="middle" class="svg-text">sample</text>
+        <rect x="520" y="150" width="160" height="56" rx="10" class="svg-node-muted"/>
+        <text x="600" y="173" text-anchor="middle" class="svg-text-sm">queue</text>
+        <text x="600" y="192" text-anchor="middle" class="svg-text">sample</text>
+        <!-- Edges: directed, labelled with the protocol. -->
+        <path d="M160,130 L248,130" class="svg-edge" marker-end="url(#infra-arrow)"/>
+        <text x="204" y="122" text-anchor="middle" class="svg-text-sm">HTTPS</text>
+        <path d="M410,120 L518,90" class="svg-edge" marker-end="url(#infra-arrow)"/>
+        <text x="462" y="96" text-anchor="middle" class="svg-text-sm">SQL</text>
+        <path d="M410,140 L518,176" class="svg-edge-dash" marker-end="url(#infra-arrow)"/>
+        <text x="462" y="172" text-anchor="middle" class="svg-text-sm">async</text>
+      </svg>
+      <figcaption>sample</figcaption>
+      <div class="legend">
+        <span><i class="swatch" style="background: var(--primary)"></i>entry service</span>
+        <span><i class="swatch" style="background: var(--muted)"></i>managed resource</span>
+        <span><svg width="26" height="8" aria-hidden="true"><path d="M0,4 L26,4" class="svg-edge-dash"/></svg>asynchronous</span>
+      </div>
+    </figure>
+  </section>
+
+  <!-- ===== Required when the page reports repository status ===== -->
+  <section id="sources" data-component="sources">
+    <h2>Sources</h2>
+    <p class="section-lead">The files and commands every figure on this page came from.</p>
+    <ul class="list">
+      <li><code>sample</code> — sample</li>
+      <li><code>sample</code> — sample</li>
+    </ul>
+  </section>
+
+  <footer class="footer">Generated by the harness <code>/generate-html-page</code> skill · shadcn Luma theme</footer>
+</main>
+
+<script>
+  /* Theme toggle: flip the "dark" class and remember the choice. */
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var dark = document.documentElement.classList.toggle("dark");
+    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
+  });
+  /* With no stored choice, follow the system preference as it changes. */
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+    var stored = null;
+    try { stored = localStorage.getItem("theme"); } catch (err) {}
+    if (!stored) document.documentElement.classList.toggle("dark", e.matches);
+  });
+  /* Overlays: a click anywhere but an open overlay's own "Explain" control closes it,
+     and so does Escape. The control itself still toggles natively. */
+  function closeOverlays(except) {
+    var open = document.querySelectorAll("details.overlay-toggle[open]");
+    for (var i = 0; i < open.length; i++) {
+      if (!except || !open[i].querySelector("summary").contains(except)) open[i].removeAttribute("open");
+    }
+  }
+  document.addEventListener("click", function (e) { closeOverlays(e.target); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeOverlays(null); });
+  /* Layout: each note keeps its authored side (data-side) when that fits. Otherwise it
+     takes the first other side that stays inside the diagram without overlapping a note
+     already placed or covering another pin. Notes stay anchored to their own pin. */
+  function layoutNotes(details) {
+    var canvas = details.parentNode, notes = details.querySelectorAll(".overlay-note");
+    canvas.classList.remove("overlay-stacked");
+    if (!details.open || !notes.length || getComputedStyle(notes[0]).position !== "absolute") return;
+    var misfit = false;
+    var box = canvas.getBoundingClientRect(), placed = [];
+    var pins = [].map.call(canvas.querySelectorAll(".svg-pin"), function (c) { return c.getBoundingClientRect(); });
+    function hits(a, b) { return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom; }
+    function fits(r, self) {
+      if (r.left < box.left || r.right > box.right || r.top < box.top || r.bottom > box.bottom) return false;
+      for (var i = 0; i < placed.length; i++) if (hits(r, placed[i])) return false;
+      for (var k = 0; k < pins.length; k++) if (k !== self && hits(r, pins[k])) return false;
+      return true;
+    }
+    /* Try each side at the authored width, then narrower: a narrow note is taller but
+       usually fits beside its pin without touching its neighbours. */
+    var widths = ["", "12rem", "10rem", "8.5rem"];
+    for (var i = 0; i < notes.length; i++) {
+      var n = notes[i];
+      if (!n.hasAttribute("data-authored-side")) {
+        n.setAttribute("data-authored-side", n.getAttribute("data-side") || "right");
+        n.setAttribute("data-authored-w", n.style.getPropertyValue("--note-w").trim() || "15rem");
+      }
+      var first = n.getAttribute("data-authored-side"), sides = [first, "right", "left", "below", "above"], chosen = null;
+      for (var w = 0; w < widths.length && !chosen; w++) {
+        n.style.setProperty("--note-w", widths[w] || n.getAttribute("data-authored-w"));
+        for (var s = 0; s < sides.length; s++) {
+          n.setAttribute("data-side", sides[s]);
+          if (fits(n.getBoundingClientRect(), i)) { chosen = sides[s]; break; }
+        }
+      }
+      if (!chosen) { misfit = true; chosen = first; n.style.setProperty("--note-w", n.getAttribute("data-authored-w")); }
+      n.setAttribute("data-side", chosen);
+      placed.push(n.getBoundingClientRect());
+    }
+    /* Too crowded at this width to keep every note beside its pin without overlap:
+       list the numbered notes under the diagram instead. */
+    if (misfit) canvas.classList.add("overlay-stacked");
+  }
+  var overlays = document.querySelectorAll("details.overlay-toggle");
+  for (var o = 0; o < overlays.length; o++) {
+    overlays[o].addEventListener("toggle", function (e) { layoutNotes(e.currentTarget); });
+  }
+  window.addEventListener("resize", function () {
+    for (var o = 0; o < overlays.length; o++) layoutNotes(overlays[o]);
+  });
+</script>
+</body>
+</html>

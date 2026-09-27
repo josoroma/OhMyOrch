@@ -1,0 +1,25 @@
+# harness-reset scope manifest
+#
+# Columns: mode<TAB>path<TAB>note
+#
+#   backup   captured into docs/resets/<timestamp>/ and NOT written back
+#   reset    captured, then replaced by the canonical baseline
+#   preserve a host-provided path that the canonical baseline does not define;
+#            restored from the backup after the reset so a configured hook keeps
+#            working
+#
+# The live `.claude/` directory is deliberately absent from this file. It defines
+# the canonical state, so it is never a reset target; it is read, hashed, and
+# reported, and not written.
+#
+# Paths are relative to the repository root. A nested `CLAUDE.md` anywhere outside
+# `.claude/` is matched by name rather than by path, because a host may keep one
+# per package or service.
+backup	.claude	agents, skills, hooks, commands, rules, settings, configuration
+reset	CLAUDE.md	project contract (nested copies are matched by name)
+reset	SPEC-LOGS	per-epic delivery records
+reset	openspec	change lifecycle, canonical specs, delivery goal
+reset	scripts	the executable harness (see PRESERVE.tsv for host files)
+reset	PRD.md	product intent
+reset	SPECS.md	iterable backlog
+reset	README.md	operational handbook

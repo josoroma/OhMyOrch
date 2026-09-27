@@ -1,0 +1,12 @@
+# harness-reset preserve list
+#
+# One repository-relative path per line. A listed path is captured in the backup,
+# survives the reset, and is restored from the backup afterwards, so a host's own
+# commands are not silently deleted by a reset to the canonical baseline.
+#
+# Rationale for the default entry: README, "Add the Harness Files", designates
+# `scripts/fast-validate.sh` as the project's own definition of fast validation,
+# and `scripts/run-project-validation.sh` calls it. The canonical baseline ships
+# no such file, because the harness is stack-neutral and cannot know how an
+# arbitrary host project builds or tests itself.
+scripts/fast-validate.sh
