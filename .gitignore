@@ -1,0 +1,82 @@
+# --- Claude Code local state ---
+# Local, machine-specific overrides. Never commit: may contain API keys/tokens.
+.claude/settings.local.json
+.claude/settings.local.json.bak
+.claude/*.local.json
+.claude/.credentials.json
+
+# Claude Code transient/runtime state
+.claude/todos/
+.claude/projects/
+.claude/shell-snapshots/
+.claude/statsig/
+.claude/debug/
+.claude/logs/
+.claude/.cache/
+
+# --- Harness runtime state ---
+# Per-machine goal-loop counters written by the delivery Stop hook (US-12.2).
+# openspec/delivery/goal.md IS tracked: it is the durable goal record.
+openspec/delivery/loop.state
+
+# --- Secrets & environment ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+
+# --- macOS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# --- Editors / IDEs ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.npm/
+dist/
+build/
+coverage/
+.nyc_output/
+*.tsbuildinfo
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Logs & temp ---
+*.log
+logs/
+tmp/
+temp/
+.cache/

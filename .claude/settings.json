@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(openspec list:*)",
+      "Bash(openspec status:*)",
+      "Bash(openspec view:*)",
+      "Bash(openspec show:*)",
+      "Bash(openspec validate:*)",
+      "Bash(openspec doctor:*)",
+      "Bash(openspec config list:*)",
+      "Bash(openspec config get:*)",
+      "Bash(bash scripts/validate-product-artifacts.sh:*)",
+      "Bash(scripts/validate-product-artifacts.sh:*)",
+      "Bash(bash scripts/workflow-status.sh:*)",
+      "Bash(scripts/workflow-status.sh:*)",
+      "Bash(bash scripts/validate-implementation-plan.sh:*)",
+      "Bash(scripts/validate-implementation-plan.sh:*)",
+      "Bash(bash scripts/check-write-scope.sh:*)",
+      "Bash(scripts/check-write-scope.sh:*)",
+      "Bash(bash scripts/check-scope.sh:*)",
+      "Bash(scripts/check-scope.sh:*)",
+      "Bash(bash scripts/test-write-scope.sh:*)",
+      "Bash(scripts/test-write-scope.sh:*)",
+      "Bash(bash scripts/test-guards.sh:*)",
+      "Bash(scripts/test-guards.sh:*)",
+      "Bash(bash scripts/status.sh:*)",
+      "Bash(scripts/status.sh:*)",
+      "Bash(bash scripts/validate-status.sh:*)",
+      "Bash(scripts/validate-status.sh:*)",
+      "Bash(bash scripts/test-status.sh:*)",
+      "Bash(scripts/test-status.sh:*)",
+      "Bash(bash scripts/completion-gate.sh:*)",
+      "Bash(scripts/completion-gate.sh:*)",
+      "Bash(bash scripts/validate-verification.sh:*)",
+      "Bash(scripts/validate-verification.sh:*)",
+      "Bash(bash scripts/test-completion.sh:*)",
+      "Bash(scripts/test-completion.sh:*)",
+      "Bash(bash scripts/validate-review.sh:*)",
+      "Bash(scripts/validate-review.sh:*)",
+      "Bash(bash scripts/validate-test-report.sh:*)",
+      "Bash(scripts/validate-test-report.sh:*)",
+      "Bash(bash scripts/guard-planning-handoff.sh:*)",
+      "Bash(scripts/guard-planning-handoff.sh:*)",
+      "Bash(bash scripts/guard-context-preflight.sh:*)",
+      "Bash(scripts/guard-context-preflight.sh:*)",
+      "Bash(bash scripts/guard-archive.sh:*)",
+      "Bash(scripts/guard-archive.sh:*)",
+      "Bash(bash scripts/guard-story-done.sh:*)",
+      "Bash(scripts/guard-story-done.sh:*)",
+      "Bash(bash scripts/run-project-validation.sh:*)",
+      "Bash(scripts/run-project-validation.sh:*)",
+      "Bash(bash scripts/delivery.sh:*)",
+      "Bash(scripts/delivery.sh:*)",
+      "Bash(bash scripts/test-delivery.sh:*)",
+      "Bash(scripts/test-delivery.sh:*)",
+      "Bash(bash scripts/guard-delivery-loop.sh:*)",
+      "Bash(scripts/guard-delivery-loop.sh:*)",
+      "Bash(bash scripts/validate-html-page.sh:*)",
+      "Bash(scripts/validate-html-page.sh:*)",
+      "Bash(bash scripts/test-html-page.sh:*)",
+      "Bash(scripts/test-html-page.sh:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.claude/settings.local.json)",
+      "Read(./secrets/**)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Bash(rm -rf /*)",
+      "Bash(git push --force:*)"
+    ],
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/validate-product-artifacts.sh\" && exec \"$d/scripts/validate-product-artifacts.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Validating product artifacts"
+          },
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/run-project-validation.sh\" && exec \"$d/scripts/run-project-validation.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Running project fast validation"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-planning-handoff.sh\" && exec \"$d/scripts/guard-planning-handoff.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Checking planning handoff"
+          },
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-context-preflight.sh\" && exec \"$d/scripts/guard-context-preflight.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Checking CODEBASE context"
+          },
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-story-done.sh\" && exec \"$d/scripts/guard-story-done.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Checking the DONE transition"
+          },
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-delivery-loop.sh\" && exec \"$d/scripts/guard-delivery-loop.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Checking delivery-loop verdict ownership"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-archive.sh\" && exec \"$d/scripts/guard-archive.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Checking archive eligibility"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-delivery-loop.sh\" && exec \"$d/scripts/guard-delivery-loop.sh\" --hook --quiet; exit 0'",
+            "statusMessage": "Checking the delivery goal"
+          }
+        ]
+      }
+    ]
+  },
+  "respectGitignore": true,
+  "includeGitInstructions": true,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "env": {
+    "OPENSPEC_TELEMETRY": "0"
+  }
+}

@@ -1,0 +1,54 @@
+schema: spec-driven
+
+# Project context — shown to the AI when creating artifacts.
+context: |
+  This repository is the OhMyOrch Harness: a reusable, spec-driven multi-agent
+  delivery workflow for Claude Code plus OpenSpec. It is a documentation- and
+  configuration-first project — there is no application runtime, package
+  manifest, or test suite. The primary deliverables are Markdown contracts
+  (CLAUDE.md, PRD.md, SPECS.md, README.md, CODEBASE.md) and agent, skill, and
+  rule definitions under .claude/.
+
+  Product intent lives in PRD.md. The iterable backlog lives in SPECS.md.
+  CODEBASE.md is a descriptive current-state map of an analyzed repository and
+  is never a source of product intent.
+
+  Delivery model: one bounded OpenSpec change per independently verifiable
+  READY user story. Do not collapse a multi-epic backlog into a single change.
+
+  Required per-change artifacts beyond the OpenSpec defaults:
+    implementation-plan.md  (Planner handoff)
+    review.md               (Reviewer findings)
+    test-report.md          (Tester acceptance evidence)
+    status.md               (durable resumption state)
+
+  Roles are separated and MUST NOT collapse: the Implementer may not approve
+  its own work, the Reviewer may not silently repair reviewed product code, and
+  the Tester may not repair failing behavior. When product behavior is missing,
+  ambiguous, or contradictory, mark the story NEEDS CLARIFICATION or BLOCKED
+  rather than inventing requirements.
+
+# Per-artifact rules.
+rules:
+  proposal:
+    - Identify exactly one selected story or cohesive feature by its SPECS.md identifier.
+    - State explicitly what is out of scope for the change.
+    - Keep the change small enough to implement, review, and test as one bounded unit.
+  tasks:
+    - Map each task to at least one acceptance criterion from the selected story.
+    - Keep tasks independently completable and verifiable.
+  design:
+    - Include a design artifact only when the change alters architecture, data, or an external contract.
+    - Record rejected alternatives when a non-obvious decision is made.
+
+# Per-operation guidance.
+operations:
+  apply:
+    guidance:
+      - Implement only work required by the active change; record unrelated findings as follow-up.
+      - Run the relevant project validation before declaring implementation complete.
+      - Update a task checkbox only when that task is actually complete.
+  archive:
+    guidance:
+      - "Confirm every gate before archiving: tasks complete, no blocking review findings, acceptance criteria passing, and OpenSpec verification free of blocking mismatch."
+      - "Reject archival when any gate fails, and report which gate blocked it."
