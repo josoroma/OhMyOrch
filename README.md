@@ -1,5 +1,7 @@
 # OhMyOrch Harness
 
+![OhMyOrch](docs/images/OhMyOrch.png)
+
 A reusable, spec-driven multi-agent workflow for Claude Code and OpenSpec.
 
 The harness supports greenfield and brownfield repositories. For an existing codebase it first creates a durable `CODEBASE.md` describing the current system, then uses product source material plus that context to generate or update `PRD.md` and an iterable `SPECS.md`. It delivers one bounded feature at a time through separate planning, implementation, review, testing, and archival stages.
@@ -38,7 +40,8 @@ The harness supports greenfield and brownfield repositories. For an existing cod
 - [24. Example End-to-End Session](#24-example-end-to-end-session)
 - [25. What OpenSpec Provides vs What This Harness Adds](#25-what-openspec-provides-vs-what-this-harness-adds)
 - [26. The Executable Harness](#26-the-executable-harness)
-- [27. References](#27-references)
+- [27. The Canonical Reset](#27-the-canonical-reset)
+- [28. References](#28-references)
 
 ## Why this exists
 
@@ -1682,7 +1685,49 @@ file, symlink, and directory outside the scope — **all** of `.claude/` include
 is unchanged. The engine
 `.claude/skills/harness-reset/harness-reset.sh` lives under `.claude/`, not under
 `scripts/`, because the reset replaces `scripts/` wholesale and bash reads a script
-file incrementally; `scripts/harness-reset.sh` is a launcher that delegates to it.
+file incrementally; `scripts/harness-reset.sh` is a launc.
+
+## 27. The Canonical Reset
+
+`/harness-reset` is the way back to a blank project. It does not reinstall the
+harness and it does not touch `.claude/`. It copies the canonical baseline in
+`.claude/skills/harness-reset/canonical/` over the scoped project artifacts, after
+a verified backup.
+
+```bash
+scripts/harness-reset.sh --dry-run
+scripts/harness-reset.sh
+```
+
+Run the dry run first. It writes nothing and names the repository root, the scope
+entries that would change, and the backup path. The real run refuses to start
+unless that backup verifies.
+
+| Kept | Reset to the canonical empty harness |
+|---|---|
+| `.claude/` (never written) | `CLAUDE.md`, including nested copies outside `.claude/` |
+| `docs/pages/`, `docs/images/`, application source, anything not in the manifest | `SPEC-LOGS/`, `openspec/`, `scripts/` |
+| host files listed in `PRESERVE.tsv` (`scripts/fast-validate.sh`) | `PRD.md`, `SPECS.md`, `README.md` |
+
+The backup lands in `docs/resets/<yyyy-mm-dd-hh-mm-ss>/`. That directory is
+gitignored because a backup of `.claude/` includes `.claude/settings.local.json`.
+Do not commit it. Restore with:
+
+```bash
+cd <root> && cp -RP docs/resets/<timestamp>/. .
+```
+
+A reset project validates and its backlog is empty. `scripts/test-guards.sh`
+expects the harness's own delivered `SPECS.md`, so those navigation cases fail on
+the empty backlog. That is the canonical state, not a defect the reset introduced.
+
+Resume from the workflow, not from the wiped artifacts:
+
+```text
+/analyze-codebase   when the repository has source to describe
+/generate-prd
+/ingest-spec
+```egates to it.
 `scripts/test-harness-reset.sh` protects all of the above (94 cases).
 
 ### Troubleshooting
@@ -1701,7 +1746,7 @@ file incrementally; `scripts/harness-reset.sh` is a launcher that delegates to i
 | goal recorded `BLOCKED` | escalation or no progress; the reason is in `goal.md` | resolve the reason, then `/deliver <same target>` |
 | main-session write to `review.md` blocked | an ACTIVE goal; the orchestrator never authors verdicts | delegate to the `reviewer` / `tester` subagent |
 
-## 27. References
+## 28. References
 
 - OpenSpec: https://openspec.dev/
 - OpenSpec Quickstart: https://openspec.dev/docs/quickstart

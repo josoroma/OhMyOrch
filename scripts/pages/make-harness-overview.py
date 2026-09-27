@@ -8,7 +8,7 @@ Every figure and inventory table is recomputed from the repository on each run.
 Usage: python3 scripts/pages/make-harness-overview.py
        scripts/validate-html-page.sh --page docs/pages/harness-overview.html
 """
-import os, re, subprocess
+import base64, os, re, subprocess
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 tpl = open(os.path.join(ROOT, "scripts/templates/html-page.html")).read()
@@ -37,6 +37,8 @@ agents = int(sh("ls .claude/agents/*.md | grep -vc README"))
 skills = int(sh("ls .claude/skills | wc -l"))
 rules = int(sh("ls .claude/rules/*.md | grep -vc README"))
 date = sh("date +%Y-%m-%d")
+with open(os.path.join(ROOT, "docs/images/OhMyOrch.png"), "rb") as fh:
+    logo = "data:image/png;base64," + base64.b64encode(fh.read()).decode("ascii")
 pct = round(100 * done / stories)
 
 epic_rows = []
@@ -50,7 +52,7 @@ for e in range(1, epics + 1):
     epic_rows.append(f'          <tr><td>EPIC-{e}</td><td>{t}</td><td class="num">{d} / {n}</td><td>{badge}</td></tr>')
 
 suites = []
-for s in ["write-scope", "guards", "status", "completion", "delivery", "html-page"]:
+for s in ["write-scope", "guards", "status", "completion", "delivery", "html-page", "harness-reset"]:
     if not os.path.exists(os.path.join(ROOT, f"scripts/test-{s}.sh")):
         continue
     out = sh(f"scripts/test-{s}.sh 2>&1 | sed -n 's/^  passed: //p;s/^  failed: /F/p'")
@@ -108,6 +110,7 @@ SKILLS = [
     ("review-feature", "independent review of one change"),
     ("test-feature", "independent acceptance of one change"),
     ("generate-html-page", "a themed, self-contained explainer or status page"),
+    ("harness-reset", "back up, then restore the canonical empty harness"),
 ]
 ORDER = ["codebase-analyst", "product-specifier", "spec-ingestor", "product-manager",
          "planner", "implementer", "reviewer", "tester"]
@@ -348,6 +351,39 @@ S_HARNESS = f'''
   </section>
 '''
 
+S_RESET = '''
+  <section id="reset" data-component="table">
+    <h2>The canonical reset</h2>
+    <p class="section-lead"><code>/harness-reset</code> returns a repository to a blank harness. It backs the scoped artifacts up, verifies that backup, then copies the canonical baseline over them. <code>.claude/</code> is never written: it is the definition of the state being restored.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Scope from .claude/skills/harness-reset/manifest.tsv. Application source, docs/pages/, and docs/images/ are outside it.</caption>
+        <thead><tr><th scope="col">Path</th><th scope="col">Backed up</th><th scope="col">Reset</th></tr></thead>
+        <tbody>
+          <tr><td><code>.claude/</code></td><td>yes</td><td><span class="badge badge-success">never</span></td></tr>
+          <tr><td><code>CLAUDE.md</code>, including nested copies outside <code>.claude/</code></td><td>yes</td><td>yes</td></tr>
+          <tr><td><code>SPEC-LOGS/</code>, <code>openspec/</code>, <code>scripts/</code></td><td>yes</td><td>yes</td></tr>
+          <tr><td><code>PRD.md</code>, <code>SPECS.md</code>, <code>README.md</code></td><td>yes</td><td>yes</td></tr>
+          <tr><td>anything else, including application source</td><td>no</td><td><span class="badge badge-success">never</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>How to run it</h3>
+    <pre><code>scripts/harness-reset.sh --dry-run   # writes nothing; names the root and the backup path
+scripts/harness-reset.sh             # back up, verify, then reset</code></pre>
+    <ul class="list">
+      <li><strong>Backup first, or nothing changes.</strong> The backup is <code>docs/resets/<yyyy-mm-dd-hh-mm-ss>/</code>. It is verified by SHA-256 manifest before the reset starts. Any backup failure aborts with the tree unchanged.</li>
+      <li><strong>An existing backup is not overwritten.</strong> The directory is created with <code>mkdir</code>, not <code>-p</code>, so a collision fails the run.</li>
+      <li><strong>Host files survive.</strong> <code>PRESERVE.tsv</code> lists them. <code>scripts/fast-validate.sh</code> is the default, and it is restored from the backup after <code>scripts/</code> is replaced.</li>
+      <li><strong>The engine lives under <code>.claude/</code>.</strong> <code>.claude/skills/harness-reset/harness-reset.sh</code> is what runs. <code>scripts/harness-reset.sh</code> only launches it, because the reset replaces <code>scripts/</code> while bash is still reading the script.</li>
+      <li><strong>A reset project is empty, not broken.</strong> It validates. <code>scripts/test-guards.sh</code> expects this repository's delivered backlog, so those navigation cases fail on the virgin <code>SPECS.md</code>. That is the canonical state.</li>
+      <li><strong>Do not commit the backup.</strong> It is a byte copy of <code>.claude/</code>, so it contains <code>.claude/settings.local.json</code>. <code>docs/resets/</code> is gitignored for that reason.</li>
+    </ul>
+    <div class="callout"><p class="callout-title">Restore</p><p><code>cd <root> && cp -RP docs/resets/<timestamp>/. .</code></p></div>
+    <p class="section-lead">After a reset, resume from the workflow: <code>/analyze-codebase</code> when there is source to describe, then <code>/generate-prd</code>, then <code>/ingest-spec</code>.</p>
+  </section>
+'''
+
 S_SENIOR = '''
   <section id="senior" data-component="table">
     <h2>The delivery loop is a senior developer's tooling</h2>
@@ -522,7 +558,7 @@ Command: /review-feature us-12-2-run-delivery-goal-loop (includes /opsx:verify)<
 body = f'''<body>
 
 <header class="header">
-  <div class="brand"><span class="brand-mark" aria-hidden="true">CH</span><span>OhMyOrch Harness</span></div>
+  <div class="brand"><img class="brand-logo" src="{logo}" width="1448" height="1086" alt=""><span>OhMyOrch Harness</span></div>
   <button id="theme-toggle" class="toggle" type="button" aria-label="Toggle light and dark theme">
     <span class="icon-moon" aria-hidden="true">☾</span><span class="icon-sun" aria-hidden="true">☀</span>
     <span>Theme</span>
@@ -551,6 +587,7 @@ body = f'''<body>
       <li><a href="#example">Worked example: EPIC-12</a></li>
       <li><a href="#artifacts">Artifacts and handoffs</a></li>
       <li><a href="#enforcement">Hooks and guards</a></li>
+      <li><a href="#reset">The canonical reset</a></li>
       <li><a href="#backlog">Backlog status</a></li>
       <li><a href="#suites">Regression suites</a></li>
       <li><a href="#sources">Sources</a></li>
@@ -766,7 +803,7 @@ body = f'''<body>
       <li>Every hook wrapper fails open when the harness script is absent.</li>
     </ul>
   </section>
-
+{S_RESET}
   <section id="backlog" data-component="table">
     <h2>Backlog status</h2>
     <div class="table-wrap">
@@ -810,6 +847,8 @@ body = f'''<body>
       <li><code>README.md</code> §5–§8, <code>.claude/skills/{{analyze-codebase,generate-prd,ingest-spec}}/SKILL.md</code>, <code>scripts/guard-context-preflight.sh</code> — the entry workflows and their guard outcomes</li>
       <li><code>awk '/^---/{{n++;next}} n==1' .claude/agents/*.md</code> — each agent's tools and hook; <code>grep -o 'scripts/[a-z-]*' .claude/skills/*/SKILL.md</code> — each skill's scripts and delegates</li>
       <li><code>ls .claude/commands/opsx</code> — {n_cmds} commands; <code>ls scripts/guard-*.sh scripts/validate-*.sh scripts/test-*.sh</code> — guards, validators, suites</li>
+      <li><code>.claude/skills/harness-reset/SKILL.md</code>, <code>manifest.tsv</code>, <code>PRESERVE.tsv</code>, <code>README.md</code> §27 — the canonical reset</li>
+      <li><code>docs/images/OhMyOrch.png</code> — the header logo, embedded as a data URI because the page CSP allows only <code>img-src data:</code></li>
       <li><code>.claude/skills/deliver/SKILL.md</code> Step 2, <code>scripts/delivery.sh</code> (<code>set_action escalate</code>) — the loop steps, owners, and the seven escalation causes</li>
       <li><code>SPEC-LOGS/README-EPIC-12.md</code> — the EPIC-12 narrative, rounds, and known limits</li>
       <li><code>openspec/changes/archive/*us-12-*/</code> (<code>tasks.md</code>, <code>review.md</code>, <code>history/</code>, <code>test-report.md</code>, <code>completion.md</code>, <code>specs/</code>) — the EPIC-12 table and the US-12.2 walkthrough</li>

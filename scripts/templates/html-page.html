@@ -138,6 +138,10 @@ pre code { background: none; padding: 0; }
   background: var(--primary); color: var(--primary-foreground);
   display: grid; place-items: center; font-size: 0.8rem;
 }
+.brand-logo {
+  height: 1.75rem; width: auto; display: block;
+  border-radius: calc(var(--radius) - 4px);
+}
 .main { max-width: 64rem; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 .hero { padding: 1.5rem 0 1rem; }
 .hero h1 { font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
@@ -329,7 +333,7 @@ td.num { min-width: 0; }
 <body>
 
 <header class="header">
-  <div class="brand"><span class="brand-mark" aria-hidden="true">CH</span><span>{{PROJECT}}</span></div>
+  <div class="brand"><span class="brand-mark" aria-hidden="true">OH</span><span>{{PROJECT}}</span></div>
   <button id="theme-toggle" class="toggle" type="button" aria-label="Toggle light and dark theme">
     <span class="icon-moon" aria-hidden="true">☾</span><span class="icon-sun" aria-hidden="true">☀</span>
     <span>Theme</span>

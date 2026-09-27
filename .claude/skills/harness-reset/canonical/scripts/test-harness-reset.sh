@@ -354,8 +354,8 @@ check "the README says not to commit backups"  0 grep -q 'do not commit a backup
 # ---------------------------------------------------------------------------
 
 printf '\n%s\n' "----------------------------------------"
-printf 'passed: %s\n' "$PASS"
-printf 'failed: %s\n' "$FAIL"
+printf '  passed: %s\n' "$PASS"
+printf '  failed: %s\n' "$FAIL"
 if [ "$FAIL" -eq 0 ]; then
   printf '\n  %sRESULT: PASS%s — the canonical reset holds.\n' "$c_green" "$c_reset"
   exit 0
