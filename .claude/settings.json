@@ -71,8 +71,18 @@
       "Bash(scripts/harness-reset.sh:*)",
       "Bash(bash scripts/test-harness-reset.sh:*)",
       "Bash(scripts/test-harness-reset.sh:*)",
-      "Bash(bash .claude/skills/harness-reset/harness-reset.sh:*)",
-      "Bash(.claude/skills/harness-reset/harness-reset.sh:*)"
+      "Bash(bash scripts/package-ohmyorch.sh:*)",
+      "Bash(scripts/package-ohmyorch.sh:*)",
+      "Bash(bash scripts/test-ohmyorch-distribution.sh:*)",
+      "Bash(scripts/test-ohmyorch-distribution.sh:*)",
+      "Bash(sh install.sh:*)",
+      "Bash(install.sh:*)",
+      "Bash(sh uninstall.sh:*)",
+      "Bash(uninstall.sh:*)",
+      "Bash(bash .claude/skills/ohmyorch-harness-reset/harness-reset.sh:*)",
+      "Bash(.claude/skills/ohmyorch-harness-reset/harness-reset.sh:*)",
+      "Bash(bash .claude/skills/ohmyorch-post-install/ohmyorch-post-install.sh:*)",
+      "Bash(.claude/skills/ohmyorch-post-install/ohmyorch-post-install.sh:*)"
     ],
     "deny": [
       "Read(./.env)",

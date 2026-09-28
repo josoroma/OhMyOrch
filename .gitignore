@@ -25,6 +25,10 @@ openspec/delivery/loop.state
 # would leak them, and rotate-by-history is the worst way to find out.
 docs/resets/
 
+# Timestamped backups written by /ohmyorch:post-install. They may contain
+# .claude/settings.local.json and project-local guidance that should stay local.
+docs/pre-install-backup/
+
 # --- Secrets & environment ---
 .env
 .env.*

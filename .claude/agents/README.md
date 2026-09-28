@@ -44,9 +44,9 @@ definitions carry a `PreToolUse` hook running `scripts/check-write-scope.sh`:
 
 | Agent | Role checked | Blocks |
 |---|---|---|
-| `implementer` | `--role implementer` | `review.md`, `test-report.md` (self-approval) |
-| `reviewer` | `--role reviewer` | product code (repairing what it reviews) |
-| `tester` | `--role tester` | product code (repairing failing behavior) |
+| `implementer` | `--role ohmyorch-implementer` | `review.md`, `test-report.md` (self-approval) |
+| `reviewer` | `--role ohmyorch-reviewer` | product code (repairing what it reviews) |
+| `tester` | `--role ohmyorch-tester` | product code (repairing failing behavior) |
 
 ```yaml
 hooks:
@@ -64,9 +64,9 @@ See `scripts/README.md` for the full matrix and `scripts/test-write-scope.sh` fo
 36-case regression suite. Run `node scripts/check-frontmatter.js` after editing any
 definition — a malformed file is skipped silently by Claude Code.
 
-## Goal-driven delivery (`/deliver`)
+## Goal-driven delivery (`/ohmyorch-deliver`)
 
-The `/deliver <target>` skill (`.claude/skills/deliver/SKILL.md`, US-12.2) runs the
+The `/ohmyorch-deliver <target>` skill (`.claude/skills/ohmyorch-deliver/SKILL.md`, US-12.2) runs the
 roles as a loop over an epic, story, or task. The main session acts as the Product
 Manager. It derives the next action with `scripts/delivery.sh next` and delegates it:
 
@@ -81,7 +81,7 @@ Manager. It derives the next action with `scripts/delivery.sh next` and delegate
 Perform Product Manager actions in the main session. Never delegate them to a
 `product-manager` subagent: `scripts/guard-delivery-loop.sh` blocks only
 *main-session* writes to `review.md` / `test-report.md`, and the `product-manager`
-definition carries no write-scope hook. See `.claude/rules/delivery-loop.md`.
+definition carries no write-scope hook. See `.claude/rules/ohmyorch-delivery-loop.md`.
 
 ## Conventions
 
@@ -92,4 +92,4 @@ definition carries no write-scope hook. See `.claude/rules/delivery-loop.md`.
 - Cross-reference the owning user story under `metadata.implements` where useful.
 
 Role boundaries and the prohibition on self-approval are defined in `CLAUDE.md` and,
-from EPIC-8, `.claude/rules/team-responsibilities.md`.
+from EPIC-8, `.claude/rules/ohmyorch-team-responsibilities.md`.
