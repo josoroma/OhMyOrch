@@ -90,7 +90,7 @@ for d in "$ROOT"/.claude/skills/*; do
   name=$(basename "$d")
   case "$name" in ohmyorch-*) target="$name" ;; *) target="ohmyorch-$name" ;; esac
   mkdir -p "$PAYLOAD/.claude/skills/$target"
-  find "$d" -type f | while IFS= read -r f; do
+  find "$d" -type f ! -name '.DS_Store' | while IFS= read -r f; do
     rel=${f#"$d/"}
     case "$rel" in
       SKILL.md)
@@ -109,7 +109,7 @@ if [ -d "$ROOT/.claude/commands/ohmyorch/opsx" ]; then
   done
 fi
 if [ -d "$ROOT/.claude/commands/ohmyorch" ]; then
-  find "$ROOT/.claude/commands/ohmyorch" -type f | while IFS= read -r f; do
+  find "$ROOT/.claude/commands/ohmyorch" -type f ! -name '.DS_Store' | while IFS= read -r f; do
     rel=${f#"$ROOT/.claude/commands/ohmyorch/"}
     copy_md_with_marker "$f" "$PAYLOAD/.claude/commands/ohmyorch/$rel"
   done
@@ -145,6 +145,7 @@ for p in CLAUDE.md PRD.md SPECS.md README.md openspec scripts; do
 done
 
 rm -f "$PAYLOAD/.claude/settings.local.json"
+find "$PAYLOAD" -name '.DS_Store' -type f -delete
 
 cp "$ROOT/install.sh" "$PKG/install.sh"
 cp "$ROOT/uninstall.sh" "$PKG/uninstall.sh"
@@ -162,7 +163,7 @@ chmod +x "$PKG/install.sh" "$PKG/uninstall.sh"
 } > "$MANIFEST"
 
 ( cd "$PAYLOAD" && find . -type f | sed 's|^\./||' | LC_ALL=C sort | xargs shasum -a 256 ) > "$PKG/checksums.sha256"
-
+COPYFILE_DISABLE=1 tar --exclude '.DS_Store' --exclude '._*' -C "$WORK" -czf "$OUT_DIR/$PACKAGE.tar.gz" "$PACKAGE"
 ( cd "$WORK" && tar -czf "$OUT_DIR/$PACKAGE.tar.gz" "$PACKAGE" )
 cp "$OUT_DIR/$PACKAGE.tar.gz" "$OUT_DIR/ohmyorch-harness.tar.gz"
 {

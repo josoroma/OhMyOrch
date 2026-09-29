@@ -17,13 +17,14 @@ OhMyOrch turns product intent, codebase context, and an OpenSpec backlog into sm
 2. What it installs
 3. Entry workflows
 4. The delivery loop
-5. Role separation
-6. Files as handoffs
-7. Hooks and gates
-8. Namespaced distribution
-9. Post-install adaptation
-10. Reset and recovery
-11. What developers get
+5. Worked example: EPIC-12
+6. Role separation
+7. Files as handoffs
+8. Hooks and gates
+9. Namespaced distribution
+10. Post-install adaptation
+11. Reset and recovery
+12. What developers get
 
 ---
 
@@ -70,20 +71,52 @@ Choose the path by repository state.
 
 ## The Delivery Loop
 
-The loop advances one story at a time.
+`/ohmyorch-deliver <EPIC-N | US-N.M | US-N.M#k | "task text">` runs the `ohmyorch-deliver` skill. The main session is the orchestrator, acting as the Product Manager. It delivers each story of the target as its own OpenSpec change, in `SPECS.md` order.
 
 ```text
-select READY story
-  -> propose OpenSpec change
-  -> plan implementation
-  -> implement tasks
-  -> review independently
-  -> test independently
-  -> archive change
-  -> mark story DONE
+Step 0  scripts/delivery.sh resolve <target>; scripts/delivery.sh start <target>   -> goal.md ACTIVE
+Step 1  scripts/delivery.sh next        -> one action, its owner, its command (derived, never remembered)
+Step 2  delegate the action to its owner, then:
+        scripts/status.sh --change <id> --quiet; scripts/delivery.sh refresh
+Step 3  repeat; the Stop hook guard-delivery-loop.sh refuses to end the turn while work remains
 ```
 
-If review or test fails, the loop records why and returns to implementation with a clear next owner.
+| Action | Owner | How |
+| --- | --- | --- |
+| `select` | Product Manager (main session) | `openspec new change <id>`, story `IN PROGRESS` |
+| `propose`, `plan` | `ohmyorch-planner` | `/ohmyorch:opsx:explore`, `/ohmyorch:opsx:propose`, `/ohmyorch-plan-feature` |
+| `implement` | `ohmyorch-implementer` | `/ohmyorch:opsx:apply` |
+| `review` | `ohmyorch-reviewer` | `/ohmyorch-review-feature` (records `/ohmyorch:opsx:verify`) |
+| `test` | `ohmyorch-tester` | `/ohmyorch-test-feature` |
+| `reopen` | Product Manager | `scripts/delivery.sh reopen`: verdict to `history/`, one task per finding |
+| `archive`, `mark-done` | Product Manager | `completion-gate.sh --record`, `openspec archive`, story `DONE` (guarded) |
+| `escalate` / `complete` | human / — | goal `BLOCKED` with a reason / goal `COMPLETE` |
+
+The orchestrator never writes `review.md` or `test-report.md`, and no gate has a loop exception.
+
+---
+
+## Worked Example: EPIC-12
+
+EPIC-12 built the loop, then the loop delivered the rest of the epic. The run is recorded in `SPEC-LOGS/README-EPIC-12.md`. After a harness reset it is kept in git history at `34008f3`.
+
+```text
+start EPIC-12                 goal ACTIVE; US-12.1 already DONE
+US-12.2  select -> propose -> plan -> implement -> review r1 -> R1.1-R1.4 -> review r2
+         -> test 6/6 -> archive -> mark-done
+US-12.3  select -> propose -> plan -> implement -> review -> test 2/2 -> archive -> mark-done
+US-12.4  select -> propose -> plan -> implement -> review -> test 4/4 -> archive -> mark-done
+next -> complete              goal COMPLETE
+```
+
+| Story | Tasks | Review rounds | Scenarios |
+| --- | ---: | ---: | ---: |
+| US-12.1 | 15 | 3 | 6/6 |
+| US-12.2 | 17 | 2 | 6/6 |
+| US-12.3 | 10 | 1 | 2/2 |
+| US-12.4 | 8 | 1 | 4/4 |
+
+The implementer subagent cannot write `scripts/` or `.claude/`, so for this harness-on-harness epic the main session implemented each change. Planning, review, and testing stayed with separate subagents.
 
 ---
 

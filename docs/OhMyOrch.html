@@ -292,6 +292,7 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#installs">What it installs</a></li>
         <li><a href="#entry">Entry workflows</a></li>
         <li><a href="#loop">The delivery loop</a></li>
+        <li><a href="#epic12">Worked example: EPIC-12</a></li>
         <li><a href="#roles">Role separation</a></li>
         <li><a href="#handoffs">Files as handoffs</a></li>
         <li><a href="#gates">Hooks and gates</a></li>
@@ -351,16 +352,45 @@ tbody tr:last-child td { border-bottom: 0; }
   <section class="slide" id="loop">
     <p class="eyebrow">Execution</p>
     <h2>One story, one pass through the gates.</h2>
+    <p class="lead"><code>/ohmyorch-deliver &lt;EPIC-N | US-N.M | US-N.M#k | "task text"&gt;</code> runs the <code>ohmyorch-deliver</code> skill. The main session is the orchestrator, acting as the Product Manager. It delivers each story as its own OpenSpec change, in <code>SPECS.md</code> order.</p>
     <div class="flow" aria-label="Delivery loop">
-      <div class="step"><strong>Select</strong><span>READY story</span></div>
-      <div class="step"><strong>Propose</strong><span>OpenSpec change</span></div>
-      <div class="step"><strong>Plan</strong><span>implementation</span></div>
-      <div class="step"><strong>Implement</strong><span>tasks and tests</span></div>
-      <div class="step"><strong>Review</strong><span>independent verdict</span></div>
-      <div class="step"><strong>Test</strong><span>acceptance evidence</span></div>
-      <div class="step"><strong>Archive</strong><span>sync and mark done</span></div>
+      <div class="step"><strong>Select</strong><span>Product Manager: <code>openspec new change</code></span></div>
+      <div class="step"><strong>Propose</strong><span><code>ohmyorch-planner</code>: explore + propose</span></div>
+      <div class="step"><strong>Plan</strong><span><code>ohmyorch-planner</code>: <code>/ohmyorch-plan-feature</code></span></div>
+      <div class="step"><strong>Implement</strong><span><code>ohmyorch-implementer</code>: <code>/ohmyorch:opsx:apply</code></span></div>
+      <div class="step"><strong>Review</strong><span><code>ohmyorch-reviewer</code>: <code>review.md</code> + verify</span></div>
+      <div class="step"><strong>Test</strong><span><code>ohmyorch-tester</code>: <code>test-report.md</code></span></div>
+      <div class="step"><strong>Archive</strong><span>completion gate, archive, story <code>DONE</code></span></div>
     </div>
-    <p class="muted">If review or test fails, the loop records why and returns to implementation with a clear next owner.</p>
+    <pre><code>Step 0  scripts/delivery.sh resolve &lt;target&gt;; scripts/delivery.sh start &lt;target&gt;   -&gt; goal.md ACTIVE
+Step 1  scripts/delivery.sh next        -&gt; one action, its owner, its command (derived, never remembered)
+Step 2  delegate the action, then: scripts/status.sh --change &lt;id&gt; --quiet; scripts/delivery.sh refresh
+Step 3  repeat; the Stop hook guard-delivery-loop.sh refuses to end the turn while work remains</code></pre>
+    <p class="muted">A failing review or test runs <code>scripts/delivery.sh reopen</code>. The verdict is kept in <code>history/</code>, one task is added per finding, and the next derived action is <code>implement</code>. The loop stops only for <code>complete</code>, for <code>escalate</code> (goal <code>BLOCKED</code>), for no progress, or when a human runs <code>delivery.sh stop</code>.</p>
+  </section>
+
+  <section class="slide" id="epic12">
+    <p class="eyebrow">Recorded run</p>
+    <h2>EPIC-12 delivered itself.</h2>
+    <p class="lead">EPIC-12 built the loop, and then the loop delivered the rest of the epic. The run is recorded in <code>SPEC-LOGS/README-EPIC-12.md</code>. After a harness reset it is kept in git history at <code>34008f3</code>.</p>
+    <pre><code>start EPIC-12                 goal ACTIVE; US-12.1 already DONE
+US-12.2  select -&gt; propose -&gt; plan -&gt; implement -&gt; review r1 -&gt; R1.1-R1.4 -&gt; review r2
+         -&gt; test 6/6 -&gt; archive -&gt; mark-done
+US-12.3  select -&gt; propose -&gt; plan -&gt; implement -&gt; review -&gt; test 2/2 -&gt; archive -&gt; mark-done
+US-12.4  select -&gt; propose -&gt; plan -&gt; implement -&gt; review -&gt; test 4/4 -&gt; archive -&gt; mark-done
+next -&gt; complete              goal COMPLETE</code></pre>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Story</th><th>Tasks</th><th>Review rounds</th><th>Scenarios</th></tr></thead>
+        <tbody>
+          <tr><td>US-12.1</td><td>15</td><td>3</td><td>6/6</td></tr>
+          <tr><td>US-12.2</td><td>17</td><td>2</td><td>6/6</td></tr>
+          <tr><td>US-12.3</td><td>10</td><td>1</td><td>2/2</td></tr>
+          <tr><td>US-12.4</td><td>8</td><td>1</td><td>4/4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">The implementer subagent cannot write <code>scripts/</code> or <code>.claude/</code>, so for this harness-on-harness epic the main session implemented each change. Planning, review, and testing stayed with separate subagents.</p>
   </section>
 
   <section class="slide" id="roles">

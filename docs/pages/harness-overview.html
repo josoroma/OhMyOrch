@@ -334,7 +334,7 @@ td.num { min-width: 0; }
   <div class="hero">
     <h1>OhMyOrch Harness — Overview and Status</h1>
     <p class="lead">How the harness turns a SPECS.md backlog into delivered, reviewed, and tested OpenSpec changes, and where the backlog stands today.</p>
-    <p class="meta">Generated 2026-09-28 from the working tree (no commits yet) · see <a href="#sources">Sources</a></p>
+    <p class="meta">Generated 2026-09-28 from the working tree at <code>752db23</code> · see <a href="#sources">Sources</a></p>
   </div>
 
   <nav class="toc" aria-labelledby="toc-title">
@@ -605,7 +605,12 @@ td.num { min-width: 0; }
 
   <section id="loop" data-component="svg-overlay">
     <h2>The delivery loop</h2>
-    <p class="section-lead"><code>/ohmyorch-deliver</code> drives one target story by story. The next action is derived by <code>scripts/delivery.sh next</code> on every turn, never remembered.</p>
+    <p class="section-lead"><code>/ohmyorch-deliver &lt;EPIC-N | US-N.M | US-N.M#k | "task text"&gt;</code> runs the <code>.claude/skills/ohmyorch-deliver</code> skill. The main session is the orchestrator, acting as the Product Manager. It drives the target story by story, with each story as its own OpenSpec change. The next action is derived by <code>scripts/delivery.sh next</code> on every turn, never remembered.</p>
+    <pre><code>Step 0  scripts/delivery.sh resolve &lt;target&gt;; scripts/delivery.sh start &lt;target&gt;   -&gt; goal.md ACTIVE
+Step 1  scripts/delivery.sh next        -&gt; one action, its owner, its command
+Step 2  delegate the action to its owner, then:
+        scripts/status.sh --change &lt;id&gt; --quiet; scripts/delivery.sh refresh
+Step 3  repeat; the Stop hook guard-delivery-loop.sh refuses to end the turn while work remains</code></pre>
     <figure class="figure">
       <div class="figure-canvas">
       <svg viewBox="0 0 720 250" role="img" aria-labelledby="loop-title loop-desc">
@@ -719,14 +724,32 @@ td.num { min-width: 0; }
 
   <section id="example" data-component="svg-overlay">
     <h2>Worked example: delivering EPIC-12 through Claude</h2>
-    <p class="section-lead">EPIC-12 built the delivery loop, and then the loop delivered the rest of the epic. After US-12.1 was archived, the goal was recorded with <code>scripts/delivery.sh start EPIC-12</code>, and every later step followed <code>scripts/delivery.sh next</code> (SPEC-LOGS/README-EPIC-12.md §5). Claude Code 2.1.128, OpenSpec 1.13.2.</p>
+    <p class="section-lead">EPIC-12 built the delivery loop, and then the loop delivered the rest of the epic. After US-12.1 was archived, <code>/ohmyorch-deliver EPIC-12</code> recorded the goal with <code>scripts/delivery.sh start EPIC-12</code>, and every later step followed <code>scripts/delivery.sh next</code> (SPEC-LOGS/README-EPIC-12.md §5). Claude Code 2.1.128, OpenSpec 1.13.2. A harness reset removes that record from the working tree. It is read here from git revision <code>34008f3</code>.</p>
+
+    <h3>The skill's steps, as they ran for EPIC-12</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Steps from .claude/skills/ohmyorch-deliver/SKILL.md; what ran, from SPEC-LOGS/README-EPIC-12.md at 34008f3.</caption>
+        <thead><tr><th scope="col">Skill step</th><th scope="col">What ran for EPIC-12</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Step 0</strong> resolve and start</td><td><code>delivery.sh resolve EPIC-12</code> listed US-12.1 to US-12.4, with US-12.1 already archived. <code>delivery.sh start EPIC-12</code> recorded the goal <code>ACTIVE</code> in <code>openspec/delivery/goal.md</code>.</td></tr>
+          <tr><td><strong>Step 1</strong> derive the next action</td><td>Every action began with <code>delivery.sh next</code>. The first result was <code>select US-12.2</code>.</td></tr>
+          <tr><td><strong>Step 2</strong> delegate by owner</td><td>The Product Manager in the main session ran <code>select</code>, <code>archive</code>, and <code>mark-done</code>. <code>/ohmyorch-plan-feature</code>, <code>/ohmyorch-review-feature</code>, and <code>/ohmyorch-test-feature</code> ran the <code>ohmyorch-planner</code>, <code>ohmyorch-reviewer</code>, and <code>ohmyorch-tester</code> subagents. After each action it ran <code>status.sh --change &lt;id&gt; --quiet</code> and <code>delivery.sh refresh</code>.</td></tr>
+          <tr><td><strong>Step 3</strong> continue until the hook allows the stop</td><td><code>guard-delivery-loop.sh</code> was wired to refuse the stop while work remained. The last <code>next</code> returned <code>complete</code>, and the goal was recorded <code>COMPLETE</code>.</td></tr>
+          <tr><td><strong>Report</strong></td><td>stories, change ids, review rounds, and known limits, in <code>SPEC-LOGS/README-EPIC-12.md</code></td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="table-wrap">
       <table>
-        <caption>The four EPIC-12 changes, read from their archived artifacts.</caption>
+        <caption>The four EPIC-12 changes, read from their archived artifacts at git revision 34008f3.</caption>
         <thead><tr><th scope="col">Story</th><th scope="col">Archived change</th><th scope="col" class="num">Tasks</th><th scope="col" class="num">Review rounds</th><th scope="col">Final review</th><th scope="col" class="num">Scenarios</th><th scope="col">Capabilities</th></tr></thead>
         <tbody>
-
+          <tr><td>US-12.1</td><td><code>2026-09-24-us-12-1-resolve-delivery-target-report</code></td><td class="num">15</td><td class="num">3</td><td>approved</td><td class="num">6/6</td><td><code>delivery-target</code></td></tr>
+          <tr><td>US-12.2</td><td><code>2026-09-26-us-12-2-run-delivery-goal-loop</code></td><td class="num">17</td><td class="num">2</td><td>pass</td><td class="num">6/6</td><td><code>delivery-loop</code></td></tr>
+          <tr><td>US-12.3</td><td><code>2026-09-26-us-12-3-document-delivery-orchestrator</code></td><td class="num">10</td><td class="num">1</td><td>pass</td><td class="num">2/2</td><td><code>harness-documentation</code></td></tr>
+          <tr><td>US-12.4</td><td><code>2026-09-26-us-12-4-delivery-loop-followups</code></td><td class="num">8</td><td class="num">1</td><td>pass</td><td class="num">4/4</td><td><code>delivery-target</code> <code>harness-documentation</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -847,8 +870,14 @@ Delivery goal EPIC-12 is ACTIVE — do not stop yet.
 Next action: review  (owner: ohmyorch-reviewer, story: US-12.2)
 Command: /ohmyorch-review-feature us-12-2-run-delivery-goal-loop (includes /ohmyorch:opsx:verify)</code></pre>
     <p class="section-lead">The Stop-hook message is the format documented in <code>.claude/skills/ohmyorch-deliver/SKILL.md</code> Step 3, which uses this step as its example. The whole epic ran as:</p>
-    <pre><code>select US-12.2 -&gt; propose -&gt; plan -&gt; implement -&gt; review -&gt; (follow-ups) -&gt; review
--&gt; test -&gt; archive -&gt; mark-done -&gt; select US-12.3 -&gt; propose -&gt; plan -&gt; implement -&gt; ...</code></pre>
+    <pre><code>start EPIC-12                 goal ACTIVE; US-12.1 already DONE
+US-12.2  select -&gt; propose -&gt; plan -&gt; implement -&gt; review r1 (pass, observations)
+         -&gt; implement R1.1-R1.4 -&gt; review r2 (pass) -&gt; test 6/6 -&gt; archive -&gt; mark-done
+US-12.3  select -&gt; propose -&gt; plan -&gt; implement -&gt; review (pass) -&gt; test 2/2
+         -&gt; archive -&gt; mark-done
+US-12.4  select -&gt; propose -&gt; plan -&gt; implement -&gt; review (pass) -&gt; test 4/4
+         -&gt; archive -&gt; mark-done
+next -&gt; complete              goal COMPLETE</code></pre>
     <div class="callout"><p class="callout-title">Known limits, recorded in README-EPIC-12 §7</p><p>Live Claude Code behavior (the hook firing, the 8-block override) was not exercised in a live session. The verdict guard sees only Write, Edit, and MultiEdit, not shell redirects. The main session implemented this harness-on-harness epic, and independence came from delegating planning, review, and testing to separate subagents.</p></div>
   </section>
 
@@ -1031,7 +1060,7 @@ scripts/harness-reset.sh             # back up, verify, then reset</code></pre>
 
   <section id="sources" data-component="sources">
     <h2>Sources</h2>
-    <p class="section-lead">The files and commands every figure on this page came from, run on 2026-09-28. The repository had no commits, so no revision is recorded.</p>
+    <p class="section-lead">The files and commands every figure on this page came from, run on 2026-09-28 against the working tree at revision <code>752db23</code>.</p>
     <ul class="list">
       <li><code>grep -cE '^# EPIC-[0-9]+:' SPECS.md</code> — 0 epics</li>
       <li><code>grep -cE '^### US-[0-9]+\.[0-9]+:' SPECS.md</code> — 0 stories</li>
@@ -1050,8 +1079,8 @@ scripts/harness-reset.sh             # back up, verify, then reset</code></pre>
       <li><code>.claude/skills/ohmyorch-harness-reset/SKILL.md</code>, <code>manifest.tsv</code>, <code>PRESERVE.tsv</code>, <code>README.md</code> §27 — the canonical reset</li>
       <li><code>docs/images/OhMyOrch.png</code> — the header logo, embedded as a data URI because the page CSP allows only <code>img-src data:</code></li>
       <li><code>.claude/skills/ohmyorch-deliver/SKILL.md</code> Step 2, <code>scripts/delivery.sh</code> (<code>set_action escalate</code>) — the loop steps, owners, and the seven escalation causes</li>
-      <li><code>SPEC-LOGS/README-EPIC-12.md</code> — the EPIC-12 narrative, rounds, and known limits</li>
-      <li><code>openspec/changes/archive/*us-12-*/</code> (<code>tasks.md</code>, <code>review.md</code>, <code>history/</code>, <code>test-report.md</code>, <code>completion.md</code>, <code>specs/</code>) — the EPIC-12 table and the US-12.2 walkthrough</li>
+      <li><code>git show 34008f3:SPEC-LOGS/README-EPIC-12.md</code> — the EPIC-12 narrative, skill steps, rounds, and known limits</li>
+      <li><code>git show 34008f3:openspec/changes/archive/*us-12-*/</code> (<code>tasks.md</code>, <code>review.md</code>, <code>history/</code>, <code>test-report.md</code>, <code>specs/</code>) — the EPIC-12 table and the US-12.2 walkthrough</li>
     </ul>
   </section>
 

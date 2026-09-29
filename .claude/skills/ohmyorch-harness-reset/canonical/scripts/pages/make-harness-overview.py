@@ -185,17 +185,25 @@ for a in ["ohmyorch-implementer", "ohmyorch-reviewer", "ohmyorch-tester"]:
     hook_rows.append(f'          <tr><td><code>PreToolUse</code></td><td><code>Write|Edit|MultiEdit</code></td><td><code>check-write-scope.sh --role {a}</code></td><td><code>.claude/agents/{a}.md</code></td><td>a {a} write outside its scope</td></tr>')
 
 # ---- EPIC-12, from the archive ---------------------------------------------
+# A harness reset removes the archive from the working tree, so the EPIC-12 record
+# is read from the pinned revision that still holds it (README §18, worked example).
+E12_REV = "34008f3"
 e12_rows = []
-for d in sorted(sh("ls -d openspec/changes/archive/*us-12-*").split()):
+_e12_arch = "openspec/changes/archive"
+_e12_dirs = sorted(sh(f"git ls-tree --name-only {E12_REV} {_e12_arch}/ | grep us-12- || true").split())
+for d in _e12_dirs:
     name = os.path.basename(d)
-    story = "US-" + re.search(r"us-(\d+)-(\d+)", name).group(1) + "." + re.search(r"us-(\d+)-(\d+)", name).group(2)
-    ntask = sh(f"grep -c '^- \\[x\\]' {d}/tasks.md")
-    rounds = 1 + int(sh(f"ls {d}/history 2>/dev/null | grep -c review || true") or 0)
-    cov = sh(f"sed -n 's/^Coverage: \\([0-9]*\\/[0-9]*\\).*/\\1/p' {d}/test-report.md | head -1")
-    verdict = sh(f"sed -n 's/^Verdict: //p' {d}/review.md | head -1")
-    capsl = " ".join(f"<code>{c}</code>" for c in sh(f"ls {d}/specs").split())
+    m = re.search(r"us-(\d+)-(\d+)", name)
+    story = f"US-{m.group(1)}.{m.group(2)}"
+    show = lambda f: f"git show {E12_REV}:{d}/{f}"
+    ntask = sh(show("tasks.md") + " | grep -c '^- \\[x\\]'")
+    rounds = 1 + int(sh(f"git ls-tree --name-only {E12_REV} {d}/history/ 2>/dev/null | grep -c review || true") or 0)
+    cov = sh(show("test-report.md") + " | sed -n 's/^Coverage: \\([0-9]*\\/[0-9]*\\).*/\\1/p' | head -1")
+    verdict = sh(show("review.md") + " | sed -n 's/^Verdict: //p' | head -1")
+    capsl = " ".join(f"<code>{os.path.basename(c)}</code>" for c in sh(f"git ls-tree --name-only {E12_REV} {d}/specs/").split())
     e12_rows.append(f'          <tr><td>{story}</td><td><code>{name}</code></td><td class="num">{ntask}</td><td class="num">{rounds}</td><td>{E(verdict)}</td><td class="num">{cov}</td><td>{capsl}</td></tr>')
 e12_rows = "\n".join(e12_rows)
+rev = sh("git rev-parse --short HEAD 2>/dev/null")
 
 S_WORKFLOWS = f'''
   <section id="workflows" data-component="svg-overlay">
@@ -497,11 +505,26 @@ swim = "\n".join(sv)
 S_EXAMPLE = f'''
   <section id="example" data-component="svg-overlay">
     <h2>Worked example: delivering EPIC-12 through Claude</h2>
-    <p class="section-lead">EPIC-12 built the delivery loop, and then the loop delivered the rest of the epic. After US-12.1 was archived, the goal was recorded with <code>scripts/delivery.sh start EPIC-12</code>, and every later step followed <code>scripts/delivery.sh next</code> (SPEC-LOGS/README-EPIC-12.md §5). Claude Code 2.1.128, OpenSpec 1.13.2.</p>
+    <p class="section-lead">EPIC-12 built the delivery loop, and then the loop delivered the rest of the epic. After US-12.1 was archived, <code>/ohmyorch-deliver EPIC-12</code> recorded the goal with <code>scripts/delivery.sh start EPIC-12</code>, and every later step followed <code>scripts/delivery.sh next</code> (SPEC-LOGS/README-EPIC-12.md §5). Claude Code 2.1.128, OpenSpec 1.13.2. A harness reset removes that record from the working tree. It is read here from git revision <code>{E12_REV}</code>.</p>
+
+    <h3>The skill's steps, as they ran for EPIC-12</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Steps from .claude/skills/ohmyorch-deliver/SKILL.md; what ran, from SPEC-LOGS/README-EPIC-12.md at {E12_REV}.</caption>
+        <thead><tr><th scope="col">Skill step</th><th scope="col">What ran for EPIC-12</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Step 0</strong> resolve and start</td><td><code>delivery.sh resolve EPIC-12</code> listed US-12.1 to US-12.4, with US-12.1 already archived. <code>delivery.sh start EPIC-12</code> recorded the goal <code>ACTIVE</code> in <code>openspec/delivery/goal.md</code>.</td></tr>
+          <tr><td><strong>Step 1</strong> derive the next action</td><td>Every action began with <code>delivery.sh next</code>. The first result was <code>select US-12.2</code>.</td></tr>
+          <tr><td><strong>Step 2</strong> delegate by owner</td><td>The Product Manager in the main session ran <code>select</code>, <code>archive</code>, and <code>mark-done</code>. <code>/ohmyorch-plan-feature</code>, <code>/ohmyorch-review-feature</code>, and <code>/ohmyorch-test-feature</code> ran the <code>ohmyorch-planner</code>, <code>ohmyorch-reviewer</code>, and <code>ohmyorch-tester</code> subagents. After each action it ran <code>status.sh --change &lt;id&gt; --quiet</code> and <code>delivery.sh refresh</code>.</td></tr>
+          <tr><td><strong>Step 3</strong> continue until the hook allows the stop</td><td><code>guard-delivery-loop.sh</code> was wired to refuse the stop while work remained. The last <code>next</code> returned <code>complete</code>, and the goal was recorded <code>COMPLETE</code>.</td></tr>
+          <tr><td><strong>Report</strong></td><td>stories, change ids, review rounds, and known limits, in <code>SPEC-LOGS/README-EPIC-12.md</code></td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="table-wrap">
       <table>
-        <caption>The four EPIC-12 changes, read from their archived artifacts.</caption>
+        <caption>The four EPIC-12 changes, read from their archived artifacts at git revision {E12_REV}.</caption>
         <thead><tr><th scope="col">Story</th><th scope="col">Archived change</th><th scope="col" class="num">Tasks</th><th scope="col" class="num">Review rounds</th><th scope="col">Final review</th><th scope="col" class="num">Scenarios</th><th scope="col">Capabilities</th></tr></thead>
         <tbody>
 {e12_rows}
@@ -560,8 +583,14 @@ Delivery goal EPIC-12 is ACTIVE — do not stop yet.
 Next action: review  (owner: ohmyorch-reviewer, story: US-12.2)
 Command: /ohmyorch-review-feature us-12-2-run-delivery-goal-loop (includes /ohmyorch:opsx:verify)</code></pre>
     <p class="section-lead">The Stop-hook message is the format documented in <code>.claude/skills/ohmyorch-deliver/SKILL.md</code> Step 3, which uses this step as its example. The whole epic ran as:</p>
-    <pre><code>select US-12.2 -&gt; propose -&gt; plan -&gt; implement -&gt; review -&gt; (follow-ups) -&gt; review
--&gt; test -&gt; archive -&gt; mark-done -&gt; select US-12.3 -&gt; propose -&gt; plan -&gt; implement -&gt; ...</code></pre>
+    <pre><code>start EPIC-12                 goal ACTIVE; US-12.1 already DONE
+US-12.2  select -&gt; propose -&gt; plan -&gt; implement -&gt; review r1 (pass, observations)
+         -&gt; implement R1.1-R1.4 -&gt; review r2 (pass) -&gt; test 6/6 -&gt; archive -&gt; mark-done
+US-12.3  select -&gt; propose -&gt; plan -&gt; implement -&gt; review (pass) -&gt; test 2/2
+         -&gt; archive -&gt; mark-done
+US-12.4  select -&gt; propose -&gt; plan -&gt; implement -&gt; review (pass) -&gt; test 4/4
+         -&gt; archive -&gt; mark-done
+next -&gt; complete              goal COMPLETE</code></pre>
     <div class="callout"><p class="callout-title">Known limits, recorded in README-EPIC-12 §7</p><p>Live Claude Code behavior (the hook firing, the 8-block override) was not exercised in a live session. The verdict guard sees only Write, Edit, and MultiEdit, not shell redirects. The main session implemented this harness-on-harness epic, and independence came from delegating planning, review, and testing to separate subagents.</p></div>
   </section>
 '''
@@ -581,7 +610,7 @@ body = f'''<body>
   <div class="hero">
     <h1>{TITLE}</h1>
     <p class="lead">{SUMMARY}</p>
-    <p class="meta">Generated {date} from the working tree (no commits yet) · see <a href="#sources">Sources</a></p>
+    <p class="meta">Generated {date} from the working tree at <code>{rev}</code> · see <a href="#sources">Sources</a></p>
   </div>
 
   <nav class="toc" aria-labelledby="toc-title">
@@ -652,7 +681,12 @@ body = f'''<body>
 
   <section id="loop" data-component="svg-overlay">
     <h2>The delivery loop</h2>
-    <p class="section-lead"><code>/ohmyorch-deliver</code> drives one target story by story. The next action is derived by <code>scripts/delivery.sh next</code> on every turn, never remembered.</p>
+    <p class="section-lead"><code>/ohmyorch-deliver &lt;EPIC-N | US-N.M | US-N.M#k | "task text"&gt;</code> runs the <code>.claude/skills/ohmyorch-deliver</code> skill. The main session is the orchestrator, acting as the Product Manager. It drives the target story by story, with each story as its own OpenSpec change. The next action is derived by <code>scripts/delivery.sh next</code> on every turn, never remembered.</p>
+    <pre><code>Step 0  scripts/delivery.sh resolve &lt;target&gt;; scripts/delivery.sh start &lt;target&gt;   -&gt; goal.md ACTIVE
+Step 1  scripts/delivery.sh next        -&gt; one action, its owner, its command
+Step 2  delegate the action to its owner, then:
+        scripts/status.sh --change &lt;id&gt; --quiet; scripts/delivery.sh refresh
+Step 3  repeat; the Stop hook guard-delivery-loop.sh refuses to end the turn while work remains</code></pre>
     <figure class="figure">
       <div class="figure-canvas">
       <svg viewBox="0 0 720 250" role="img" aria-labelledby="loop-title loop-desc">
@@ -843,7 +877,7 @@ body = f'''<body>
 
   <section id="sources" data-component="sources">
     <h2>Sources</h2>
-    <p class="section-lead">The files and commands every figure on this page came from, run on {date}. The repository had no commits, so no revision is recorded.</p>
+    <p class="section-lead">The files and commands every figure on this page came from, run on {date} against the working tree at revision <code>{rev}</code>.</p>
     <ul class="list">
       <li><code>grep -cE '^# EPIC-[0-9]+:' SPECS.md</code> — {epics} epics</li>
       <li><code>grep -cE '^### US-[0-9]+\\.[0-9]+:' SPECS.md</code> — {stories} stories</li>
@@ -862,8 +896,8 @@ body = f'''<body>
       <li><code>.claude/skills/ohmyorch-harness-reset/SKILL.md</code>, <code>manifest.tsv</code>, <code>PRESERVE.tsv</code>, <code>README.md</code> §27 — the canonical reset</li>
       <li><code>docs/images/OhMyOrch.png</code> — the header logo, embedded as a data URI because the page CSP allows only <code>img-src data:</code></li>
       <li><code>.claude/skills/ohmyorch-deliver/SKILL.md</code> Step 2, <code>scripts/delivery.sh</code> (<code>set_action escalate</code>) — the loop steps, owners, and the seven escalation causes</li>
-      <li><code>SPEC-LOGS/README-EPIC-12.md</code> — the EPIC-12 narrative, rounds, and known limits</li>
-      <li><code>openspec/changes/archive/*us-12-*/</code> (<code>tasks.md</code>, <code>review.md</code>, <code>history/</code>, <code>test-report.md</code>, <code>completion.md</code>, <code>specs/</code>) — the EPIC-12 table and the US-12.2 walkthrough</li>
+      <li><code>git show {E12_REV}:SPEC-LOGS/README-EPIC-12.md</code> — the EPIC-12 narrative, skill steps, rounds, and known limits</li>
+      <li><code>git show {E12_REV}:openspec/changes/archive/*us-12-*/</code> (<code>tasks.md</code>, <code>review.md</code>, <code>history/</code>, <code>test-report.md</code>, <code>specs/</code>) — the EPIC-12 table and the US-12.2 walkthrough</li>
     </ul>
   </section>
 

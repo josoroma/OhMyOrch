@@ -768,10 +768,11 @@ directory keeps the full audit trail — `proposal.md`, `specs/`, `tasks.md`,
 `implementation-plan.md`, `review.md`, `test-report.md`, `status.md`, `completion.md` —
 so a shipped story traces from `SPECS.md` to its evidence (NFR-001).
 
-This repository is its own worked example: every delivered story in `SPECS.md` is `DONE`
-and links to its archived change, whose files record how it was delivered. EPIC-12
-was delivered by the orchestrator it built (see §18 and `SPEC-LOGS/README-EPIC-12.md`).
-The canonical capabilities are listed by:
+This repository was its own worked example. Before it was reset to a blank harness,
+every delivered story in `SPECS.md` was `DONE` and linked to its archived change. EPIC-12
+was delivered by the orchestrator it built. That trail is no longer in the working tree,
+but it is still in git history at commit `34008f3`. See §18, *Worked example:
+`/ohmyorch-deliver EPIC-12`*. The canonical capabilities are listed by:
 
 ```bash
 openspec list --specs
@@ -806,7 +807,8 @@ A task is never delivered alone, because it has no acceptance criteria of its ow
 (BR-005). The Focus tells the Planner and Implementer what to prioritise. The story's
 scenarios are still the definition of done.
 
-Preview a target without recording anything:
+Preview a target without recording anything. This output was recorded while US-12.3
+was in progress:
 
 ```text
 $ scripts/delivery.sh resolve EPIC-12
@@ -904,6 +906,86 @@ stall counter `openspec/delivery/loop.state` is per-machine and git-ignored.
   goal blocks again at once.
 - Starting a *different* target while a goal is `ACTIVE` or `BLOCKED` is refused. Run
   `scripts/delivery.sh stop` first.
+
+### Worked example: `/ohmyorch-deliver EPIC-12`
+
+EPIC-12 built this loop. The loop then delivered the rest of the epic. This is the
+recorded run, taken from `SPEC-LOGS/README-EPIC-12.md` and the four archived
+changes. A harness reset removes those files from the working tree. They remain in
+git history at commit `34008f3`:
+
+```bash
+git show 34008f3:SPEC-LOGS/README-EPIC-12.md
+git ls-tree -r --name-only 34008f3 openspec/changes/archive | grep us-12
+```
+
+Each step of `.claude/skills/ohmyorch-deliver/SKILL.md`, and what it did for EPIC-12:
+
+| Skill step | What ran |
+|---|---|
+| Step 0: resolve and start | `scripts/delivery.sh resolve EPIC-12` listed US-12.1 to US-12.4. US-12.1 was already archived. `scripts/delivery.sh start EPIC-12` recorded the goal `ACTIVE` in `openspec/delivery/goal.md`. |
+| Step 1: derive the next action | Every action began with `scripts/delivery.sh next`. The first result was `select US-12.2`, because US-12.1 was `DONE`. |
+| Step 2: delegate by owner | The orchestrator, the Product Manager in the main session, ran `select`, `archive`, and `mark-done` itself. `/ohmyorch-plan-feature`, `/ohmyorch-review-feature`, and `/ohmyorch-test-feature` ran the `ohmyorch-planner`, `ohmyorch-reviewer`, and `ohmyorch-tester` subagents. After each action it ran `scripts/status.sh --change <id> --quiet` and `scripts/delivery.sh refresh`. |
+| Step 3: continue until the hook allows the stop | `scripts/guard-delivery-loop.sh` was wired to refuse the stop while work remained. The last `next` returned `complete`, and the goal was recorded `COMPLETE`. |
+| Report | stories, change ids, review rounds, and known limits, recorded in `SPEC-LOGS/README-EPIC-12.md`. |
+
+The derived action sequence:
+
+```text
+start EPIC-12                 goal ACTIVE; US-12.1 already DONE
+US-12.2  select -> propose -> plan -> implement -> review r1 (pass, observations)
+         -> implement R1.1-R1.4 -> review r2 (pass) -> test 6/6 -> archive -> mark-done
+US-12.3  select -> propose -> plan -> implement -> review (pass) -> test 2/2
+         -> archive -> mark-done
+US-12.4  select -> propose -> plan -> implement -> review (pass) -> test 4/4
+         -> archive -> mark-done
+next -> complete              goal COMPLETE
+```
+
+While US-12.2 waited for review, the session saw the following. An attempt to end
+the turn got the Stop-hook reply in the format documented in the skill's Step 3:
+
+```text
+$ scripts/delivery.sh next
+Action:  review
+Story:   US-12.2
+Change:  us-12-2-run-delivery-goal-loop
+Owner:   ohmyorch-reviewer
+Command: /ohmyorch-review-feature us-12-2-run-delivery-goal-loop (includes /ohmyorch:opsx:verify)
+
+Delivery goal EPIC-12 is ACTIVE — do not stop yet.
+Next action: review  (owner: ohmyorch-reviewer, story: US-12.2)
+Command: /ohmyorch-review-feature us-12-2-run-delivery-goal-loop (includes /ohmyorch:opsx:verify)
+```
+
+The four changes, read from their archived `tasks.md`, `review.md`, `history/`, and
+`test-report.md`:
+
+| Story | Archived change | Tasks | Review rounds | Scenarios | Capabilities |
+|---|---|---:|---:|---:|---|
+| US-12.1 | `2026-09-24-us-12-1-resolve-delivery-target-report` | 15 | 3 | 6/6 | `delivery-target` |
+| US-12.2 | `2026-09-26-us-12-2-run-delivery-goal-loop` | 17 | 2 | 6/6 | `delivery-loop` |
+| US-12.3 | `2026-09-26-us-12-3-document-delivery-orchestrator` | 10 | 1 | 2/2 | `harness-documentation` |
+| US-12.4 | `2026-09-26-us-12-4-delivery-loop-followups` | 8 | 1 | 4/4 | `delivery-target`, `harness-documentation` |
+
+US-12.1 was delivered before the goal was recorded. Its three review rounds each ran
+`scripts/delivery.sh reopen`, which kept the verdict in `history/` and appended one
+remediation task per finding. US-12.2's first review passed with observations. Its
+verdict was kept as `history/review-r1.md`, and tasks R1.1 to R1.4 were added. Because
+that work changed code, the change was reviewed again rather than archived on the first
+verdict. Each archive passed `completion-gate.sh --record`, with verdict `eligible`,
+and then `guard-archive.sh`.
+
+The record states three limits (README-EPIC-12 §7):
+
+- The `ohmyorch-implementer` subagent cannot write `scripts/` or `.claude/` under
+  `check-write-scope.sh`. For this harness-on-harness epic, the main session
+  implemented each change. Independence came from separate planning, review, and
+  test subagents.
+- Live Claude Code behavior was not exercised in a live session: the Stop hook
+  firing and the 8-block override. The wired commands were run directly with
+  realistic payloads.
+- The verdict guard sees `Write`, `Edit`, and `MultiEdit`, not shell redirects.
 
 ## 19. The Orchestrator Loop and the Plan Handoff
 
