@@ -55,10 +55,20 @@ suites = []
 for s in ["write-scope", "guards", "status", "completion", "delivery", "html-page", "harness-reset", "ohmyorch-distribution"]:
     if not os.path.exists(os.path.join(ROOT, f"scripts/test-{s}.sh")):
         continue
-    out = sh(f"scripts/test-{s}.sh 2>&1 | sed -n 's/^  passed: //p;s/^  failed: /F/p'")
-    parts = out.split()
-    p = parts[0] if parts else "unknown"
-    f = parts[1][1:] if len(parts) > 1 else "unknown"
+    raw = sh(f"scripts/test-{s}.sh 2>&1")
+    counted = re.search(r"Result:\s+(\d+)\s+passed,\s+(\d+)\s+failed", raw)
+    if counted:
+        p, f = counted.group(1), counted.group(2)
+    else:
+        out = "\n".join(
+            line[len("  passed: "):] if line.startswith("  passed: ")
+            else "F" + line[len("  failed: "):]
+            for line in raw.splitlines()
+            if line.startswith("  passed: ") or line.startswith("  failed: ")
+        )
+        parts = out.split()
+        p = parts[0] if parts else "unknown"
+        f = parts[1][1:] if len(parts) > 1 else "unknown"
     badge = ('<span class="badge badge-success">PASS</span>' if f == "0"
              else '<span class="badge badge-danger">FAIL</span>')
     suites.append((s, p, f, badge))
