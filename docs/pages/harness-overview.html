@@ -367,7 +367,7 @@ td.num { min-width: 0; }
       <div class="card"><div class="stat-label">Archived changes</div><div class="stat-value">1</div><div class="stat-note">one per delivered story</div></div>
       <div class="card"><div class="stat-label">Canonical capabilities</div><div class="stat-value">1</div><div class="stat-note">under openspec/specs/</div></div>
       <div class="card"><div class="stat-label">Harness definitions</div><div class="stat-value">26</div><div class="stat-note">8 agents + 18 skills; plus 7 rules</div></div>
-      <div class="card"><div class="stat-label">Suite assertions</div><div class="stat-value">707</div><div class="stat-note">across 8 regression suites</div></div>
+      <div class="card"><div class="stat-label">Suite assertions</div><div class="stat-value">708</div><div class="stat-note">across 8 regression suites</div></div>
     </div>
   </section>
 
@@ -1023,7 +1023,7 @@ scripts/harness-reset.sh             # back up, verify, then reset</code></pre>
           <tr><td><code>scripts/test-delivery.sh</code></td><td class="num">179</td><td class="num">0</td><td><span class="badge badge-success">PASS</span></td></tr>
           <tr><td><code>scripts/test-html-page.sh</code></td><td class="num">151</td><td class="num">0</td><td><span class="badge badge-success">PASS</span></td></tr>
           <tr><td><code>scripts/test-harness-reset.sh</code></td><td class="num">98</td><td class="num">0</td><td><span class="badge badge-success">PASS</span></td></tr>
-          <tr><td><code>scripts/test-ohmyorch-distribution.sh</code></td><td class="num">37</td><td class="num">0</td><td><span class="badge badge-success">PASS</span></td></tr>
+          <tr><td><code>scripts/test-ohmyorch-distribution.sh</code></td><td class="num">38</td><td class="num">0</td><td><span class="badge badge-success">PASS</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1045,8 +1045,8 @@ scripts/harness-reset.sh             # back up, verify, then reset</code></pre>
       <li><code>CLAUDE.md</code>, <code>PRD.md</code> — the workflow and the separation-of-duties rule</li>
       <li><code>README.md</code> §5–§8, <code>.claude/skills/{ohmyorch-analyze-codebase,ohmyorch-generate-prd,ohmyorch-ingest-spec}/SKILL.md</code>, <code>scripts/guard-context-preflight.sh</code> — the entry workflows and their guard outcomes</li>
       <li><code>awk '/^---/{n++;next} n==1' .claude/agents/*.md</code> — each agent's tools and hook; <code>grep -o 'scripts/[a-z-]*' .claude/skills/*/SKILL.md</code> — each skill's scripts and delegates</li>
-      <li><code>ls .claude/commands/ohmyorch/opsx</code> — 7 commands; <code>ls scripts/guard-*.sh scripts/validate-*.sh scripts/test-*.sh</code> — guards, validators, sui
-      <li><code>.claude/skills/ohmyorch-post-install/SKILL.md</code>, <code>docs/distribution.md</code> — post-install adaptation and the release bundle</li>tes</li>
+      <li><code>ls .claude/commands/ohmyorch/opsx</code> — 7 commands; <code>ls scripts/guard-*.sh scripts/validate-*.sh scripts/test-*.sh</code> — guards, validators, suites</li>
+      <li><code>.claude/skills/ohmyorch-post-install/SKILL.md</code>, <code>docs/distribution.md</code> — post-install adaptation and the release bundle</li>
       <li><code>.claude/skills/ohmyorch-harness-reset/SKILL.md</code>, <code>manifest.tsv</code>, <code>PRESERVE.tsv</code>, <code>README.md</code> §27 — the canonical reset</li>
       <li><code>docs/images/OhMyOrch.png</code> — the header logo, embedded as a data URI because the page CSP allows only <code>img-src data:</code></li>
       <li><code>.claude/skills/ohmyorch-deliver/SKILL.md</code> Step 2, <code>scripts/delivery.sh</code> (<code>set_action escalate</code>) — the loop steps, owners, and the seven escalation causes</li>

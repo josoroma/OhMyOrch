@@ -52,13 +52,23 @@ for e in range(1, epics + 1):
     epic_rows.append(f'          <tr><td>EPIC-{e}</td><td>{t}</td><td class="num">{d} / {n}</td><td>{badge}</td></tr>')
 
 suites = []
-for s in ["write-scope", "guards", "status", "completion", "delivery", "html-page", "harness-reset"]:
+for s in ["write-scope", "guards", "status", "completion", "delivery", "html-page", "harness-reset", "ohmyorch-distribution"]:
     if not os.path.exists(os.path.join(ROOT, f"scripts/test-{s}.sh")):
         continue
-    out = sh(f"scripts/test-{s}.sh 2>&1 | sed -n 's/^  passed: //p;s/^  failed: /F/p'")
-    parts = out.split()
-    p = parts[0] if parts else "unknown"
-    f = parts[1][1:] if len(parts) > 1 else "unknown"
+    raw = sh(f"scripts/test-{s}.sh 2>&1")
+    counted = re.search(r"Result:\s+(\d+)\s+passed,\s+(\d+)\s+failed", raw)
+    if counted:
+        p, f = counted.group(1), counted.group(2)
+    else:
+        out = "\n".join(
+            line[len("  passed: "):] if line.startswith("  passed: ")
+            else "F" + line[len("  failed: "):]
+            for line in raw.splitlines()
+            if line.startswith("  passed: ") or line.startswith("  failed: ")
+        )
+        parts = out.split()
+        p = parts[0] if parts else "unknown"
+        f = parts[1][1:] if len(parts) > 1 else "unknown"
     badge = ('<span class="badge badge-success">PASS</span>' if f == "0"
              else '<span class="badge badge-danger">FAIL</span>')
     suites.append((s, p, f, badge))
@@ -111,6 +121,7 @@ SKILLS = [
     ("ohmyorch-test-feature", "independent acceptance of one change"),
     ("ohmyorch-generate-html-page", "a themed, self-contained explainer or status page"),
     ("ohmyorch-harness-reset", "back up, then restore the canonical empty harness"),
+    ("ohmyorch-post-install", "adapt an installed harness to this repository"),
 ]
 ORDER = ["ohmyorch-codebase-analyst", "ohmyorch-product-specifier", "ohmyorch-spec-ingestor", "ohmyorch-product-manager",
          "ohmyorch-planner", "ohmyorch-implementer", "ohmyorch-reviewer", "ohmyorch-tester"]
@@ -379,7 +390,7 @@ scripts/harness-reset.sh             # back up, verify, then reset</code></pre>
       <li><strong>A reset project is empty, not broken.</strong> It validates. <code>scripts/test-guards.sh</code> expects this repository's delivered backlog, so those navigation cases fail on the virgin <code>SPECS.md</code>. That is the canonical state.</li>
       <li><strong>Do not commit the backup.</strong> It is a byte copy of <code>.claude/</code>, so it contains <code>.claude/settings.local.json</code>. <code>docs/resets/</code> is gitignored for that reason.</li>
     </ul>
-    <div class="callout"><p class="callout-title">Restore</p><p><code>cd <root> && cp -RP docs/resets/<timestamp>/. .</code></p></div>
+    <div class="callout"><p class="callout-title">Restore</p><p><code>cd <root> && cp -RP docs/resets/<timestamp>/. .</code></p></div> On a host repository, <code>/ohmyorch:post-install</code> adapts the installed harness and writes a backup to <code>docs/pre-install-backup/</code> first. <code>scripts/package-ohmyorch.sh</code> builds the namespaced release bundle.
     <p class="section-lead">After a reset, resume from the workflow: <code>/ohmyorch-analyze-codebase</code> when there is source to describe, then <code>/ohmyorch-generate-prd</code>, then <code>/ohmyorch-ingest-spec</code>.</p>
   </section>
 '''
@@ -847,6 +858,7 @@ body = f'''<body>
       <li><code>README.md</code> §5–§8, <code>.claude/skills/{{ohmyorch-analyze-codebase,ohmyorch-generate-prd,ohmyorch-ingest-spec}}/SKILL.md</code>, <code>scripts/guard-context-preflight.sh</code> — the entry workflows and their guard outcomes</li>
       <li><code>awk '/^---/{{n++;next}} n==1' .claude/agents/*.md</code> — each agent's tools and hook; <code>grep -o 'scripts/[a-z-]*' .claude/skills/*/SKILL.md</code> — each skill's scripts and delegates</li>
       <li><code>ls .claude/commands/ohmyorch/opsx</code> — {n_cmds} commands; <code>ls scripts/guard-*.sh scripts/validate-*.sh scripts/test-*.sh</code> — guards, validators, suites</li>
+      <li><code>.claude/skills/ohmyorch-post-install/SKILL.md</code>, <code>docs/distribution.md</code> — post-install adaptation and the release bundle</li>
       <li><code>.claude/skills/ohmyorch-harness-reset/SKILL.md</code>, <code>manifest.tsv</code>, <code>PRESERVE.tsv</code>, <code>README.md</code> §27 — the canonical reset</li>
       <li><code>docs/images/OhMyOrch.png</code> — the header logo, embedded as a data URI because the page CSP allows only <code>img-src data:</code></li>
       <li><code>.claude/skills/ohmyorch-deliver/SKILL.md</code> Step 2, <code>scripts/delivery.sh</code> (<code>set_action escalate</code>) — the loop steps, owners, and the seven escalation causes</li>

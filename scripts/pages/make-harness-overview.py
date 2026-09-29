@@ -857,8 +857,8 @@ body = f'''<body>
       <li><code>CLAUDE.md</code>, <code>PRD.md</code> — the workflow and the separation-of-duties rule</li>
       <li><code>README.md</code> §5–§8, <code>.claude/skills/{{ohmyorch-analyze-codebase,ohmyorch-generate-prd,ohmyorch-ingest-spec}}/SKILL.md</code>, <code>scripts/guard-context-preflight.sh</code> — the entry workflows and their guard outcomes</li>
       <li><code>awk '/^---/{{n++;next}} n==1' .claude/agents/*.md</code> — each agent's tools and hook; <code>grep -o 'scripts/[a-z-]*' .claude/skills/*/SKILL.md</code> — each skill's scripts and delegates</li>
-      <li><code>ls .claude/commands/ohmyorch/opsx</code> — {n_cmds} commands; <code>ls scripts/guard-*.sh scripts/validate-*.sh scripts/test-*.sh</code> — guards, validators, sui
-      <li><code>.claude/skills/ohmyorch-post-install/SKILL.md</code>, <code>docs/distribution.md</code> — post-install adaptation and the release bundle</li>tes</li>
+      <li><code>ls .claude/commands/ohmyorch/opsx</code> — {n_cmds} commands; <code>ls scripts/guard-*.sh scripts/validate-*.sh scripts/test-*.sh</code> — guards, validators, suites</li>
+      <li><code>.claude/skills/ohmyorch-post-install/SKILL.md</code>, <code>docs/distribution.md</code> — post-install adaptation and the release bundle</li>
       <li><code>.claude/skills/ohmyorch-harness-reset/SKILL.md</code>, <code>manifest.tsv</code>, <code>PRESERVE.tsv</code>, <code>README.md</code> §27 — the canonical reset</li>
       <li><code>docs/images/OhMyOrch.png</code> — the header logo, embedded as a data URI because the page CSP allows only <code>img-src data:</code></li>
       <li><code>.claude/skills/ohmyorch-deliver/SKILL.md</code> Step 2, <code>scripts/delivery.sh</code> (<code>set_action escalate</code>) — the loop steps, owners, and the seven escalation causes</li>
