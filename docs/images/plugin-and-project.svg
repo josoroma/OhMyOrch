@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 570" role="img" aria-labelledby="title description">
+  <title id="title">Installed code and project memory have different homes</title>
+  <desc id="description">Claude installs skills, agents, hooks, runtime, contracts, and templates as a plugin. Explicit project-root paths select the consumer's documents, OpenSpec evidence, configuration, and private runtime state. Updates and uninstall preserve project files; bootstrap and upgrades are separate reviewed operations.</desc>
+  <defs>
+    <linearGradient id="surface" x2="1" y2="1"><stop stop-color="#101b32"/><stop offset="1" stop-color="#111127"/></linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 8 4 0 8" fill="none" stroke="#a78bfa" stroke-width="1.5"/></marker>
+    <style>
+      text{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      .title{font-size:25px;font-weight:700;fill:#f1f5ff}
+      .label{font-size:16px;font-weight:650;fill:#e0e7ff}
+      .detail{font-size:15px;fill:#bac9e0}
+      .code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:14px;fill:#dbeafe}
+    </style>
+  </defs>
+  <rect width="1080" height="570" rx="28" fill="url(#surface)"/>
+  <rect x="1" y="1" width="1078" height="568" rx="27" fill="none" stroke="#34425d"/>
+  <text x="40" y="60" class="title">Install the capability. Keep the memory in your project.</text>
+  <text x="40" y="91" class="detail">Physical plugin root selects code · canonical project root selects data</text>
+
+  <rect x="40" y="120" width="450" height="330" rx="20" fill="#13233a" stroke="#458299" stroke-width="1.5"/>
+  <rect x="40" y="120" width="450" height="6" rx="3" fill="#67e8f9"/>
+  <text x="66" y="166" class="title">Installed plugin</text>
+  <text x="66" y="194" class="detail">Claude cache or explicit development checkout</text>
+  <text x="66" y="241" class="label">24 skills + eight scoped agents</text>
+  <text x="66" y="275" class="label">Root hooks + Bash / jq runtime</text>
+  <text x="66" y="309" class="label">Seven contracts + validators</text>
+  <text x="66" y="343" class="label">Neutral bootstrap / artifact templates</text>
+  <path d="M66 368H464" stroke="#344b64"/>
+  <text x="66" y="402" class="detail">Read-only during consumer operations</text>
+  <text x="66" y="427" class="detail">No copied executables or bundled credentials</text>
+
+  <path d="M496 271H583" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="540" y="253" text-anchor="middle" fill="#ddd6fe" font-size="13">explicit root</text>
+  <text x="540" y="298" text-anchor="middle" fill="#ddd6fe" font-size="13">read / validate</text>
+  <text x="540" y="317" text-anchor="middle" fill="#ddd6fe" font-size="13">owned writes</text>
+
+  <rect x="590" y="120" width="450" height="330" rx="20" fill="#211d3c" stroke="#7e6aaf" stroke-width="1.5"/>
+  <rect x="590" y="120" width="450" height="6" rx="3" fill="#a78bfa"/>
+  <text x="616" y="166" class="title">Your project</text>
+  <text x="616" y="194" class="detail">Your intent, evidence, settings, and history</text>
+  <text x="616" y="239" class="code">PRD / SPECS / CODEBASE</text>
+  <text x="616" y="274" class="code">openspec/changes/&lt;id&gt;/</text>
+  <text x="616" y="309" class="code">openspec/delivery/goal.md</text>
+  <text x="616" y="344" class="code">.claude/ohmyorch/project.json</text>
+  <path d="M616 368H1014" stroke="#4b3c68"/>
+  <text x="616" y="402" class="detail">Ignored leases, counters, backups, approvals</text>
+  <text x="616" y="427" class="detail">Provider secrets remain user-owned</text>
+
+  <rect x="40" y="479" width="1000" height="56" rx="16" fill="#0e172b" stroke="#34425d"/>
+  <text x="540" y="513" text-anchor="middle" fill="#dbeafe" font-size="17">Updates and uninstall preserve project data · bootstrap and upgrades are explicit</text>
+</svg>

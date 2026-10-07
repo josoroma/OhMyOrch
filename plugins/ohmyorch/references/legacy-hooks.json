@@ -1,0 +1,42 @@
+[
+  {
+    "event": "PostToolUse",
+    "matcher": "Write|Edit|MultiEdit",
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/validate-product-artifacts.sh\" && exec \"$d/scripts/validate-product-artifacts.sh\" --hook --quiet; exit 0'"
+  },
+  {
+    "event": "PostToolUse",
+    "matcher": "Write|Edit|MultiEdit",
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/run-project-validation.sh\" && exec \"$d/scripts/run-project-validation.sh\" --hook --quiet; exit 0'"
+  },
+  {
+    "event": "PreToolUse",
+    "matcher": "Write|Edit|MultiEdit",
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-planning-handoff.sh\" && exec \"$d/scripts/guard-planning-handoff.sh\" --hook --quiet; exit 0'"
+  },
+  {
+    "event": "PreToolUse",
+    "matcher": "Write|Edit|MultiEdit",
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-context-preflight.sh\" && exec \"$d/scripts/guard-context-preflight.sh\" --hook --quiet; exit 0'"
+  },
+  {
+    "event": "PreToolUse",
+    "matcher": "Write|Edit|MultiEdit",
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-story-done.sh\" && exec \"$d/scripts/guard-story-done.sh\" --hook --quiet; exit 0'"
+  },
+  {
+    "event": "PreToolUse",
+    "matcher": "Write|Edit|MultiEdit",
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-delivery-loop.sh\" && exec \"$d/scripts/guard-delivery-loop.sh\" --hook --quiet; exit 0'"
+  },
+  {
+    "event": "PreToolUse",
+    "matcher": "Bash",
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-archive.sh\" && exec \"$d/scripts/guard-archive.sh\" --hook --quiet; exit 0'"
+  },
+  {
+    "event": "Stop",
+    "matcher": null,
+    "command": "sh -c 'd=\"${CLAUDE_PROJECT_DIR:-$PWD}\"; test -x \"$d/scripts/guard-delivery-loop.sh\" && exec \"$d/scripts/guard-delivery-loop.sh\" --hook --quiet; exit 0'"
+  }
+]

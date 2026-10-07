@@ -1,0 +1,53 @@
+name: Deploy GitHub Pages
+
+# Publishes only the generated guide, its assets, and the entry-point redirect.
+# Site URL: https://josoroma.github.io/OhMyOrch
+#
+# Static pages are committed. Project settings, recovery data and plugin source
+# are excluded from the dedicated Pages artifact.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Stage public pages only
+        run: |
+          mkdir -p .pages-artifact
+          cp index.html .pages-artifact/
+          mkdir -p .pages-artifact/docs
+          cp docs/OhMyOrch.html .pages-artifact/docs/
+          cp -R docs/assets docs/images .pages-artifact/docs/
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .pages-artifact
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

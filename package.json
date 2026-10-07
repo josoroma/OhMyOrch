@@ -1,0 +1,21 @@
+{
+  "name": "ohmyorch-maintainer-tools",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Maintainer validation only; consumers install the Claude Code plugin.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node tools/check-plugin.mjs && node tools/check-links.mjs && node tools/render-guide.mjs --check",
+    "docs:build": "node tools/render-guide.mjs",
+    "test": "bash tests/run.sh",
+    "test:marketplace": "python3 tests/test_marketplace.py",
+    "package:plugin": "python3 tools/package-plugin.py",
+    "check:release": "python3 tools/check-release.py"
+  },
+  "devDependencies": {
+    "markdown-it": "15.0.2",
+    "yaml": "2.9.1"
+  }
+}

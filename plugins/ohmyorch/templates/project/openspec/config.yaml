@@ -1,0 +1,6 @@
+schema: spec-driven
+
+context: |
+  Project intent is defined by approved PRD/SPECS artifacts.
+  OhMyOrch handles independent planning, implementation, review and testing.
+  Project-specific architecture and validation commands remain unknown until analysis.

@@ -1,0 +1,9 @@
+{
+  "pluginVersion": "0.0.1",
+  "licenseApproved": false,
+  "liveAgentIdentityAndDenials": false,
+  "liveDeliveryLifecycle": false,
+  "latestStableValidated": false,
+  "rollbackRehearsed": true,
+  "notes": "The owner authorized consolidation of all published history into one commit and replacement of v1.0.0 with the sole literal tag 0.0.1 on 2026-10-07. Live authenticated tests remain an explicit gate for public packaged artifacts and support claims by user direction; the distribution license is unresolved. Never mark evidence true based on synthetic hook payloads or publication alone."
+}

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/josoroma/OhMyOrch/project.schema.json",
+  "title": "OhMyOrch project configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "enabled",
+    "documents",
+    "openspec",
+    "output",
+    "delivery",
+    "fastValidation"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "documents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prd",
+        "specs",
+        "codebase"
+      ],
+      "properties": {
+        "prd": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical project-relative path. No traversal, symlink components or control characters."
+        },
+        "specs": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical project-relative path. No traversal, symlink components or control characters."
+        },
+        "codebase": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical project-relative path. No traversal, symlink components or control characters."
+        }
+      }
+    },
+    "openspec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "schema"
+      ],
+      "properties": {
+        "root": {
+          "const": "openspec"
+        },
+        "schema": {
+          "const": "spec-driven"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pages",
+        "epicLogs"
+      ],
+      "properties": {
+        "pages": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical project-relative path. No traversal, symlink components or control characters."
+        },
+        "epicLogs": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical project-relative path. No traversal, symlink components or control characters."
+        }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxStalls"
+      ],
+      "properties": {
+        "maxStalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6
+        }
+      }
+    },
+    "fastValidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "script"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "script": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical project-relative path. No traversal, symlink components or control characters."
+        }
+      }
+    }
+  }
+}

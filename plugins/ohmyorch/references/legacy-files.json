@@ -1,0 +1,770 @@
+{
+  "schemaVersion": 1,
+  "revision": "6198da15df78cd5a68d4227abd4e4e5d27372ac8",
+  "files": [
+    {
+      "path": ".claude/agents/README.md",
+      "sha256": "c701a9e8dc0c47ffda3e805342df4da0def61552e82c991a257ab64e44881c8d"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-codebase-analyst.md",
+      "sha256": "514bc0fcf3c77e7107de375caffcbf116eb7658101babb5be7854775a7dc496a"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-implementer.md",
+      "sha256": "adaa5cec31ab18b1dc0040895a8e088d202dba9c8cd925b584cafb995181aa37"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-planner.md",
+      "sha256": "f3e083996cf6cf6e64e1a1ae2cc30dd462351989fabf845579a0067e578d580d"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-product-manager.md",
+      "sha256": "ee52b7ae20c8f08f82145019cbec7a51e4956193a235745aa92cc2c63fd48b16"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-product-specifier.md",
+      "sha256": "d6640479b2db214965991b884db5ca5ed915d73735d2e58e4b3254b87df4a983"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-reviewer.md",
+      "sha256": "0552283dbbe2f18359249638f4546f207a4ce27f0b6f78732e3b1846314dbce4"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-spec-ingestor.md",
+      "sha256": "077a85713b5b995675db3998712406c61899692e7f8bc1998fdc77829e8ee8cd"
+    },
+    {
+      "path": ".claude/agents/ohmyorch-tester.md",
+      "sha256": "c1e3ff61bb659dda1606aa7d3b58cf5eeabe3e8504ce681edeaef4e56f0e070c"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/opsx/apply.md",
+      "sha256": "3c9551f92576a93ef3510f717f65fd8f75b5a170b5b933e87a500abdea967735"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/opsx/archive.md",
+      "sha256": "abefb001e95bbb945a1ee6dc6a27a2c6729e8783c7676f4279178891163a786b"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/opsx/explore.md",
+      "sha256": "faa74de1a8c424886fdcf2a5f27a2a01179ca4ab4bdb53dd9b30a4efaf7941b5"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/opsx/propose.md",
+      "sha256": "ba63b0c5f9085ce3c9d81b89009b3e5a41cab8709b49ca1c9402230b7e5416a5"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/opsx/sync.md",
+      "sha256": "52986ddef25e4037a561a46508886b60f6f0f77163f62feed4e88fcfa305f108"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/opsx/update.md",
+      "sha256": "36ce5484d8d2426fdbd1ea4dd5cfa8a89a4396a24f0eee50f1565840d6527c6a"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/opsx/verify.md",
+      "sha256": "9b11aeed6d466bd95c273eab12bd28dba5e55087ed750563371d9bb605a75722"
+    },
+    {
+      "path": ".claude/commands/ohmyorch/post-install.md",
+      "sha256": "433eefb88a4d1778ae4ad50aa664344985f71f2c08bcae9cf8fa274ef68bf953"
+    },
+    {
+      "path": ".claude/rules/README.md",
+      "sha256": "f55d22d4457ca5f3eaa6fdfaf04ffc0267c5cdf04d8433db1a7ff9befe06622c"
+    },
+    {
+      "path": ".claude/rules/ohmyorch-codebase-context.md",
+      "sha256": "890b420f63943b6487cac5ad95c9684dc3f279517cb08f1fa6a412a238eae269"
+    },
+    {
+      "path": ".claude/rules/ohmyorch-delivery-loop.md",
+      "sha256": "b425c2cc0ba9fec3b621ef31a04d2803d04c4804f631b5261881159df31a32e3"
+    },
+    {
+      "path": ".claude/rules/ohmyorch-gherkin.md",
+      "sha256": "e0384cdebbed0ba0e5bdd9f0b90d6a74eae1f79480d3beadd2011bfc7a90dc21"
+    },
+    {
+      "path": ".claude/rules/ohmyorch-openspec.md",
+      "sha256": "f60e64c6e99228c879c1b2b079277f6b384edcfddc11e4b52ffff0351b460c58"
+    },
+    {
+      "path": ".claude/rules/ohmyorch-specification-ingestion.md",
+      "sha256": "a1554b2b0734101ca025dee5ed486e377210063ac4a22bdd143fd7e69562f719"
+    },
+    {
+      "path": ".claude/rules/ohmyorch-team-responsibilities.md",
+      "sha256": "8ae4b75cd7674286d59efd621195927ab19aae395351f74ca343c637cd5f6fc4"
+    },
+    {
+      "path": ".claude/rules/ohmyorch-testing.md",
+      "sha256": "da1cf9fac452794f9a26a9ca85a9fc28f073f3034cad0e8433e813f022080ecb"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-analyze-codebase/SKILL.md",
+      "sha256": "308daa6f023c825c4d6d17377aa34dc6454ab6daa89a912cab8924abe835c5e9"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-deliver/SKILL.md",
+      "sha256": "7f48fa9f503a9529ac820c6c2956d8e9904e527a18b3041c9123cc04ab64cf10"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-generate-html-page/SKILL.md",
+      "sha256": "e0b5442703a02b403ce0b7759cd1268a6742c38440d323dfdc0327bf5ba116ec"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-generate-prd/SKILL.md",
+      "sha256": "7cd14f55ffab2cf5898020a3f1c0fc363f7ef199a93c529f19a7dc13537d064e"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/PRESERVE.tsv",
+      "sha256": "9f46c0f00bfaa92e70d8991bf6a776afbcd9917fa02f820a0518ed37284b1ce8"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/SKILL.md",
+      "sha256": "265d902b9fa39c62191a8e365f2b5a1f769f57f5f7a30887eff7f9d706748387"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/CLAUDE.md",
+      "sha256": "0b6e68b83bf3be8b4aae52f6ab9262bdc1a4d9bf41bc19b88398d393f768e63f"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/PRD.md",
+      "sha256": "93ab73e535a4a70c238152623d9006d14fa80891bee3c7ca4897547a737676aa"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/README.md",
+      "sha256": "86a1a27770919024ea3a74f5a2e75b5c26f583df2db7ba5f13a6c95ae2cc6cad"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/SPEC-LOGS/README.md",
+      "sha256": "a685b95ea693643331c83846492367405a1d1f542ae214c35b5071370f8b8fb4"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/SPECS.md",
+      "sha256": "e6c27531eda8208ac37262d5fa7198525896d1719fe1b3da009bab61e1cc0a37"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/openspec/changes/archive/README.md",
+      "sha256": "49f97fd2aad501380c35982dbb6adc6b186b5b43063d047097c6961cdb3c16bb"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/openspec/config.yaml",
+      "sha256": "340ed60bb8abb7ee3eafebcfe33256376a32dcaa74beca80e059a143a18717e9"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/openspec/delivery/README.md",
+      "sha256": "9775f9109ab78d4575d813c0d3979f892c478e6d68c709b72ecab083a1e64508"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/openspec/specs/README.md",
+      "sha256": "4251b9d82cad4cf6d72685b03023a54c3102af11e02131077f25d5c6afc2d58e"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/README.md",
+      "sha256": "95b0793fa40d11dd61018b9a1270e26b9ed42b639db097df8fe7ee4c66d13e47"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/check-frontmatter.js",
+      "sha256": "95ac31225ab0a9d0420b1cb2c734ff192509ae86e9e5937dab7bba9aa1584a46"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/check-scope.sh",
+      "sha256": "9f72b0845cd5add0bfd3cb764964498a1f472af82351fa364efa8747539b25f2"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/check-write-scope.sh",
+      "sha256": "1eac03ef82c689c353b1b33fb8271eb0dfe7095a1b1f7d0b03f6b5fe3410d268"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/completion-gate.sh",
+      "sha256": "24a5444ae9a9b5d0721aa118827b5a8375e178a3b0d5928fd98ca22d94af36ee"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/delivery.sh",
+      "sha256": "2e309684be7298a8183e576bab5656263b919824e358e29ead6a570fc3939dcc"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/completion/incoherent/completion.md",
+      "sha256": "6b313ffe3f64b756854f72066c6fd39bfc8181235edacc1450e97fc9081eca68"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/completion/malformed/completion.md",
+      "sha256": "ba032fdf85960f402a159c6938e4a735f5cec317cb9d5c8b49095fbcc5aa1fa2"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/completion/valid/completion.md",
+      "sha256": "0dfc791fb5ca9d6c779f1f7212283dbc97c37919b6737781239b6c8b53eaaec1"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-char-ref.html",
+      "sha256": "9f1c0ad95701e2b9b3dc77b94d21f7e6b90e78dee7d12d5129c6dd0ccc734a73"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-comment-quirk.html",
+      "sha256": "193afe7490651e7bce575ed3a8656bdc322378b9bc9c1450adc9de167ada12dd"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-create-element.html",
+      "sha256": "7e5b17b1fd7e509421ecef5d3dfd4676c2eb35c93004e85f999d130e3edf6773"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-css-escape.html",
+      "sha256": "218d7403b1658dcd364cef2cec15bbdfa33038775773ad05c9af5c118b877b1c"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-duplicate-rel.html",
+      "sha256": "9f94cceb720ba81fed9b4970d48f745a6f9c666ebbb1ab438c1269aa5ceafdde"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-form-feed.html",
+      "sha256": "6524d4a037cc79b4c0f882bdad00ad089cb5e13f54133d7d5857e0a4d91fdd60"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-module-import.html",
+      "sha256": "b0ab4a3806281f9cd2d9b6754d3b843d10ec7cb4b50b5246e513ffa12db949f1"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-script-body.html",
+      "sha256": "dd7067cb109788e83180672ddab61d14f12de0df29dd0905e5ede0924e589b07"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-bypass-svg-script.html",
+      "sha256": "58a98cd5af82ef8c1b848a354a57501d3951fd573d29bc9bb0698ebc968a84da"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-commented.html",
+      "sha256": "43c7cec1334bc8fa536842769761ea422195f3d23c0fffca86b8a6722aaafc49"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-dotted-i-attr.html",
+      "sha256": "914c930b746aa2193b9ace1408953ae219f7dd685370f229b3a24f6afc4e5af1"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-dotted-i-value.html",
+      "sha256": "4d5962fcb82361f5fe08958d37aae606caf7d377c5dc45b3e1699285a24065e6"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-late.html",
+      "sha256": "f4b66b4175bb0066bda6f69077170b47477fcd25d671f03e807f9a1b4a18d994"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-missing.html",
+      "sha256": "111d1c8cc9faf4487a2a92dc5483daabe6a0b2c18caf417807eb7b3122c74d80"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-nul-in-attr.html",
+      "sha256": "8ecea0ab894cfab6d9d6401a5fc1f951f9be0c7b4ac582aebf3724856862c914"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-nul-in-policy.html",
+      "sha256": "f47f8f4d47e3d9a73337d12ee58d3bc50ffe90fed5c85bf49f585f4d278ca9ed"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-nul-in-tag.html",
+      "sha256": "19391a3a30f9a9da057fb1b2f7c09ece6dfdbd057cc1242b2657d021d9f7fa5f"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-vt-before-content.html",
+      "sha256": "c38825fa9a8e7100b669f1d827f8893a28f62d446d23eb263d98e37f643e9dd1"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-vt-in-html.html",
+      "sha256": "3a4c84544015f9aef19bafd108bfd7939aec8e654ae32f5b99273508fcf07778"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-vt-in-meta.html",
+      "sha256": "f521f723e061b35a3075d0311dffc867fbcd7e4fbc6417b2de9c7fb1059bf92f"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/csp-weakened.html",
+      "sha256": "29c733f933bff1d962ec2f6c61d59fb95bda630432c940979897a6f0dcdd414d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/doctype.html",
+      "sha256": "0198fe6229b594c1a5cec626307aafe7420f1930206cb9e967ca51bda027a789"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/lang.html",
+      "sha256": "7093a87a8ab249467e7be89ceff2098851258c4976a7b42d8421879e8cab03c6"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-font.html",
+      "sha256": "cf1e2ae8ff033f9a87e2aab7327e99caf3600f8d5307459df03e082183fb874b"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-import.html",
+      "sha256": "40aa5a181055bcfaf6ce66aa1b33289d5c725f41f8cdb9b6945cd383fb21e490"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-link-multi-token.html",
+      "sha256": "52a9f4625224f744417f2df3f27a943d28ecc20553c934c49dc8d26e1e355a72"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-link-single-quote.html",
+      "sha256": "d23f8e9a535183eb126856fcbb33236895f75edda5f8e1bd1bc91acb5b95f7aa"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-link-spaced-equals.html",
+      "sha256": "ed69107c34c07a4828e3be0d14e258661061591ac1508f434b51558c4afd05d4"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-link.html",
+      "sha256": "2e8680f7d1548d3cfcdb1f2a0a2079b86951ddbbf42f6a55f4a57f1c8c9dc9c6"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-preconnect.html",
+      "sha256": "13f6db2e503fb03f69b6fb961593a3402a848ffd092ca250f0597a117e3616c1"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-preload-single-quote.html",
+      "sha256": "014f8be52c6d9eed8d2ae11d77cff632081cb53adf6276f0e349d80e61edee53"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-protocol-relative.html",
+      "sha256": "77ccde69cfc467e5c6a3d5a275f0548ad2c4bcdbf0a38277d664f52dea8cff3d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-quoted-gt.html",
+      "sha256": "97101af6233ecb52384fed8901d102ec00ccdc646a7b3ea789cbc77e61e3a499"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-script-spaced-equals.html",
+      "sha256": "4363ffe99eee057ee7e689717d96e7477b9fa698c4832bbb3066a58d4c4cb4a7"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-script.html",
+      "sha256": "2fe51965fa6943e7acaad2e977f2f0f40df49c839042d588fdaa1c07463de809"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-slash-separator.html",
+      "sha256": "86a59954c8058d0764d668e7fa3cb31e70bc1327dd879b6cc4613628033bedcd"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-uppercase.html",
+      "sha256": "a340a7d75b6566c58a5b94c7ff4592300817acb9a4d5436e29fd335653c1a5f6"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/self-contained-url.html",
+      "sha256": "be11adf5b7db344cb7f9fc98a87b5f12cfb56fe1858b0088b98d632c994e0209"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/sources-empty.html",
+      "sha256": "3000205f08558f818030df151219e798a8b66f8f0315080057781778d473241b"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/sources-missing.html",
+      "sha256": "899415adf53ecb4f9a79a1a3fe1a43b2d2dcc6e2f6f62956fd5e5b6b1595ab97"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/svg-a11y-dangling-label.html",
+      "sha256": "e3694a214c4702c583fa8fff10cfd4dd2966750a02649480118a54134cd30aad"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/svg-a11y-no-name.html",
+      "sha256": "f4b8835738bfe30ba74a68b171824713dc08b6df89a323a4a3d09714a1b03127"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/svg-a11y-no-role.html",
+      "sha256": "f69fe4951820bdfab25c9dcfc531262b04f858a2e58f91d350f078b46165e0bc"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toc-after-section.html",
+      "sha256": "1d563a4112aa52d63a14cd37d85f8718a1c42e9632634a7b134f5377dc98a395"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toc-links-dangling.html",
+      "sha256": "04cf6556e6090e86cdb47f7aa66fdeb4822352f04c78261e1e4562acf42a1a2c"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toc-missing.html",
+      "sha256": "6c848525615fde9d0c7765a4cd43dd8445e7c7cc0a633df108a36bb267571dc3"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toc-unlinked-section.html",
+      "sha256": "09489e854568d855c9c1ed1d1c353c7e213b8fa90e17eb35ac38d8edee034546"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toggle-no-button.html",
+      "sha256": "d5bd02eda99ac8c049046ff414baff1adddb9e5bf6cc94f3c7fb5d0c6fbf7d5d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toggle-no-class.html",
+      "sha256": "5088844a634ccd8fa799871d0ac145e43dba07b0e72412f8a95173899b5c55a3"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toggle-no-storage.html",
+      "sha256": "3a8236243712385ba574c93fdd19e20438b824cfc993b9a1d2f4d68d273e35d7"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/toggle-no-system.html",
+      "sha256": "5595250f10daf5b465e444b370c588ec5dd4ca22eff9044788b612c90bc59b76"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/tokens-dark-scoped.html",
+      "sha256": "7c2aa2e2e7a05c2348901cbaf78338ac84db798974126792771d8c1de0cbafe3"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/tokens-dark.html",
+      "sha256": "24a7174bc8ab005f58403cd638c976b8eeaf5613b34603fdc745759826def8e5"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/tokens-light-missing.html",
+      "sha256": "e099dfe2685a5788a2c9bd0c40eee47ff662eba3df1d9a610bf760df9406adb0"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/invalid/tokens-light.html",
+      "sha256": "42ae6157243e2e40381f963ca5684caeca81ebe45c761e2bd600aea3a24aa046"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/make-fixtures.py",
+      "sha256": "c5776df121627b240e4549fe4683264146b06d5b35f452ce4a33eab93c3bdf68"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/valid/page-compact-tokens.html",
+      "sha256": "111cac615440a0a7b57fe48816418940dcb45e354afb111926acb4dfe34d30ec"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/valid/page-mentions-markup.html",
+      "sha256": "9148e3f12845677d1604dadcc0e748ebe695fa8c729a0117658ba770a94c916c"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/html-pages/valid/page.html",
+      "sha256": "6178979396d44c98dc68926ffead649f08ced415f6e91cdf6752af3820193f6c"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/invalid/CODEBASE.md",
+      "sha256": "7c3e7ce12ab8d6fcd37eb8619ea8b8d18b2071ccc3b08a632cd5ae399b6c7d01"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/invalid/PRD.md",
+      "sha256": "e9307d5fec12ae9a38e4688f628dfeaba684e00b0ff13b0c8bff259f878447ee"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/invalid/SPECS.md",
+      "sha256": "b1e588db284b03b3f827642961906db5082a325e0f36f8bfa2d8a2ef1c1064cd"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/plans/invalid/implementation-plan.md",
+      "sha256": "219b4c47e54eff4df38126dd678c481f09bb497371b7ea8233ef7ee01903fca0"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/plans/valid/implementation-plan.md",
+      "sha256": "ee7d88b586915f0a71f72b0dcb664f7273506a504a9f3775b099b051b8164ce2"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/reviews/blocking/review.md",
+      "sha256": "cfb48859b298363faa28674506f15731fcce182d005d398e0d619edbf473a631"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/reviews/invalid/review.md",
+      "sha256": "5dc12a9b38386138f7bdad12e47ab5cd38f02cb035d88f6657ff57c86808f973"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/reviews/valid/review.md",
+      "sha256": "e99dd27493bb604d471510485869587ca9baf8ce0b732d89b276e48ba666296a"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/status/incoherent/status.md",
+      "sha256": "dedff7ae5491b8a859357b9ddd58d8e5aa88479637e76fd8847242418c51fb01"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/status/malformed/status.md",
+      "sha256": "7c6f873197a0dbea9e7c07253f6ccf6cabc4a3a521ef709c62330d18cc9fc1db"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/status/valid/status.md",
+      "sha256": "4aabefed7f3e7c086394a8670bc0252e93a4995583fa176f5d6311ed688db25d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/test-reports/failing/test-report.md",
+      "sha256": "2e863169fd17f2d8ee25aaf3fdf5d412a60867e49641db05ee06b336d929ee34"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/test-reports/invalid/test-report.md",
+      "sha256": "bd9844591ac4baf5c28b28d21769c10f0b12880b60121edec6cd134dcaf35037"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/test-reports/valid/test-report.md",
+      "sha256": "c5ba64cc30c12e2e18ae2e3518f170deb9be3c81c0b2e9c9b7f9278f95bc6382"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/valid/CODEBASE.md",
+      "sha256": "987daf004fe71bd89aa64a40d2de6d022c0fd110fa610b9388bca60250448276"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/valid/PRD.md",
+      "sha256": "eae8dd74d4e8e39bf6210bfd7689f48adc2d3e9dac7004d5547862dd1dee87c7"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/fixtures/valid/SPECS.md",
+      "sha256": "7e8fa953d399e1efc3dbf9387458af71b72c22fd0a5168b479667dd7e005b319"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/guard-archive.sh",
+      "sha256": "ebe5d4a972dd66678e0adf86c9d79160c136eb3543002cc2042db1c89a4559c4"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/guard-context-preflight.sh",
+      "sha256": "b2a8a1220a73866a4f26af03dc43cc8da01818ff01de97fdda0f4171a523d80b"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/guard-delivery-loop.sh",
+      "sha256": "a56afeb9ecd206b6ea04bc9e2c67c6902d162154be80d255d6c511b5fee33457"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/guard-planning-handoff.sh",
+      "sha256": "9b8c1ec260e2d04f3fcf26f2ea7647e83cd14c10a204205f28164d4371680d13"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/guard-story-done.sh",
+      "sha256": "41d95fe1490d4aba3fec4e78a4a0612e8bd6087f33242ae702137bd2e98f537d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/harness-reset.sh",
+      "sha256": "c71f1af74c7ecbc5df76bbd1d00038b3e372634f9f410037408d397efb2fe9a8"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/package-ohmyorch.sh",
+      "sha256": "06ef4b192af92fa440646ba7fc934baad9229c0731273d73bc9992f1b00c571d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/pages/make-harness-overview.py",
+      "sha256": "c99964744dcadbf6a7560b6fa5e0b373bd0d4ea1a48d08fe705c4f6c369c88bb"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/run-project-validation.sh",
+      "sha256": "e7f09c17ab9d94f7c35e127eb0dbceed741580898ec0167c4538e9f665afd04a"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/status.sh",
+      "sha256": "e2904a8912155dff4819b7cf22b514e34bdb1a47e5c1c086bbfd9fe0e2c5ad3d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/templates/completion.md",
+      "sha256": "e2e9074fad4b8fe02a299f438ee2808c5c4f7efc8d6b0bb57360933b1cce36b8"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/templates/html-page.html",
+      "sha256": "2b0e7cbff2ce0c3ba88312f888f580c1922a6df984c26220cd98202ffe0072cd"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/templates/implementation-plan.md",
+      "sha256": "f2ce50e8d98bdf4bf7db62ef3deda1924d846d724cd43cfe622480e4a0a4379f"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/templates/status.md",
+      "sha256": "63d52fbbe7da1c3eb726bcdc99a35bdfc656cb68277d1f132d2987ab92f2e4e1"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-completion.sh",
+      "sha256": "88a1c7fc59037edc9e1d6d7ad143354f7baece0e146d957d4f3b74d110ddf9b4"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-delivery.sh",
+      "sha256": "ba6998a4cf9aee90b3607d4f6b6a0d755d477e02d8982dccf65d429908de6fa4"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-guards.sh",
+      "sha256": "654ef9b4845bb595298b76035eccfa0a544e464b26d00a85f8b16b83d35ff840"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-harness-reset.sh",
+      "sha256": "0fec60e51b3527f898db2cb87898b031e5d9f8ba93a98dab9e03b54fe1ef2c9f"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-html-page.sh",
+      "sha256": "910afe7019777f8e3b3f56a8b5d3ded6441b38e94ab4d28b33d000279640e357"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-ohmyorch-distribution.sh",
+      "sha256": "63d5e889bbd5e8ac584b20baa801dfba83b39a9de97c3e446b7741fb7461d9b0"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-status.sh",
+      "sha256": "f6eced7e34c227e28ab9054c92f0ad5d98078c907fdfd14dcd62169dd58bc36e"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/test-write-scope.sh",
+      "sha256": "c63c802f92bbac09e410024b6386c1212ea91d9a557b1f4bc4d5f576ff5c9cc2"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/validate-html-page.sh",
+      "sha256": "90a813b59995e3cc33637404ca5c1118cf0686cf32174e0b331a63e74fb3b694"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/validate-implementation-plan.sh",
+      "sha256": "9a9952b9bc3ddfbe7b3b08cec69fccc961524520eedb3c60436cccad4a865aec"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/validate-product-artifacts.sh",
+      "sha256": "ace7be62caed0a2932f201751e5699d995ddd4bfa155d27c8ee42623069f7ed4"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/validate-review.sh",
+      "sha256": "f3b0af14f812ee3db12661a57d8f8c630d58279aeaa024972e173f422c15ea10"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/validate-status.sh",
+      "sha256": "d103e8b57628139c5e4a3de296ccc15cff708a2c46ed33975509fdbeb2623f6c"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/validate-test-report.sh",
+      "sha256": "c9a538746f3c30bf01694900db569ff979d34dae9f04cbd5ec1b2d713938dd56"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/validate-verification.sh",
+      "sha256": "63c43cd40fe72e505a99a6a06041adabb59b2f0cb745d653a4e2e375c29ef90d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/canonical/scripts/workflow-status.sh",
+      "sha256": "eda4494c211ebae18c41ccaaccf11245d4dacea37bdf8b44eeb7be1eb62a89a5"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/harness-reset.sh",
+      "sha256": "6a2a3554ffc497bd7a9658fd7083b5a0364fc4d51e8f9358c9d1a34cf1c68ab8"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-harness-reset/manifest.tsv",
+      "sha256": "05e6ef81fc09759b4f19233948a51c0c59b8db7974bb633be2935ee077bf0a77"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-ingest-spec/SKILL.md",
+      "sha256": "9a18a90f456688a482a5c8bd868c6a5b1adf99309910d0aabb8cf981620d480d"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-openspec-apply-change/SKILL.md",
+      "sha256": "6fc0292a65afb4b68c471443d9b8fe81d0832940359f6594a22025c35c9f5a3a"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-openspec-archive-change/SKILL.md",
+      "sha256": "869459b42e9ae7cb248e4ca5a2f5a6ca847ab9620f32f401a8b21e35c8aa8a29"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-openspec-explore/SKILL.md",
+      "sha256": "754dcc35e954a40c81959dd0cd41d30e23e0f1738dc2bc2a3626213ed76f9f3f"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-openspec-propose/SKILL.md",
+      "sha256": "87b4c26087c4d8b7e9b955ba4551840bd4e183d7e23d977e357873c747ae2f99"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-openspec-sync-specs/SKILL.md",
+      "sha256": "dc957b1e96eeea06c22bdb42488ba2007fffdcbbedd872ebd310f0af7a18ecfa"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-openspec-update-change/SKILL.md",
+      "sha256": "8f4b13445179eae5d0634700dc4db467bb01f11fdefb1812ddb41f8eaade3b8f"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-openspec-verify-change/SKILL.md",
+      "sha256": "00b3e454f030438ffd38eef597fc8a168b2115b86ae0dad484b48d140911fb97"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-plan-feature/SKILL.md",
+      "sha256": "f1e865a644f482c4e0695d4350f88a5decf1e8d23ca3ab6538726ea98838cb60"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-post-install/SKILL.md",
+      "sha256": "2aae167b10d85193ea65612397eeb08d01068e47816df3842e21c0e8d423fd38"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-post-install/ohmyorch-post-install.sh",
+      "sha256": "8cdb7e0496e0c0d37ceebf15339c4d378b17abf8834c769e936ebf6b49d439b1"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-product-iteration/SKILL.md",
+      "sha256": "643f2637e3c5a06dc06df6c1d79062d0f7691fc86dbf2713d82934d2120bedc5"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-review-feature/SKILL.md",
+      "sha256": "845dd342d198f49af2143d23f01e3d22407399d6d8dd00572d9dca4d8d960af5"
+    },
+    {
+      "path": ".claude/skills/ohmyorch-test-feature/SKILL.md",
+      "sha256": "d70ede146bd57d3d1fe4e2c3a5ecf14574c29f868ef2a677f7e71c1341cd6ee5"
+    },
+    {
+      "path": "scripts/harness-reset.sh",
+      "sha256": "c71f1af74c7ecbc5df76bbd1d00038b3e372634f9f410037408d397efb2fe9a8"
+    },
+    {
+      "path": "scripts/validate-html-page.sh",
+      "sha256": "90a813b59995e3cc33637404ca5c1118cf0686cf32174e0b331a63e74fb3b694"
+    },
+    {
+      "path": "scripts/guard-planning-handoff.sh",
+      "sha256": "9b8c1ec260e2d04f3fcf26f2ea7647e83cd14c10a204205f28164d4371680d13"
+    },
+    {
+      "path": "scripts/guard-story-done.sh",
+      "sha256": "41d95fe1490d4aba3fec4e78a4a0612e8bd6087f33242ae702137bd2e98f537d"
+    },
+    {
+      "path": "scripts/validate-test-report.sh",
+      "sha256": "c9a538746f3c30bf01694900db569ff979d34dae9f04cbd5ec1b2d713938dd56"
+    },
+    {
+      "path": "scripts/validate-review.sh",
+      "sha256": "f3b0af14f812ee3db12661a57d8f8c630d58279aeaa024972e173f422c15ea10"
+    },
+    {
+      "path": "scripts/guard-context-preflight.sh",
+      "sha256": "b2a8a1220a73866a4f26af03dc43cc8da01818ff01de97fdda0f4171a523d80b"
+    },
+    {
+      "path": "scripts/guard-archive.sh",
+      "sha256": "ebe5d4a972dd66678e0adf86c9d79160c136eb3543002cc2042db1c89a4559c4"
+    },
+    {
+      "path": "scripts/check-write-scope.sh",
+      "sha256": "1eac03ef82c689c353b1b33fb8271eb0dfe7095a1b1f7d0b03f6b5fe3410d268"
+    },
+    {
+      "path": "scripts/completion-gate.sh",
+      "sha256": "24a5444ae9a9b5d0721aa118827b5a8375e178a3b0d5928fd98ca22d94af36ee"
+    },
+    {
+      "path": "scripts/status.sh",
+      "sha256": "e2904a8912155dff4819b7cf22b514e34bdb1a47e5c1c086bbfd9fe0e2c5ad3d"
+    },
+    {
+      "path": "scripts/validate-product-artifacts.sh",
+      "sha256": "ace7be62caed0a2932f201751e5699d995ddd4bfa155d27c8ee42623069f7ed4"
+    },
+    {
+      "path": "scripts/run-project-validation.sh",
+      "sha256": "e7f09c17ab9d94f7c35e127eb0dbceed741580898ec0167c4538e9f665afd04a"
+    },
+    {
+      "path": "scripts/delivery.sh",
+      "sha256": "2e309684be7298a8183e576bab5656263b919824e358e29ead6a570fc3939dcc"
+    },
+    {
+      "path": "scripts/validate-status.sh",
+      "sha256": "d103e8b57628139c5e4a3de296ccc15cff708a2c46ed33975509fdbeb2623f6c"
+    },
+    {
+      "path": "scripts/validate-implementation-plan.sh",
+      "sha256": "9a9952b9bc3ddfbe7b3b08cec69fccc961524520eedb3c60436cccad4a865aec"
+    },
+    {
+      "path": "scripts/validate-verification.sh",
+      "sha256": "63c43cd40fe72e505a99a6a06041adabb59b2f0cb745d653a4e2e375c29ef90d"
+    },
+    {
+      "path": "scripts/check-scope.sh",
+      "sha256": "9f72b0845cd5add0bfd3cb764964498a1f472af82351fa364efa8747539b25f2"
+    },
+    {
+      "path": "scripts/guard-delivery-loop.sh",
+      "sha256": "a56afeb9ecd206b6ea04bc9e2c67c6902d162154be80d255d6c511b5fee33457"
+    },
+    {
+      "path": "scripts/workflow-status.sh",
+      "sha256": "eda4494c211ebae18c41ccaaccf11245d4dacea37bdf8b44eeb7be1eb62a89a5"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+name: Prepare plugin release artifacts
+on:
+  push:
+    tags: ['*']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  artifacts:
+    if: github.event_name != 'push' || github.event.deleted != true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm install -g @anthropic-ai/claude-code@2.1.292 @fission-ai/openspec@1.13.2
+      - run: npm run check
+      - run: npm test
+      - run: npm run test:marketplace
+      - run: claude plugin validate --strict --json plugins/ohmyorch
+      - run: claude plugin validate --strict --json .claude-plugin/marketplace.json
+      - name: Check public artifact readiness
+        id: readiness
+        shell: bash
+        run: |
+          tag_args=()
+          diagnostics=$(mktemp)
+          trap 'rm -f "$diagnostics"' EXIT
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag_args+=(--tag "$GITHUB_REF_NAME")
+          fi
+          if python3 tools/check-release.py "${tag_args[@]}" 2> "$diagnostics"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            result=$?
+            cat "$diagnostics" >&2
+            if [ "$result" -ne 1 ] || ! grep -q '^Public release blocked:$' "$diagnostics"; then exit "$result"; fi
+            if grep -vE '^(Public release blocked:|- (licenseApproved|liveAgentIdentityAndDenials|liveDeliveryLifecycle|latestStableValidated|rollbackRehearsed): release evidence/decision pending|- Actual plugin LICENSE and SPDX manifest license required)$' "$diagnostics"; then exit "$result"; fi
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Public artifacts remain gated by pending license/live-validation evidence."
+            echo "Public packaging and artifact upload were skipped. See the readiness check above for pending evidence." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - if: steps.readiness.outputs.ready == 'true'
+        run: npm run package:plugin
+      - if: steps.readiness.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-release-artifacts
+          path: dist/ohmyorch-*
+# Publishing is deliberately a maintainer action after these evidence gates pass.

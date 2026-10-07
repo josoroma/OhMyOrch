@@ -1,0 +1,34 @@
+name: Validate Claude Code plugin
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        claude: ['2.1.285', '2.1.292']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm install -g @anthropic-ai/claude-code@${{ matrix.claude }} @fission-ai/openspec@1.13.2
+      - run: npm run check
+      - run: claude plugin validate --strict --json plugins/ohmyorch
+      - run: claude plugin validate --strict --json .claude-plugin/marketplace.json
+      - run: npm test
+      - run: npm run test:marketplace
+      - run: npm run package:plugin -- --development
+      - uses: actions/upload-artifact@v4
+        with:
+          name: development-plugin-${{ matrix.os }}-${{ matrix.claude }}
+          path: dist/ohmyorch-*-development.*

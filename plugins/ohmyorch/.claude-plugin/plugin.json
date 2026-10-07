@@ -1,0 +1,32 @@
+{
+  "name": "ohmyorch",
+  "version": "0.0.1",
+  "description": "Spec-driven delivery with independent planning, implementation, review, testing and resumable OpenSpec gates.",
+  "author": {
+    "name": "OhMyOrch maintainers"
+  },
+  "homepage": "https://github.com/josoroma/OhMyOrch",
+  "repository": "https://github.com/josoroma/OhMyOrch",
+  "keywords": [
+    "openspec",
+    "delivery",
+    "review",
+    "orchestration"
+  ],
+  "metadata": {
+    "testedClaudeCode": [],
+    "testedOpenSpec": [
+      "1.13.2"
+    ],
+    "projectSchemaVersion": 1,
+    "formatValidatedClaudeCode": [
+      "2.1.285",
+      "2.1.292"
+    ],
+    "cacheLifecycleValidatedClaudeCode": [
+      "2.1.285",
+      "2.1.292"
+    ],
+    "liveAgentValidation": "pending-release-gate"
+  }
+}

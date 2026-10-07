@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">OhMyOrch delivery loop</title>
+  <desc id="description">A cyan circular arrow and violet center on a dark background.</desc>
+  <rect width="64" height="64" rx="16" fill="#111c30"/>
+  <path d="M47 24a18 18 0 1 0 2 16" fill="none" stroke="#73e2ee" stroke-width="5" stroke-linecap="round"/>
+  <path d="m38 23 11 2 2-11" fill="none" stroke="#c4b5fd" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="32" cy="32" r="5" fill="#c4b5fd"/>
+</svg>

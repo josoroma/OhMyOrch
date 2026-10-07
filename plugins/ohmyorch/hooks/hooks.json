@@ -1,0 +1,101 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}",
+              "--mode",
+              "pre-write"
+            ],
+            "timeout": 30,
+            "statusMessage": "Checking OhMyOrch pre-write"
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}",
+              "--mode",
+              "pre-bash"
+            ],
+            "timeout": 30,
+            "statusMessage": "Checking OhMyOrch pre-bash"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}",
+              "--mode",
+              "post-write"
+            ],
+            "timeout": 30,
+            "statusMessage": "Checking OhMyOrch post-write"
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}",
+              "--mode",
+              "stop"
+            ],
+            "timeout": 30,
+            "statusMessage": "Checking OhMyOrch stop"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}",
+              "--mode",
+              "session-context"
+            ],
+            "timeout": 30,
+            "statusMessage": "Checking OhMyOrch session-context"
+          }
+        ],
+        "matcher": "startup|resume|clear|compact"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "ohmyorch-marketplace",
+  "description": "OhMyOrch plugins for independent, spec-driven delivery.",
+  "owner": {
+    "name": "OhMyOrch maintainers"
+  },
+  "plugins": [
+    {
+      "name": "ohmyorch",
+      "description": "Spec-driven delivery with independent planning, implementation, review, testing and resumable OpenSpec gates.",
+      "source": "./plugins/ohmyorch",
+      "category": "development"
+    }
+  ]
+}

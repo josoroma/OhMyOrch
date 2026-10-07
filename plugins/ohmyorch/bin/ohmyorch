@@ -1,0 +1,62 @@
+#!/bin/bash
+set -uo pipefail
+source "$(cd -- "$(dirname -- "$0")/../lib" && pwd -P)/runtime.sh"
+source "$OHMYORCH_CODE_ROOT/lib/session.sh"
+export OHMYORCH_ALLOW_UNCONFIGURED=0
+skip_global_value=0; requested_operation=''
+for cli_arg in "$@"; do
+  if [ "$skip_global_value" -eq 1 ]; then skip_global_value=0; continue; fi
+  case "$cli_arg" in
+    --project-root|--session-id) skip_global_value=1 ;;
+    --takeover) ;;
+    *) requested_operation="$cli_arg"; break ;;
+  esac
+done
+case "$requested_operation" in doctor|bootstrap|upgrade-project|migrate-legacy)
+  export OHMYORCH_ALLOW_UNCONFIGURED=1 ;; esac
+ohmyorch_init "$@"
+set -- "${OHMYORCH_ARGS[@]+"${OHMYORCH_ARGS[@]}"}"
+[ "$#" -gt 0 ] || ohmyorch_die 'usage: ohmyorch --project-root /absolute/project <operation> [arguments]'
+operation="$1"; shift
+case "$operation" in
+  doctor|bootstrap|adapt-project|upgrade-project|migrate-legacy|harness-reset|delivery|workflow-status|status|completion-gate|validate-product-artifacts|validate-implementation-plan|validate-review|validate-test-report|validate-status|validate-verification|validate-html-page|check-write-scope|check-scope|guard-planning-handoff|guard-context-preflight|guard-story-done|guard-archive|guard-delivery-loop|run-project-validation) ;;
+  *) ohmyorch_die "unknown operation: $operation" ;;
+esac
+script="$OHMYORCH_CODE_ROOT/scripts/$operation.sh"
+[ -x "$script" ] || ohmyorch_die "missing bundled operation: $operation"
+# Direct state writers use the same project transaction lock and owner boundary.
+if [ "$operation" = status ] || { [ "$operation" = completion-gate ] && [[ " $* " == *" --record "* ]]; }; then
+  mutates=1
+  if [ "$operation" = status ]; then
+    for writer_arg in "$@"; do case "$writer_arg" in --resume|--dry-run|-h|--help) mutates=0 ;; esac; done
+  fi
+  if [ "$mutates" -eq 1 ]; then
+    ohmyorch_require_active
+    owner=$(ohmyorch_owner_session || true)
+    [ -z "$owner" ] || [ "$owner" = "$OHMYORCH_SESSION_ID" ] || ohmyorch_die 'another session owns PM state'
+    ohmyorch_operation_lock || exit 2
+    trap 'ohmyorch_unlock' EXIT
+    "$script" "$@"; exit "$?"
+  fi
+fi
+if [ "$operation" = delivery ]; then
+  case "${1:-}" in
+    start|refresh|reopen|stop|block)
+      if [ "${1:-}" = start ]; then
+        command -v openspec >/dev/null 2>&1 || ohmyorch_die 'OpenSpec 1.13.2 is required for supported delivery'
+        [ "$(openspec --version 2>/dev/null)" = 1.13.2 ] || ohmyorch_die 'delivery compatibility target is OpenSpec 1.13.2'
+      fi
+      owner_before=$(ohmyorch_owner_session || true)
+      ohmyorch_operation_lock || exit 2
+      trap 'ohmyorch_unlock' EXIT
+      ohmyorch_acquire_owner || exit 2
+      "$script" "$@"; rc=$?
+      [ "$rc" -ne 0 ] || ohmyorch_touch_owner || exit 2
+      if { [ "$rc" -ne 0 ] && [ -z "$owner_before" ]; } ||
+         { [ "$rc" -eq 0 ] && { [ "${1:-}" = stop ] || [ "${1:-}" = block ]; }; }; then
+        ohmyorch_release_owner
+      fi
+      exit "$rc" ;;
+  esac
+fi
+exec "$script" "$@"

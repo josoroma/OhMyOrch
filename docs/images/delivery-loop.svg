@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 680" role="img" aria-labelledby="title description">
+  <title id="title">One story, seven gates, a deliberate finish</title>
+  <desc id="description">Select a READY story, plan it, hand off the implementation plan, implement, review, test, and check artifact acceptance. Then evaluate four completion conditions, archive, and mark DONE. Findings or failed tests reopen the change for fresh implementation, review, and testing.</desc>
+  <defs>
+    <linearGradient id="surface" x2="1" y2="1"><stop stop-color="#101b32"/><stop offset="1" stop-color="#111127"/></linearGradient>
+    <linearGradient id="accent"><stop stop-color="#67e8f9"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 8 4 0 8" fill="none" stroke="#89a1c9" stroke-width="1.5"/></marker>
+    <marker id="repair" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 8 4 0 8" fill="none" stroke="#c4b5fd" stroke-width="1.5"/></marker>
+    <style>
+      text{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      .card{fill:#15223b;stroke:#324566;stroke-width:1.5}
+      .name{fill:#f1f5ff;font-size:21px;font-weight:650}
+      .detail{fill:#bac9e0;font-size:15px}
+      .badge{fill:#0d1629;stroke:#67e8f9;stroke-width:1.5}
+      .number{fill:#67e8f9;font-size:17px;font-weight:700;text-anchor:middle}
+      .flow{fill:none;stroke:#89a1c9;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1080" height="680" rx="28" fill="url(#surface)"/>
+  <rect x="1" y="1" width="1078" height="678" rx="27" fill="none" stroke="#34425d"/>
+  <rect x="40" y="38" width="52" height="4" rx="2" fill="url(#accent)"/>
+  <text x="40" y="82" fill="#f1f5ff" font-size="30" font-weight="700">Small scope. Clear owners. Visible evidence.</text>
+  <text x="40" y="110" class="detail">One OpenSpec change per story · re-derive the next action after every handoff</text>
+
+  <path class="flow" d="M340 183H382"/>
+  <path class="flow" d="M690 183H732"/>
+  <path class="flow" d="M890 232V280"/>
+  <path class="flow" d="M740 333H698"/>
+  <path class="flow" d="M390 333H348"/>
+  <path class="flow" d="M190 382V430"/>
+  <path class="flow" d="M340 483H382"/>
+  <path class="flow" d="M690 483H732"/>
+
+  <rect class="card" x="40" y="134" width="300" height="98" rx="16"/>
+  <circle class="badge" cx="70" cy="166" r="16"/><text class="number" x="70" y="172">1</text>
+  <text class="name" x="98" y="173">Select READY work</text>
+  <text class="detail" x="60" y="207">Coordinator · story + change</text>
+
+  <rect class="card" x="390" y="134" width="300" height="98" rx="16"/>
+  <circle class="badge" cx="420" cy="166" r="16"/><text class="number" x="420" y="172">2</text>
+  <text class="name" x="448" y="173">Plan the change</text>
+  <text class="detail" x="410" y="207">Planner · proposal, specs, tasks</text>
+
+  <rect class="card" x="740" y="134" width="300" height="98" rx="16"/>
+  <circle class="badge" cx="770" cy="166" r="16"/><text class="number" x="770" y="172">3</text>
+  <text class="name" x="798" y="173">Hand off the plan</text>
+  <text class="detail" x="760" y="207">Planner · implementation plan</text>
+
+  <rect class="card" x="740" y="284" width="300" height="98" rx="16"/>
+  <circle class="badge" cx="770" cy="316" r="16"/><text class="number" x="770" y="322">4</text>
+  <text class="name" x="798" y="323">Implement</text>
+  <text class="detail" x="760" y="357">Implementer · code, tests, tasks</text>
+
+  <rect class="card" x="390" y="284" width="300" height="98" rx="16"/>
+  <circle class="badge" cx="420" cy="316" r="16"/><text class="number" x="420" y="322">5</text>
+  <text class="name" x="448" y="323">Review independently</text>
+  <text class="detail" x="410" y="357">Reviewer · review.md</text>
+
+  <rect class="card" x="40" y="284" width="300" height="98" rx="16"/>
+  <circle class="badge" cx="70" cy="316" r="16"/><text class="number" x="70" y="322">6</text>
+  <text class="name" x="98" y="323">Test acceptance</text>
+  <text class="detail" x="60" y="357">Tester · test-report.md</text>
+
+  <rect class="card" x="40" y="434" width="300" height="98" rx="16"/>
+  <circle class="badge" cx="70" cy="466" r="16"/><text class="number" x="70" y="472">7</text>
+  <text class="name" x="98" y="473">Check the contracts</text>
+  <text class="detail" x="60" y="507">Coordinator · artifact acceptance</text>
+
+  <rect x="390" y="434" width="300" height="98" rx="16" fill="#19203b" stroke="#a78bfa" stroke-width="1.5"/>
+  <text class="name" x="410" y="473">Completion → archive</text>
+  <text class="detail" x="410" y="507">Four separate completion conditions</text>
+
+  <rect x="740" y="434" width="300" height="98" rx="16" fill="#122e32" stroke="#5eead4" stroke-width="1.5"/>
+  <text x="760" y="473" fill="#99f6e4" font-size="21" font-weight="700">Mark the story DONE</text>
+  <text class="detail" x="760" y="507">Then select the next epic story</text>
+
+  <path d="M310 382V404H434" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M540 382V404H1056V333H1047" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#repair)"/>
+  <rect x="434" y="390" width="398" height="28" rx="14" fill="#241e42"/>
+  <text x="633" y="409" text-anchor="middle" fill="#ddd6fe" font-size="14">Finding or FAIL → reopen → fresh checks</text>
+
+  <rect x="40" y="564" width="1000" height="76" rx="16" fill="#0e172b" stroke="#34425d"/>
+  <text x="60" y="595" fill="#e0e7ff" font-size="17" font-weight="650">Keep the trail. Resume from the files.</text>
+  <text class="detail" x="60" y="620">Preserve earlier verdicts · record blockers · inspect eligibility under the documented policy</text>
+</svg>
