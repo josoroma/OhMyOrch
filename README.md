@@ -1,5 +1,9 @@
 # OhMyOrch
 
+[![Watch From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained on YouTube](https://img.youtube.com/vi/vLKeNAXPPd8/maxresdefault.jpg)](https://www.youtube.com/watch?v=vLKeNAXPPd8)
+
+[**Watch the walkthrough: From Spec to Delivery**](https://www.youtube.com/watch?v=vLKeNAXPPd8)
+
 ![OhMyOrch](https://josoroma.github.io/OhMyOrch/docs/images/OhMyOrch.png)
 
 <https://josoroma.github.io/OhMyOrch/docs/OhMyOrch.html>

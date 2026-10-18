@@ -115,8 +115,11 @@ h2 { margin: 4rem 0 1.35rem; padding-top: 1.75rem; border-top: 1px solid var(--b
 h3 { font-size: 1.2rem; font-weight: 650; margin: 2.5rem 0 1.1rem; }
 p { margin: 0 0 1.25rem; }
 strong { color: var(--foreground); font-weight: 650; }
-article > h1 + p { margin-bottom: 2.25rem; }
-article > h1 + p + p { font-size: clamp(1.3rem, 3vw, 1.8rem); line-height: 1.5; letter-spacing: -.025em; max-width: 42rem; margin-bottom: 1.5rem; }
+article > h1 + p, article > .video-feature + p { margin-bottom: 2.25rem; }
+article > h1 + p + p, article > .video-feature + p + p { font-size: clamp(1.3rem, 3vw, 1.8rem); line-height: 1.5; letter-spacing: -.025em; max-width: 42rem; margin-bottom: 1.5rem; }
+.video-feature { margin: 0 0 2.25rem; }
+.video-feature iframe { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 0; border-radius: var(--radius-2xl); background: #000; box-shadow: var(--shadow-soft); }
+.video-feature figcaption { margin-top: .75rem; font-size: .85rem; line-height: 1.6; }
 .brand-image { display: block; width: 100%; height: auto; max-height: 500px; object-fit: contain; }
 .diagram { width: 100%; height: auto; display: block; margin: 2rem 0; border-radius: var(--radius-4xl); box-shadow: var(--shadow-soft); }
 ul, ol { padding-left: 1.6rem; margin: 1rem 0 1.5rem; }

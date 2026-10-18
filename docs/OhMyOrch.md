@@ -1,5 +1,7 @@
 # OhMyOrch
 
+[From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained](https://www.youtube.com/watch?v=vLKeNAXPPd8)
+
 ![OhMyOrch: a cyan and violet loop connecting an agent, a specification, code, and approval](images/OhMyOrch.png)
 
 **Pick a READY story**

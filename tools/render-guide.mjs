@@ -59,13 +59,20 @@ md.renderer.rules.image = (t, i, o, e, self) => {
 md.renderer.rules.table_open = () => '<div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>\n';
 md.renderer.rules.table_close = () => '</table></div>\n';
 
-const body = md.renderer.render(tokens, md.options, {});
+// Standalone YouTube links stay usable in Markdown and become players on Pages.
+const body = md.renderer.render(tokens, md.options, {}).replace(
+  /<p><a href="https:\/\/www\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})">([^<]+)<\/a><\/p>/g,
+  (_, videoId, title) => `<figure class="video-feature">
+  <iframe src="https://www.youtube-nocookie.com/embed/${videoId}" title="${title}" width="960" height="540" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <figcaption><a href="https://www.youtube.com/watch?v=${videoId}">Watch on YouTube: ${title}</a></figcaption>
+</figure>`,
+);
 const toc = headings.map(({ id, label }) => `          <li><a href="#${id}">${escape(label)}</a></li>`).join('\n');
 const html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="One READY story. Clear handoffs. Independent verdicts. Meet OhMyOrch's resumable Claude Code and OpenSpec delivery loop.">
