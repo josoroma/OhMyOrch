@@ -4,21 +4,37 @@
 
 [**Watch the walkthrough: From Spec to Delivery**](https://www.youtube.com/watch?v=vLKeNAXPPd8)
 
+The walkthrough was recorded for 0.0.1 and predates the simplified propose, apply, verify, archive flow described below.
+
 ![OhMyOrch](https://josoroma.github.io/OhMyOrch/docs/images/OhMyOrch.png)
 
 <https://josoroma.github.io/OhMyOrch/docs/OhMyOrch.html>
 
 [Plugin handbook](plugins/ohmyorch/README.md) · [Installation & updates](docs/distribution.md)
 
-![Product overview](docs/images/ohmyorch-workflow-hero-slide.png)
+## How delivery works
 
-![Seven ordered gates](docs/images/seven-gates-one-clear-next-action.png)
+OhMyOrch is a Claude Code plugin that delivers a `SPECS.md` backlog with OpenSpec. Each READY story becomes one OpenSpec change, and the main session takes it through four steps:
 
-![Evidence, not chat memory](docs/images/evidence-not-chat-memory.png)
+```text
+SPECS.md READY story
+   -> propose   /ohmyorch:opsx-propose   proposal.md, specs/, design.md (only when needed), tasks.md
+   -> apply     /ohmyorch:opsx-apply     implement the tasks, tick them in tasks.md
+   -> verify    /ohmyorch:opsx-verify    advisory check of the implementation against the change
+   -> archive   openspec archive <id> -y merges the delta specs, moves the change to changes/archive/
+   -> story marked DONE in SPECS.md
+```
+
+Run the whole loop with `/ohmyorch:deliver <target>`, where the target is an epic (`EPIC-1`), a story (`US-1.1`) or a task (`US-1.1#2`). The next action is derived from `SPECS.md` and the change directory on every call, so a new session resumes from the files, not from chat memory.
+
+- A change's record is OpenSpec's own artifacts. `tasks.md` is the only progress tracker.
+- Verify writes no file. A CRITICAL finding becomes a new unticked task, which returns the change to apply.
+- Two guards are mechanical: `openspec archive` is refused while `tasks.md` has unticked tasks, and a story cannot become DONE while its change is still active.
+- The plugin has 20 skills (19 public commands and one internal contract), three read-only authoring agents for the PRD, SPECS and CODEBASE documents, root hooks and a Bash/jq runtime. The [guide](docs/OhMyOrch.md) lists every skill.
 
 ![Local plugin workflow](docs/images/ohmyorch-local-plugin-workflow.png)
 
-**0.0.1 is published.** For a local preview, run from this repository:
+**0.1.0 is the current source version; it is not tagged. The last tagged release is 0.0.1.** For a local preview, run from this repository:
 
 ```bash
 claude --plugin-dir ./plugins/ohmyorch
@@ -28,13 +44,7 @@ claude --plugin-dir ./plugins/ohmyorch
 
 ![Installation, prerequisites and release checks](docs/images/validate-first-publish-second.png)
 
-![What's included in the plugin](docs/images/ohmyorch-plugin-contents.png)
-
-![Skills by job](docs/images/ohmyorch-skill-map.png)
-
 ![Contributing and project ownership](docs/images/publisher-repo-and-consumer-project.png)
-
-![Delivery records and handoffs](docs/images/ohmyorch-artifact-trail.png)
 
 ## See your specification as a workspace
 

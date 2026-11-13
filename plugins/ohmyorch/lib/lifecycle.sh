@@ -92,8 +92,8 @@ ohmyorch_bootstrap_plan() {
 Use the installed plugin's /ohmyorch:doctor and /ohmyorch:deliver commands.
 Project intent: $OHMYORCH_DOC_PRD. Backlog: $OHMYORCH_DOC_SPECS.
 Current-state evidence: $OHMYORCH_DOC_CODEBASE (generate it only through analysis).
-Delegate implementation, review and testing independently. Specialists persist
-their own verdicts; the main session derives resumption from project artifacts.
+Each READY story is one OpenSpec change: propose, apply, verify, archive.
+The next action is derived from project artifacts, never from chat memory.
 Generic rules are bundled in the plugin; updates never copy executable code here.
 EOF
   if [ ! -e CLAUDE.md ] || [ "$MODE" = merge ]; then
@@ -130,7 +130,7 @@ EOF
 
 ohmyorch_adapt_plan() {
   ohmyorch_require_active
-  local subject path source body
+  local subject path source body config template recorded
   for subject in codebase product delivery testing; do
     path=".claude/rules/ohmyorch-$subject-standards.md"
     body="$OHMYORCH_STAGE/$subject-rule"
@@ -145,7 +145,7 @@ ohmyorch_adapt_plan() {
       case "$subject" in
         codebase) printf 'Read configured CODEBASE before planning. Its observations constrain feasibility and never invent product intent. Architecture, entry points and tooling remain unknown unless evidenced there.\n' ;;
         product) printf 'Human decisions and approved source material govern intent. Ingest testable scenarios and explicit unknowns; do not invent READY stories.\n' ;;
-        delivery) printf 'One story/change at a time. Derive the next action from gates. Planner returns the handoff; implementer edits product code; reviewer/tester write only their selected verdict. Archive before DONE.\n' ;;
+        delivery) printf "One story/change at a time. Each change follows OpenSpec: propose, apply, verify, archive. Derive the next action from the change's artifacts and tasks. Archive before DONE.\n" ;;
         testing) printf 'Observe evidence for every evaluated criterion. FAIL and UNVERIFIED remain distinct; never label an unrun command PASS. Use documented project checks. Fast validation needs current local hash approval.\n' ;;
       esac
     } > "$body"
@@ -155,6 +155,16 @@ ohmyorch_adapt_plan() {
   ohmyorch_plan_block README.md "$OHMYORCH_STAGE/readme-body" usage || exit 2
   MODE=merge
   ohmyorch_bootstrap_plan
+  # An unedited scaffolded OpenSpec config follows the template; an edited or
+  # unrecorded one stays project-owned. The ledger kind stays `scaffold`, so
+  # harness-reset still leaves the file alone.
+  config=openspec/config.yaml; template="$OHMYORCH_CODE_ROOT/templates/project/openspec/config.yaml"
+  recorded=$(jq -r --arg path "$config" '.files[$path] | select(.kind=="scaffold") | .sha256' "$OHMYORCH_STAGE/ledger.json")
+  if [ -f "$config" ] && [ -n "$recorded" ] && [ "$recorded" = "$(ohmyorch_hash "$config")" ] &&
+     [ "$recorded" != "$(ohmyorch_hash "$template")" ]; then
+    ohmyorch_plan_file "$config" "$template" managed || exit 2
+    ohmyorch_record "$config" "$template" scaffold || exit 2
+  fi
   if [ "$NESTED" -eq 1 ]; then
     [ -f "$OHMYORCH_DOC_CODEBASE" ] || ohmyorch_die '--nested requires real CODEBASE evidence'
     while IFS= read -r directory; do

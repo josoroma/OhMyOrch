@@ -34,8 +34,8 @@ cannot be turned into a test, because there is nothing to do. It must be given a
 ## Acceptance is mandatory
 
 A story MUST NOT be `READY` unless its expected observable behavior is testable
-(BR-005). "Testable" means: a Tester, given the scenario and the implementation,
-can decide unambiguously whether it passes.
+(BR-005). "Testable" means: whoever verifies the change, given the scenario and the
+implementation, can decide unambiguously whether it passes.
 
 If you cannot write the `Then` as an assertion, the requirement is not yet
 understood. That is a finding, not an obstacle to work around.
@@ -55,12 +55,12 @@ Prefer `Then the script exits 2 and prints a message naming the missing plan` ov
 Modal verbs carry the acceptance bar, and they are not interchangeable:
 
 - **MUST** — required for acceptance. A failure blocks the change.
-- **SHOULD** — expected. A deviation is permitted but must be recorded and
-  justified in the test report.
+- **SHOULD** — expected. A deviation is permitted but must be reported and
+  justified when the change is verified.
 - **MAY** — optional. Absence is never a defect.
 
-The Reviewer and Tester apply these levels literally. A failed `SHOULD` is a
-finding to record, not a reason to block; a failed `MUST` blocks.
+Whoever verifies the change applies these levels literally. A failed `SHOULD` is a
+finding to report, not a reason to block; a failed `MUST` blocks.
 
 ## One scenario, one behavior
 
@@ -71,6 +71,6 @@ scenario fails and the report cannot say which requirement regressed.
 ## Traceability
 
 Story identifiers (`US-8.2`) and requirement identifiers (`BR-002`, `NFR-001`)
-appear in the artifacts that implement them. A reviewer should be able to start
+appear in the artifacts that implement them. A reader should be able to start
 at an acceptance criterion and follow it to the code, the test, and the evidence
 (NFR-002).

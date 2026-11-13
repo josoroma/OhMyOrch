@@ -15,16 +15,16 @@ argument-hint: <topic or page slug>
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/contract.md` and the applicable bundled rules before acting. Run `"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" doctor --json` and stop on FAIL/UNSUPPORTED checks. Resolve every PRD/SPECS/CODEBASE reference through its `documents` mapping. These artifact names never imply a root-only layout. Use concrete resolved paths in Read/Write/Edit/Bash calls; do not copy plugin code/rules into the project. Resolve project files from the explicit project root and bundled files from the plugin root.
 
-Inline path substitution supplies text, not automatic Bash environment variables. Shell-escape each substituted path/argument as a literal argument; never evaluate user `$ARGUMENTS` as shell code. Essential rules also reach delegated agents directly through the `ohmyorch:contract` preload. Pass project root, change, story, configured artifacts and prior evidence explicitly when delegating. Reviewer/tester agents persist their own selected verdict; the caller reads and validates it.
+Inline path substitution supplies text, not automatic Bash environment variables. Shell-escape each substituted path/argument as a literal argument; never evaluate user `$ARGUMENTS` as shell code. Essential rules also reach delegated agents directly through the `ohmyorch:contract` preload. Pass project root, change, story, configured artifacts and prior evidence explicitly when delegating.
 Generate one **self-contained HTML page** in the shadcn Luma theme, with light and dark
 modes. The page opens from disk, loads nothing from the network, and can be shared as
 a single file.
 
 Use it to:
 
-- **demo codebase status** — backlog progress, gate state, suite results;
+- **demo codebase status** — backlog progress, change progress (artifacts and tasks), suite results;
 - **explain a codebase** — modules, data model, infrastructure, request flow;
-- **explain spec-driven development** — the roles, the artifacts, the gates, the loop.
+- **explain spec-driven development** — the artifacts and the propose, apply, verify, archive loop.
 
 **Start with `$ARGUMENTS`**: the topic, and optionally the slug. Read `output.pages`
 from doctor (default `docs/pages`) and set `page_path` to the concrete contained
@@ -48,9 +48,9 @@ Pick the sections the topic needs, in reading order. Each becomes one
 
 | Page | Sections |
 |---|---|
-| status | overview (stats), backlog table, gates table, suites table, what's next, sources |
+| status | overview (stats), backlog table, change progress table (artifacts and tasks), suites table, what's next, sources |
 | codebase explainer | overview, module map (SVG), data model (ER), infrastructure (SVG), request flow (overlay), conventions (lists), sources |
-| spec-driven development | the idea, the roles (table), the artifacts (table), the loop (overlay), the gates (list), sources |
+| spec-driven development | the idea, the artifacts (table), the propose/apply/verify/archive loop (overlay), the two guards (list), sources |
 
 Keep section ids short and lowercase: `overview`, `data-model`, `infrastructure`.
 
@@ -66,9 +66,13 @@ grep -cE '^### US-[0-9]+\.[0-9]+:' "${CLAUDE_PROJECT_DIR}/$mapped_specs" # stori
 grep -c '^Status: DONE' "${CLAUDE_PROJECT_DIR}/$mapped_specs" # delivered stories
 ls "${CLAUDE_PROJECT_DIR}/openspec/changes/archive" | wc -l # archived changes
 ls "${CLAUDE_PROJECT_DIR}/openspec/specs" | wc -l          # canonical capabilities
-"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" workflow-status                              # gate state of the active change
+"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" delivery next # next action of the recorded goal; fails when none is recorded
+openspec list                                              # active changes and their task progress
+openspec status --change <id>                              # artifact state of one active change
 git rev-parse --short HEAD 2>/dev/null || echo "no commits yet"
 ```
+
+Run the `openspec` and `git` lines from the project root.
 
 For another codebase, read `CODEBASE.md` when it exists: it is the evidence-backed
 map of the repository. Otherwise read the manifests, entry points, schema files, and

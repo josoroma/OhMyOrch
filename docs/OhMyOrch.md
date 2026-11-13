@@ -6,23 +6,23 @@
 
 **Pick a READY story**
 
-Follow clear handoffs and keep the evidence when you finish.
+Propose it, apply it, verify it, archive it.
 
-OhMyOrch brings a repeatable delivery loop to Claude Code. The main session coordinates one OpenSpec change at a time, delegates each stage to its owner, and derives the next action from project artifacts. You can see what passed, what needs attention, and where to resume.
+OhMyOrch brings a repeatable delivery loop to Claude Code. Each READY story in your `SPECS.md` backlog becomes one OpenSpec change. The main session proposes the change, applies its tasks, verifies the result, archives it, and marks the story DONE. The next action is always derived from project files, so you can see what is finished, what is pending, and where to resume.
 
-OhMyOrch **0.0.1** is the version published in this repository. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.
+OhMyOrch **0.1.0** is the version in this repository; it is not tagged, and the last tagged release is 0.0.1. The walkthrough video above was recorded for 0.0.1 and predates the propose, apply, verify, archive flow this guide describes. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.
 
 ## Why the loop is useful
 
 A large goal gets a small working unit: one independently verifiable story, one change, one next action. An epic becomes a sequence of those changes. Task focus still carries the parent story's acceptance criteria.
 
-Each handoff has a place to land. The implementation plan tells the implementer what to build and check. The reviewer records findings. The tester records acceptance evidence. The coordinator reads those files and decides what comes next.
+The record is OpenSpec's own. A change holds `proposal.md`, delta `specs/`, `tasks.md` and, only when the change needs it, `design.md`. `tasks.md` is the only progress tracker: a task is ticked when it is really done.
 
-A failed verdict becomes history, remediation tasks become visible, and fresh implementation, review, and testing follow. A missing product decision becomes a blocker. A new session can pick up from these files.
+Problems stay visible in the same files. A CRITICAL verify finding becomes a new unticked task, so the change returns to apply. A missing product decision becomes a blocker, and the loop stops for a human. A new session picks up from these files, not from chat memory.
 
 ### Start the whole loop with one command
 
-In an initialized project, run **`/ohmyorch:deliver <target>`** in Claude Code. It reads the configured `SPECS.md` backlog and coordinates selection, planning, implementation, independent review, acceptance testing, completion checks, archival, and the DONE transition. For example, to deliver an existing epic:
+In an initialized project, run **`/ohmyorch:deliver <target>`** in Claude Code. It reads the configured `SPECS.md` backlog and, for each story, proposes the change, applies its tasks, verifies the implementation, archives the change, and marks the story DONE. For example, to deliver an existing epic:
 
 ```text
 /ohmyorch:deliver EPIC-1
@@ -39,13 +39,13 @@ Choose the scope that matches your backlog:
 
 These IDs and task text are examples; use targets that actually exist in your mapped `SPECS.md`. Feature selection uses the story's `US-N.M` ID. Stories must be READY with approved acceptance criteria and satisfied dependencies. The loop continues until the goal is COMPLETE or a blocker requires a human decision. Resolve the blocker and repeat the same command to resume.
 
-![Ordered delivery stages with remediation and a separate completion decision](images/delivery-loop.svg)
+![One READY story moves through propose, apply, verify, and archive, then is marked DONE](images/delivery-loop.svg)
 
 ## Start in a real project
 
 Actual delivery needs an authenticated Claude Code session. Prerequisites are OpenSpec **1.13.2**, Bash **3.2+**, jq **1.6+**, Git, shasum, and standard Unix utilities. OpenSpec is installed separately and has its own Node requirements; the bundled plugin runtime uses Bash and jq.
 
-Claude Code **2.1.292** is the recorded preferred validation target. Format and isolated marketplace/cache checks also passed on **2.1.285**. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.
+Claude Code **2.1.292** is the recorded preferred validation target. For 0.0.1, format and isolated marketplace/cache checks passed on it and on **2.1.285**. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.
 
 With a checkout of this version, run from your consuming project:
 
@@ -99,6 +99,10 @@ Analysis produces descriptive CODEBASE evidence. Adaptation creates owned projec
 
 Use `/ohmyorch:generate-prd` with human-approved requirements and `/ohmyorch:ingest-spec` with an approved source. Codebase observations explain what exists; product decisions define what should change. Missing behavior remains NEEDS CLARIFICATION or BLOCKED until a human resolves it.
 
+Before a write to the mapped PRD or SPECS, a hook checks that the CODEBASE context is current. It refuses the write when the project has existing code but no CODEBASE document, or when files have changed since the revision that CODEBASE records. Run `/ohmyorch:analyze-codebase`, or record your decision in the document being written: `CODEBASE Context: skipped (<reason>)` when there is no CODEBASE document, or `CODEBASE Context: consumed (<revision>, staleness accepted)` for the recorded revision when it is stale. Commits that touch only the mapped PRD, SPECS, and CODEBASE do not make the analysis stale.
+
+Delivery bookkeeping in SPECS never needs that check: `Status:` and `Change:` lines, task ticks, and the story and task rows of the `## Work Item Status` table. Adding, rewording, moving, or deleting a task line is a material edit and is checked.
+
 Start when the selected story exists, is READY, has acceptance scenarios and source traceability, and its dependencies are satisfied. The following IDs are examples; choose real ones from your backlog:
 
 ```text
@@ -113,51 +117,45 @@ An epic delivers its stories in backlog order, each with its own change:
 
 Task focus uses `/ohmyorch:deliver US-1.1#2` or a uniquely matching task description. The parent story still supplies acceptance; checking one task does not approve the story.
 
-## Follow the owners and gates
+## Follow the four steps
 
-The main session is the coordinator and Product Manager. It selects work, persists read-only specialists' handoffs, evaluates gates, records status, and owns archival and backlog transitions. Technical stages are delegated.
+The main session performs every step. Each step leaves its result in OpenSpec's own artifacts, and a change has no other files.
 
-| Gate | Owner | Evidence the next stage reads |
+| Step | Command | What it leaves on disk |
 |---|---|---|
-| 1. Selection | Main coordinator | Selected story and one OpenSpec change |
-| 2. Planning | `ohmyorch:planner`, coordinator persists | `proposal.md`, delta `specs/`, `tasks.md` |
-| 3. Plan handoff | `ohmyorch:planner`, coordinator persists | `implementation-plan.md` |
-| 4. Implementation | `ohmyorch:implementer` | Product code/tests and completed tasks |
-| 5. Review | `ohmyorch:reviewer` | Specialist-authored `review.md`, no blocking findings |
-| 6. Testing | `ohmyorch:tester` | Specialist-authored `test-report.md`, no FAIL |
-| 7. Artifact acceptance | Main coordinator checks | Backlog readiness and codebase-context contracts |
+| 1. Propose | `/ohmyorch:opsx-propose <change>` | `openspec/changes/<change>/` with `proposal.md`, delta `specs/`, `tasks.md` and, only when needed, `design.md`. The story becomes IN PROGRESS with a `Change:` line in SPECS. |
+| 2. Apply | `/ohmyorch:opsx-apply <change>` | Product code and tests, with each finished task ticked in `tasks.md`. |
+| 3. Verify | `/ohmyorch:opsx-verify <change>` | No new file. The report covers completeness, correctness, and coherence; a CRITICAL issue becomes an unticked task in `tasks.md`. |
+| 4. Archive | `openspec archive <change> -y` | Delta specs merged into `openspec/specs/`, and the change moved to `openspec/changes/archive/`. The story is then marked DONE in SPECS. |
 
-After every result, the coordinator derives the next action again. Actions include selection, proposal, planning, implementation, review, testing, reopening, archival, a DONE transition, completion, or escalation. Stored goal text is a human record; current artifacts govern the next step.
+`/ohmyorch:opsx-explore` is optional. Use it only when a story or the affected code is unclear.
 
-The reviewer and tester persist their own verdicts and return the path and summary. The implementer does not author approval evidence. Blocking findings or FAIL require reopening: preserve the verdict, append remediation tasks, implement fixes, and obtain fresh review and testing.
+After every step, the session derives the next action again from SPECS and the change directory. There are six actions:
 
-## Meet the eight agents
+| Action | Derived when | What the session does |
+|---|---|---|
+| `propose` | The story has no change yet, or the change's planning artifacts are incomplete. | Creates the change, or authors only what is missing. |
+| `apply` | `tasks.md` has an unticked task. | Implements the pending tasks and ticks each one. |
+| `verify` | Every task is ticked. | Verifies the change; with no CRITICAL issue, archives it. |
+| `mark-done` | The change is archived, no active directory has its id, and the story is not DONE. | Sets the story to DONE and points its `Change:` line at the archived change. |
+| `escalate` | The story is not READY or IN PROGRESS, a dependency is unfinished, or another change is still active. | Stops and reports the decision a human must make. |
+| `complete` | Every story in the goal is DONE. | Reports the result. |
 
-Skills are the commands you invoke. Agents are the specialists those commands delegate to. All eight inherit the session's selected model and preload the shared `ohmyorch:contract`.
+Planning is complete when the change has `proposal.md`, at least one `.md` file under `specs/`, and a `tasks.md` with task checkboxes. `design.md` is never required, and a change whose `.openspec.yaml` declares `skip_specs: true` needs no `specs/`. Tasks are counted the way OpenSpec counts them: a checkbox with any marker other than `x` is unfinished. Only one change is active at a time. Stored goal text is a human record; current files govern the next step.
+
+## Meet the three authoring agents
+
+Skills are the commands you invoke. Delivery runs in the main session, without per-step agents. Three agents support the documents that come before delivery: each inspects and authors, and the calling skill persists what it returns. All three inherit the session's selected model and preload the shared `ohmyorch:contract`.
 
 | Agent | Responsibility and handoff | Example entry point |
 |---|---|---|
-| [`ohmyorch:codebase-analyst`](../plugins/ohmyorch/agents/codebase-analyst.md) | Inspect actual code and return evidence-backed CODEBASE content; the coordinator persists it. | `/ohmyorch:analyze-codebase` |
-| [`ohmyorch:product-specifier`](../plugins/ohmyorch/agents/product-specifier.md) | Turn approved product sources into PRD content; the coordinator persists it. | `/ohmyorch:generate-prd docs/approved-brief.md` |
+| [`ohmyorch:codebase-analyst`](../plugins/ohmyorch/agents/codebase-analyst.md) | Inspect actual code and return evidence-backed CODEBASE content. | `/ohmyorch:analyze-codebase` |
+| [`ohmyorch:product-specifier`](../plugins/ohmyorch/agents/product-specifier.md) | Turn approved product sources into PRD content. | `/ohmyorch:generate-prd docs/approved-brief.md` |
 | [`ohmyorch:spec-ingestor`](../plugins/ohmyorch/agents/spec-ingestor.md) | Return a source-traceable SPECS backlog with stories and acceptance scenarios. | `/ohmyorch:ingest-spec` |
-| [`ohmyorch:planner`](../plugins/ohmyorch/agents/planner.md) | Author proposal/spec/task handoffs and the repository-aware implementation plan. | `/ohmyorch:plan-feature add-password-reset` |
-| [`ohmyorch:implementer`](../plugins/ohmyorch/agents/implementer.md) | Modify product code and implementation tests; complete the selected change's tasks. | `/ohmyorch:opsx-apply add-password-reset` |
-| [`ohmyorch:reviewer`](../plugins/ohmyorch/agents/reviewer.md) | Independently assess the change, record OpenSpec verification, and persist `review.md`. | `/ohmyorch:review-feature add-password-reset` |
-| [`ohmyorch:tester`](../plugins/ohmyorch/agents/tester.md) | Independently test acceptance criteria and persist `test-report.md` with evidence. | `/ohmyorch:test-feature add-password-reset` |
-| [`ohmyorch:product-manager`](../plugins/ohmyorch/agents/product-manager.md) | Select eligible work, evaluate gates, and control archival/backlog transitions. During `deliver`, the main session performs this role. | `/ohmyorch:deliver US-1.1` or `/ohmyorch:product-iteration US-1.1` |
 
-Analyst, specifier, ingestor, and planner have Read/Grep/Glob/Bash tool budgets and return authored content. Implementer, reviewer, and tester also have Write/Edit; each writes within its role's scope. Product Manager also has Agent for delegation. Read-only roles do not use Bash to bypass their write boundary. The reviewer and tester report defects; the implementer repairs them.
+Each agent has a Read/Grep/Glob/Bash tool budget, with no Write or Edit, and its prompt declares it read-only. The root hook dispatcher enforces the same rule for file tools: a Write, Edit, or MultiEdit from any `ohmyorch:*` agent is refused, so authored content returns to the main session.
 
-Use the entry-point skills for routine work; the delivery command delegates the stages in order. To request a specific specialist in conversation, name the agent and supply the selected change, mapped project documents, and approved scope. For example, when `add-password-reset` is the selected implemented change and the review preconditions pass:
-
-```text
-Use the ohmyorch:reviewer agent to review add-password-reset.
-Read its approved specs, tasks, implementation plan, and mapped project context.
-Persist only the selected change's review.md, including OpenSpec verification.
-Return the artifact path, verdict, and actionable findings to this session.
-```
-
-The reviewer persists the verdict; the coordinator reads and validates it. A blocking finding sends the change through reopening, implementation, fresh review, and fresh testing.
+Use the entry-point skills for routine work. Each one delegates to its agent and then writes the mapped document.
 
 ## Inspect without advancing
 
@@ -169,49 +167,50 @@ project_root="$(pwd -P)"
 change_id=your-change-id
 
 "$plugin_dir/bin/ohmyorch" --project-root "$project_root" delivery next --json
-"$plugin_dir/bin/ohmyorch" --project-root "$project_root" workflow-status --change "$change_id" --json
-"$plugin_dir/bin/ohmyorch" --project-root "$project_root" status --resume --change "$change_id"
-"$plugin_dir/bin/ohmyorch" --project-root "$project_root" completion-gate --change "$change_id" --json
+openspec status --change "$change_id"
+openspec list --json
 ```
 
-These calls are read-only. `workflow-status` reports the seven gates and first incomplete gate. `status --resume` reports the resume point and authored blockers. `completion-gate` returns eligibility and the first failing condition; ineligibility exits nonzero.
+These calls are read-only. `delivery next --json` prints one line for the recorded goal: its `target`, the derived `action`, the `story`, the `change`, the `command` to run, and the `reason`. Pass a target such as `US-1.1` after `next` to ask about work that has no goal yet. `openspec status --change` shows the state of each planning artifact; it lists `design.md` as not yet written for a change that has none, which is expected because design is optional. `openspec list --json` reports each active change with its completed and total task counts. Run the `openspec` commands from the project root.
 
-Writing status, recording completion, or changing the goal uses the actual Claude session ID through `--session-id`. Skills supply explicit project/plugin/session context; ordinary Bash does not automatically receive the substitutions as environment variables. The [plugin handbook](../plugins/ohmyorch/README.md) covers direct mutation and recovery commands.
+Starting, refreshing, stopping, or blocking a goal uses the actual Claude session ID through `--session-id`. Skills supply explicit project/plugin/session context; ordinary Bash does not automatically receive the substitutions as environment variables. The [plugin handbook](../plugins/ohmyorch/README.md) covers direct mutation and recovery commands.
 
 ## Pause, repair, and resume
 
 | Goal state | Meaning |
 |---|---|
 | ACTIVE | The owner session is driving the next derived action. |
-| BLOCKED | A decision, dependency, reporter failure, or stalled progress needs attention. |
+| BLOCKED | A decision, an unfinished dependency, a failed derivation, or stalled progress needs attention. |
 | STOPPED | Delivery was explicitly stopped. |
 | COMPLETE | Every story in the selected goal is DONE. |
 
 By default, three unchanged blocked Stop attempts precede the fourth unchanged Stop, which records BLOCKED and permits stopping. The counter belongs to the owner session. Another session's Stop does not drive your goal. Claude's continuation limits also apply. [Official Stop hook behavior](https://code.claude.com/docs/en/hooks).
 
-Resume a resolved BLOCKED or STOPPED goal with `/ohmyorch:deliver` and the **same target**. An ownership conflict requires explicit `--takeover` by the coordinator using the new actual session ID. No lease expiry is inferred. Refresh derived status; preserve authored blockers and earlier evidence. Deleting runtime directories is not a resume procedure.
+When the session finds in the middle of a change that a human decision is missing, the derived action does not change, so the Stop hook would keep refusing the stop. The session records the decision needed with `delivery block --reason '<story id: the decision needed>'`, reports it, and stops; the goal becomes BLOCKED with that reason. The same applies when an OpenSpec step tells the session to pause, ask the user, or wait for guidance. This is only for a missing human decision, never for work that is merely hard.
+
+Resume a resolved BLOCKED or STOPPED goal with `/ohmyorch:deliver` and the **same target**. Completed stories are not redone, because every step is derived from the repository. To redo a DONE story, set it back to READY with a new `Change:` id; with the same id it would be marked DONE again. An ownership conflict requires explicit `--takeover` from the session that takes over, using its actual session ID. No lease expiry is inferred. Notes you write between the AUTHORED markers in `openspec/delivery/goal.md` survive every refresh; the rest of that file is rewritten. Deleting runtime directories is not a resume procedure.
 
 ## Make the finish explicit
 
-Seven progress gates and four completion conditions answer different questions. Passing the gates does not by itself authorize archival. The completion check evaluates:
+A story finishes in three moves, in this order:
 
-1. Required tasks are complete.
-2. Review has no blocking findings.
-3. Acceptance evidence satisfies the current test-report policy.
-4. OpenSpec validation/recorded verification has no blocking mismatch.
+1. **Verify is advisory.** `/ohmyorch:opsx-verify` reports on completeness, correctness, and coherence, and writes no file. A CRITICAL issue becomes a new unticked task in `tasks.md`, which returns the change to apply. In this loop two kinds of finding are CRITICAL whatever rank `/ohmyorch:opsx-verify` gives them: an acceptance scenario of the story that is not implemented, whose observed result contradicts its `Then`, or for which there is no observed evidence; and a project test that fails because of this change. A test that was already failing for an unrelated reason is reported, not turned into a task. A scenario counts as passing only with evidence the session actually observed.
+2. **Archive needs every task ticked.** `openspec archive <id> -y` runs as a separate, standalone Bash call. A hook refuses it while `tasks.md` still has an unticked task. OpenSpec then validates the delta specs, merges them into `openspec/specs/`, and moves the change to `openspec/changes/archive/`. Invalid delta specs stop the archive.
+3. **DONE needs the archive.** A SPECS edit that sets a story to `Status: DONE` is refused while that story's change is still active. After the archive, set the story to DONE and point its `Change:` line at the archived change.
 
-The coordinator records `completion.md`, archives with a separate standalone `openspec archive <id> -y` Bash call, and then marks the story DONE. An epic moves to the next story. Preserve that order even where a legacy predicate is less strict; see the boundaries below.
+An epic then moves to its next story.
 
 ## Know where files belong
 
-![Installed code is separate from project intent, evidence, and private runtime state](images/plugin-and-project.svg)
+![Installed code is separate from project documents, OpenSpec changes, and private runtime state](images/plugin-and-project.svg)
 
 | Location | Ownership |
 |---|---|
 | Installed plugin tree or Claude cache | Skills, agents, hooks, runtime, validators, references, neutral templates |
 | Mapped PRD/SPECS/CODEBASE | Product intent, iterable backlog, descriptive codebase evidence |
-| `openspec/changes/<id>/` | Proposal, specs/tasks, implementation plan, verdicts, status, completion, remediation history |
-| `openspec/delivery/goal.md` and archived changes | Durable goal and completed work |
+| `openspec/changes/<id>/` | The active change: `proposal.md`, delta `specs/`, `tasks.md`, optional `design.md` |
+| `openspec/specs/` and `openspec/changes/archive/` | Canonical specs merged at archive, and completed changes |
+| `openspec/delivery/goal.md` | The recorded delivery goal: derived sections plus your authored notes |
 | Project config, ledger, managed bases | Nonsecret configuration and owned guidance provenance |
 | Ignored runtime/backups/local approval | Session lease/counters, affected-file recovery, approved script hash |
 
@@ -219,7 +218,7 @@ Update and uninstall preserve project documents/state. Initialization, adaptatio
 
 ## Choose the right skill
 
-There are **24 skills: 23 public commands and one internal contract**. Invoke public skills as `/ohmyorch:<name>`. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.
+There are **20 skills: 19 public commands and one internal contract**. Invoke public skills as `/ohmyorch:<name>`. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.
 
 ### Initialize and maintain a project
 
@@ -243,44 +242,40 @@ Lifecycle changes are manually invoked. Preview first, inspect the proposed file
 | [`generate-prd`](../plugins/ohmyorch/skills/generate-prd/SKILL.md) | Turn human-approved product source material into the mapped PRD. | `/ohmyorch:generate-prd docs/approved-brief.md` |
 | [`ingest-spec`](../plugins/ohmyorch/skills/ingest-spec/SKILL.md) | Turn the PRD/approved sources into a traceable SPECS backlog. | `/ohmyorch:ingest-spec` |
 | [`deliver`](../plugins/ohmyorch/skills/deliver/SKILL.md) | Drive or resume an epic, story, or task-focused goal through the whole loop. | `/ohmyorch:deliver EPIC-1` |
-| [`product-iteration`](../plugins/ohmyorch/skills/product-iteration/SKILL.md) | Run or resume one story from its first incomplete gate. | `/ohmyorch:product-iteration US-1.1` |
 
 ### Work on a selected change
 
-Most stage commands take an OpenSpec change ID; `opsx-explore` also accepts a story or an exploratory question. Use them when that stage's preconditions pass. `deliver` calls for the appropriate stage and specialist as it advances.
+These seven commands are the OpenSpec workflows under the plugin's namespace. Each takes an OpenSpec change ID; `opsx-explore` also accepts a story or an open question. `deliver` runs propose, apply, and verify for you as it advances. Use the commands directly when you work on a change by hand.
 
 | Skill | Use it to… | Example |
 |---|---|---|
-| [`opsx-explore`](../plugins/ohmyorch/skills/opsx-explore/SKILL.md) | Investigate an idea or clarify the selected story before implementation. | `/ohmyorch:opsx-explore US-1.1` |
-| [`opsx-propose`](../plugins/ohmyorch/skills/opsx-propose/SKILL.md) | Author the selected change's proposal, delta specs, and tasks. | `/ohmyorch:opsx-propose add-password-reset` |
+| [`opsx-explore`](../plugins/ohmyorch/skills/opsx-explore/SKILL.md) | Think through an idea or clarify a story before proposing. Optional. | `/ohmyorch:opsx-explore US-1.1` |
+| [`opsx-propose`](../plugins/ohmyorch/skills/opsx-propose/SKILL.md) | Create the change and author its proposal, delta specs, tasks and, when needed, design. | `/ohmyorch:opsx-propose add-password-reset` |
 | [`opsx-update`](../plugins/ohmyorch/skills/opsx-update/SKILL.md) | Revise existing planning artifacts coherently from approved decisions. | `/ohmyorch:opsx-update add-password-reset` |
-| [`plan-feature`](../plugins/ohmyorch/skills/plan-feature/SKILL.md) | Get a repository-aware implementation-plan handoff from the planner. | `/ohmyorch:plan-feature add-password-reset` |
-| [`opsx-apply`](../plugins/ohmyorch/skills/opsx-apply/SKILL.md) | Delegate the approved implementation/tasks to the implementer. | `/ohmyorch:opsx-apply add-password-reset` |
-| [`review-feature`](../plugins/ohmyorch/skills/review-feature/SKILL.md) | Obtain a reviewer-authored verdict with OpenSpec verification. | `/ohmyorch:review-feature add-password-reset` |
-| [`test-feature`](../plugins/ohmyorch/skills/test-feature/SKILL.md) | Obtain a tester-authored acceptance report with criterion-level evidence. | `/ohmyorch:test-feature add-password-reset` |
-| [`opsx-verify`](../plugins/ohmyorch/skills/opsx-verify/SKILL.md) | Assess implementation completeness, correctness, and coherence. | `/ohmyorch:opsx-verify add-password-reset` |
-| [`opsx-sync`](../plugins/ohmyorch/skills/opsx-sync/SKILL.md) | Merge approved delta specs into canonical specs. | `/ohmyorch:opsx-sync add-password-reset` |
-| [`opsx-archive`](../plugins/ohmyorch/skills/opsx-archive/SKILL.md) | Request archival of a change that satisfies the completion policy. | `/ohmyorch:opsx-archive add-password-reset` |
+| [`opsx-apply`](../plugins/ohmyorch/skills/opsx-apply/SKILL.md) | Implement the pending tasks and tick each one in `tasks.md`. | `/ohmyorch:opsx-apply add-password-reset` |
+| [`opsx-verify`](../plugins/ohmyorch/skills/opsx-verify/SKILL.md) | Check the implementation against the change for completeness, correctness, and coherence. Advisory. | `/ohmyorch:opsx-verify add-password-reset` |
+| [`opsx-sync`](../plugins/ohmyorch/skills/opsx-sync/SKILL.md) | Merge a change's delta specs into the canonical specs without archiving. | `/ohmyorch:opsx-sync add-password-reset` |
+| [`opsx-archive`](../plugins/ohmyorch/skills/opsx-archive/SKILL.md) | Archive a finished change interactively, with a spec-sync prompt. `deliver` uses the `openspec archive <id> -y` command instead. | `/ohmyorch:opsx-archive add-password-reset` |
 
 ### Explain and share the evidence
 
 | Skill | Use it to… | Example |
 |---|---|---|
 | [`generate-html-page`](../plugins/ohmyorch/skills/generate-html-page/SKILL.md) | Build a sourced, self-contained page about status, architecture, or delivery. | `/ohmyorch:generate-html-page Explain the password-reset delivery and its evidence` |
-| [`contract`](../plugins/ohmyorch/skills/contract/SKILL.md) | Supply shared artifact, authority, and role guidance to skills/agents. | Internal preload: `ohmyorch:contract`; not a slash command. |
+| [`contract`](../plugins/ohmyorch/skills/contract/SKILL.md) | Supply the shared operational contract to skills and agents. | Internal preload: `ohmyorch:contract`; not a slash command. |
 
 `generate-html-page` produces a self-contained themed page with evidence sources, light/dark modes, accessible SVGs, and a bundled validator. This public guide is a separate website with repository-hosted images and SVG assets.
 
-Bundled CLI operations include `delivery`, `workflow-status`, `status`, `completion-gate`, `check-scope`, `check-write-scope`, validators for product artifacts, plans, reviews, test reports, status, verification, and HTML pages, and `run-project-validation`. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.
+The bundled CLI has 14 operations: `doctor`, `bootstrap`, `adapt-project`, `upgrade-project`, `migrate-legacy`, `harness-reset`, `delivery`, `validate-product-artifacts`, `validate-html-page`, `guard-context-preflight`, `guard-story-done`, `guard-archive`, `guard-delivery-loop`, and `run-project-validation`. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.
 
 ## Walk through one feature
 
 Suppose your approved product brief describes password reset, and ingestion produces a READY story `US-1.1` in `EPIC-1`. In your initialized consumer project:
 
-1. Run `/ohmyorch:analyze-codebase` for an existing application. The analyst returns current-state evidence; the coordinator persists the mapped CODEBASE document.
+1. Run `/ohmyorch:analyze-codebase` for an existing application. The analyst returns current-state evidence; the skill persists the mapped CODEBASE document.
 2. Run `/ohmyorch:generate-prd docs/approved-brief.md`, then `/ohmyorch:ingest-spec`. Review the resulting intent, traceability, acceptance scenarios, and dependencies. Resolve missing decisions before marking work READY.
-3. Run `/ohmyorch:deliver US-1.1`. The main coordinator selects the story; the planner authors the handoffs; the implementer builds the change; reviewer and tester independently persist their verdicts. Findings reopen the change for fresh work and checks.
-4. When the completion policy passes, the coordinator records completion, archives the change, and marks the story DONE. The goal becomes COMPLETE. Inspect the archived plan, tasks, verdicts, status, completion record, and any remediation history in your project.
+3. Run `/ohmyorch:deliver US-1.1`. The session proposes one change for the story: `proposal.md`, a delta spec with a scenario for every acceptance scenario of the story, and `tasks.md`. It sets the story to IN PROGRESS, then applies the tasks and ticks each one when it is done.
+4. With every task ticked, the session verifies the change. A CRITICAL finding becomes a new task, and the loop returns to apply. With none, the session runs `openspec archive <change> -y`, marks the story DONE, and the goal becomes COMPLETE. Inspect the archived proposal, specs, and ticked tasks under `openspec/changes/archive/`, and the merged requirements under `openspec/specs/`.
 
 For every story in that epic, choose `/ohmyorch:deliver EPIC-1`. To prioritize its second task while still delivering the parent story, choose `/ohmyorch:deliver US-1.1#2`. When a run is BLOCKED or STOPPED, resolve its cause and repeat the same target to resume from the derived next action. The guide's examples describe expected behavior; authenticated full-lifecycle evidence remains a release gate.
 
@@ -290,9 +285,13 @@ For every story in that epic, choose `/ohmyorch:deliver EPIC-1`. To prioritize i
 /plugin marketplace update ohmyorch-marketplace
 /plugin update ohmyorch@ohmyorch-marketplace
 /ohmyorch:upgrade-project --dry-run
+/ohmyorch:adapt-project --dry-run
+/ohmyorch:adapt-project --apply
 ```
 
-Code update and project-state upgrade are separate. Review the latter before applying. Copied setups use `/ohmyorch:migrate-legacy --dry-run`, then apply the exact reviewed plan ID. Do not enable old and plugin hooks together.
+Code update and project-state upgrade are separate. Review the latter before applying. Managed guidance changes only when you review and apply `/ohmyorch:adapt-project`. After updating from 0.0.1, the project's `CLAUDE.md` block and `.claude/rules/ohmyorch-*-standards.md` still describe the removed flow until you do, and `/ohmyorch:upgrade-project` does not change them. Adaptation also refreshes an `openspec/config.yaml` that is unchanged since bootstrap scaffolded it; an edited one is left alone and its old `context:` line must be changed by hand. The [changelog](../plugins/ohmyorch/CHANGELOG.md) gives that line under "Upgrading from 0.0.1", with the `delivery stop` step for a goal that is still owned and the step for an in-flight change with open review findings.
+
+Copied setups use `/ohmyorch:migrate-legacy --dry-run`, then apply the exact reviewed plan ID. Do not enable old and plugin hooks together.
 
 Reset defaults to owned managed guidance; full workflow reset is a separately reviewed scope:
 
@@ -305,15 +304,17 @@ Applied lifecycle operations report recovery IDs. Rollback verifies affected-fil
 
 ## Know the current boundaries
 
-Root hooks use Claude's scoped identity fields for supported Write/Edit/MultiEdit payloads, intercept supported standalone archive commands, and evaluate only the owner's Stop events. They are workflow guardrails. Arbitrary Bash/MCP writes and renamed executables can bypass file-tool checks. PostToolUse reports findings after a write; it cannot undo it.
+Root hooks use Claude's scoped identity fields for supported Write/Edit/MultiEdit payloads, intercept supported standalone archive commands, and evaluate only the owner's Stop events. They are workflow guardrails. Arbitrary Bash/MCP writes and renamed executables can bypass file-tool checks. The archive guard sees only the `openspec archive` command; a change archived any other way is not checked. PostToolUse reports findings after a write; it cannot undo it.
 
-Legacy acceptance allows some partial/mixed PASS/UNVERIFIED reports; all-UNVERIFIED/no-positive-evidence fails. Recorded verification text has a VERIFIED/UNVERIFIED substring ambiguity. The old DONE predicate can allow an eligible active change before archival, so archive-before-DONE also remains a coordinator contract. Eligibility does not prove every criterion received full verified coverage. These behaviors were preserved during the format migration.
+In an activated project the hooks refuse a Write, Edit, or MultiEdit whose target is outside the project. That includes Claude's own plan, memory, and scratch files when they are written with those tools.
+
+Verify is advisory and is not independent evidence: the session that wrote the code also checks it. The two guards confirm only that every task is ticked before archive and that the change is archived before DONE. They do not show that a task was done well or that every scenario was exercised. A human reviews the diff before relying on a delivered story.
 
 Native Windows, custom OpenSpec schemas, registered/global stores, and unsupported prospective file-tool payloads are outside this implementation's supported scope. Linux/macOS CI is configured; recorded local execution was macOS. Authenticated role identity/denials and the complete live lifecycle remain public release gates.
 
 ## Build and inspect the source
 
-The plugin has one runtime under `plugins/ohmyorch/`. Seven reference contracts are explicitly loaded through skills and agents. It bundles no MCP server, global default agent, consumer permissions, or install-time project mutation.
+The plugin has one runtime under `plugins/ohmyorch/`. Six rule references sit beside the shared contract; skills and agents read them explicitly. It bundles no MCP server, global default agent, consumer permissions, or install-time project mutation.
 
 Maintainers generate the HTML guide from this Markdown:
 
@@ -329,7 +330,7 @@ Documentation uses local assets and system fonts. Plugin packaging excludes publ
 
 ## Sources
 
-Features are defined by the current [delivery skill](../plugins/ohmyorch/skills/deliver/SKILL.md), [operational contract](../plugins/ohmyorch/references/contract.md), [workflow reporter](../plugins/ohmyorch/scripts/workflow-status.sh), [completion gate](../plugins/ohmyorch/scripts/completion-gate.sh), [root dispatcher](../plugins/ohmyorch/hooks/dispatch.sh), and [lifecycle engine](../plugins/ohmyorch/lib/lifecycle.sh).
+Features are defined by the current [delivery skill](../plugins/ohmyorch/skills/deliver/SKILL.md), [operational contract](../plugins/ohmyorch/references/contract.md), [delivery engine](../plugins/ohmyorch/scripts/delivery.sh), [archive guard](../plugins/ohmyorch/scripts/guard-archive.sh), [story guard](../plugins/ohmyorch/scripts/guard-story-done.sh), [root dispatcher](../plugins/ohmyorch/hooks/dispatch.sh), and [lifecycle engine](../plugins/ohmyorch/lib/lifecycle.sh). The seven `opsx-*` skills are the prompts OpenSpec 1.13.2 generates, with the plugin namespace and one boundary paragraph; see the [OpenSpec provenance note](../plugins/ohmyorch/references/openspec-provenance.md).
 
 The [implementation record](plan/PLUGIN-IMPLEMENTATION.md) separates regression/cache evidence from pending authenticated tests. The [release checklist](plan/plugin-release-readiness.json) governs public packaged artifacts and support claims. Integration guidance comes from official [plugin development](https://code.claude.com/docs/en/plugins/create), [plugin commands](https://code.claude.com/docs/en/plugins/cli-reference), and [hooks](https://code.claude.com/docs/en/hooks) documentation.
 

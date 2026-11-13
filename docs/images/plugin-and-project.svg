@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 570" role="img" aria-labelledby="title description">
   <title id="title">Installed code and project memory have different homes</title>
-  <desc id="description">Claude installs skills, agents, hooks, runtime, contracts, and templates as a plugin. Explicit project-root paths select the consumer's documents, OpenSpec evidence, configuration, and private runtime state. Updates and uninstall preserve project files; bootstrap and upgrades are separate reviewed operations.</desc>
+  <desc id="description">Claude installs 20 skills, three authoring agents, hooks, runtime, six rule references, and templates as a plugin. Explicit project-root paths select the consumer's documents, OpenSpec changes, delivery goal, configuration, and private runtime state. Updates and uninstall preserve project files; bootstrap and upgrades are separate reviewed operations.</desc>
   <defs>
     <linearGradient id="surface" x2="1" y2="1"><stop stop-color="#101b32"/><stop offset="1" stop-color="#111127"/></linearGradient>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 8 4 0 8" fill="none" stroke="#a78bfa" stroke-width="1.5"/></marker>
@@ -21,10 +21,10 @@
   <rect x="40" y="120" width="450" height="6" rx="3" fill="#67e8f9"/>
   <text x="66" y="166" class="title">Installed plugin</text>
   <text x="66" y="194" class="detail">Claude cache or explicit development checkout</text>
-  <text x="66" y="241" class="label">24 skills + eight scoped agents</text>
+  <text x="66" y="241" class="label">20 skills + 3 authoring agents</text>
   <text x="66" y="275" class="label">Root hooks + Bash / jq runtime</text>
-  <text x="66" y="309" class="label">Seven contracts + validators</text>
-  <text x="66" y="343" class="label">Neutral bootstrap / artifact templates</text>
+  <text x="66" y="309" class="label">Six rule references + validators</text>
+  <text x="66" y="343" class="label">Neutral project + HTML page templates</text>
   <path d="M66 368H464" stroke="#344b64"/>
   <text x="66" y="402" class="detail">Read-only during consumer operations</text>
   <text x="66" y="427" class="detail">No copied executables or bundled credentials</text>
@@ -37,7 +37,7 @@
   <rect x="590" y="120" width="450" height="330" rx="20" fill="#211d3c" stroke="#7e6aaf" stroke-width="1.5"/>
   <rect x="590" y="120" width="450" height="6" rx="3" fill="#a78bfa"/>
   <text x="616" y="166" class="title">Your project</text>
-  <text x="616" y="194" class="detail">Your intent, evidence, settings, and history</text>
+  <text x="616" y="194" class="detail">Your intent, changes, settings, and history</text>
   <text x="616" y="239" class="code">PRD / SPECS / CODEBASE</text>
   <text x="616" y="274" class="code">openspec/changes/&lt;id&gt;/</text>
   <text x="616" y="309" class="code">openspec/delivery/goal.md</text>

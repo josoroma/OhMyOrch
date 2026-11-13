@@ -24,9 +24,9 @@
 # IMPORTANT — what this guard CAN and CANNOT check.
 #
 # A hook runs before the write. At that moment the artifact's new content does not
-# exist on disk, so the guard cannot inspect it for the `CODEBASE Context:` marker
-# that validate-product-artifacts.sh (US-2.7) requires afterwards. That check is
-# therefore a post-write concern and is deliberately NOT duplicated here.
+# exist on disk. Whether it carries the `CODEBASE Context:` marker that
+# validate-product-artifacts.sh (US-2.7) requires is a post-write concern and is
+# deliberately NOT duplicated here.
 #
 # What this guard does instead is enforce the PRECONDITION that makes the marker
 # meaningful: the state of the repository at the moment generation starts. It
@@ -35,11 +35,27 @@
 #   * CODEBASE.md exists but is stale relative to HEAD  (surface before trusting it)
 #   * a meaningful codebase exists but CODEBASE.md is absent, with no recorded skip
 #
+# Stale means that a commit after the analyzed revision touched something other
+# than the three mapped documents: committing CODEBASE.md, the PRD or the SPECS
+# does not make the analysis stale.
+#
+# Both blocks name a decision that can be recorded instead, and the write that
+# records it must pass. The plugin dispatcher (hooks/dispatch.sh, pre-write)
+# therefore reconstructs the document as the write would leave it and passes it
+# with `--content-file`. Only two lines are read from it:
+#
+#   * `CODEBASE Context: skipped (<reason>)` — a recorded skip, for the missing
+#     analysis (also honoured when either mapped document on disk carries it);
+#   * `CODEBASE Context: consumed (<recorded revision>, staleness accepted)` —
+#     acceptance of the stale analysis, tied to the revision CODEBASE.md records,
+#     so a refreshed analysis that goes stale again needs a new line. Without
+#     `--content-file` the line is read from the document on disk.
+#
 # Fails open whenever it cannot determine the situation.
 #
 # Usage:
 #   guard-context-preflight.sh --hook
-#   guard-context-preflight.sh --file <path>
+#   guard-context-preflight.sh --file <path> [--content-file <path>] [--quiet]
 #
 # Exit codes: 0 allow, 2 block, 3 usage error.
 
@@ -50,6 +66,7 @@ set -- "${OHMYORCH_ARGS[@]+"${OHMYORCH_ARGS[@]}"}"
 
 HOOK_MODE=0
 FILE=""
+CONTENT_FILE=""
 QUIET=0
 
 c_reset=""; c_red=""; c_dim=""; c_yellow=""
@@ -59,14 +76,22 @@ fi
 
 usage() {
   cat <<'EOF'
-Usage: guard-context-preflight.sh (--hook | --file <path>)
+Usage: guard-context-preflight.sh (--hook | --file <path> [--content-file <path>]) [--quiet]
 
 Blocks PRD.md / SPECS.md generation that starts from missing or stale CODEBASE
 context (US-8.2). Fails open when the situation cannot be determined.
 
+A decision recorded in the document being written lets the write proceed:
+`CODEBASE Context: skipped (<reason>)` for a missing analysis, or
+`CODEBASE Context: consumed (<recorded revision>, staleness accepted)` for a
+stale one. Commits that touch only the mapped documents do not make it stale.
+
 Options:
   --hook          Read Claude Code hook JSON on stdin (PreToolUse)
   --file <path>   Check a specific path (direct mode)
+  --content-file <path>
+                  The document as the write would leave it; a recorded decision
+                  is read from it (default: the document on disk)
   --quiet         Suppress the allow message
   -h, --help      Show this help
 
@@ -78,6 +103,10 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --hook)  HOOK_MODE=1; shift ;;
     --file)  [ $# -ge 2 ] || { echo "error: --file needs a value" >&2; exit 3; }; FILE="$2"; shift 2 ;;
+    --content-file)
+      [ $# -ge 2 ] || { echo "error: --content-file needs a value" >&2; exit 3; }
+      [ -f "$2" ] && [ -r "$2" ] || { echo "error: cannot read --content-file '$2'" >&2; exit 3; }
+      CONTENT_FILE="$2"; shift 2 ;;
     --quiet) QUIET=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "error: unknown option '$1'" >&2; usage >&2; exit 3 ;;
@@ -134,9 +163,11 @@ detect_codebase() {
     2>/dev/null | head -1 | grep -q .
 }
 
-# Product documents may live at the repository root or under docs/.
+# A recorded skip: in either mapped document on disk, in the document as this
+# write would leave it, or as a `.codebase-skip` file.
 skip_recorded() {
   grep -qiE 'CODEBASE Context:[[:space:]]*skipped' "$OHMYORCH_DOC_PRD" "$OHMYORCH_DOC_SPECS" 2>/dev/null && return 0
+  [ -n "$CONTENT_FILE" ] && grep -qiE 'CODEBASE Context:[[:space:]]*skipped' "$CONTENT_FILE" 2>/dev/null && return 0
   [ -f .codebase-skip ] && return 0
   return 1
 }
@@ -159,8 +190,19 @@ if [ "$HAS_CODEBASE_MD" -eq 1 ]; then
 
   if [ -n "$RECORDED" ] && [ "$RECORDED" != "unknown" ] \
      && git rev-parse --verify --quiet "$RECORDED" >/dev/null 2>&1; then
-    CHANGED=$(git diff --name-only "$RECORDED"..HEAD 2>/dev/null | grep -c . || true)
+    # Commits that touch only the three mapped documents do not stale the
+    # analysis. ':/' keeps the whole repository in scope; the excluded paths are
+    # relative to the project root, which is the working directory here, so they
+    # also resolve when the project is a subdirectory of the repository.
+    CHANGED=$(git diff --name-only "$RECORDED"..HEAD -- ':/' ":(exclude)$OHMYORCH_DOC_CODEBASE" ":(exclude)$OHMYORCH_DOC_PRD" ":(exclude)$OHMYORCH_DOC_SPECS" 2>/dev/null | grep -c . || true)
     CHANGED=${CHANGED:-0}
+    # The recorded acceptance is read from the document as this write would leave
+    # it (--content-file), else from the document on disk. A fixed-string match:
+    # the recorded revision may be a ref name with regex metacharacters.
+    if [ "$CHANGED" -gt 0 ] && grep -qiF -- "CODEBASE Context: consumed ($RECORDED, staleness accepted)" "${CONTENT_FILE:-$FILE}" 2>/dev/null; then
+      [ "$QUIET" -eq 1 ] || printf 'ALLOW  stale CODEBASE.md (%s) accepted by the decision recorded in %s\n' "$RECORDED" "$FILE" >&2
+      exit 0
+    fi
     if [ "$CHANGED" -gt 0 ]; then
       printf '%sBLOCKED%s  %s\n' "$c_red" "$c_reset" "$FILE" >&2
       printf '  %sCODEBASE.md describes %s, but HEAD has moved on (%s file(s) changed).%s\n' \

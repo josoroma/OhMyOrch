@@ -1,6 +1,6 @@
 {
   "name": "ohmyorch-maintainer-tools",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "description": "Maintainer validation only; consumers install the Claude Code plugin.",
   "engines": {

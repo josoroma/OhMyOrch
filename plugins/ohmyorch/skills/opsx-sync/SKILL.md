@@ -10,13 +10,10 @@ metadata:
   generatedBy: "1.13.2"
 ---
 
-## Installed plugin contract
+## OhMyOrch boundary
 
-Read `${CLAUDE_PLUGIN_ROOT}/references/contract.md` and the applicable bundled rules before acting. Run `"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" doctor --json` and stop on FAIL/UNSUPPORTED checks. Resolve every PRD/SPECS/CODEBASE reference through its `documents` mapping. These artifact names never imply a root-only layout. Use concrete resolved paths in Read/Write/Edit/Bash calls; do not copy plugin code/rules into the project. Resolve project files from the explicit project root and bundled files from the plugin root.
+Run every `openspec` command from the project root (`${CLAUDE_PROJECT_DIR}`). This plugin supports only the local `spec-driven` schema under `openspec/`: registered stores, pointers to another root, global default stores and custom schemas are out of scope, so the store and schema branches below do not apply here. Never initialize OpenSpec as a side effect; use `/ohmyorch:bootstrap --with-openspec`. Upstream `/opsx:<name>` commands are `/ohmyorch:opsx-<name>` in this plugin. Shared rules are in `${CLAUDE_PLUGIN_ROOT}/references/contract.md`; open it only when a guard refuses or a rule is unclear.
 
-Compatibility boundary: run OpenSpec with the explicit project root as its working directory. Require `openspec context --json` to resolve `root.path` to that same canonical project root and its local config to `schema: spec-driven`. Registered stores, pointers to another root, global default stores and custom schemas are unsupported by this plugin; stop and report that boundary before creating or writing artifacts. The generated upstream instructions below apply only within this boundary; their alternative store/schema branches are not supported plugin behavior. Initialization is only through explicit `/ohmyorch:bootstrap`, never an implicit OpenSpec side effect.
-
-Inline path substitution supplies text, not automatic Bash environment variables. Shell-escape each substituted path/argument as a literal argument; never evaluate user `$ARGUMENTS` as shell code. Essential rules also reach delegated agents directly through the `ohmyorch:contract` preload. Pass project root, change, story, configured artifacts and prior evidence explicitly when delegating. Reviewer/tester agents persist their own selected verdict; the caller reads and validates it.
 Sync delta specs from a change to main specs.
 
 This is an **agent-driven** operation - you will read delta specs and directly edit main specs to apply the changes. This allows intelligent merging (e.g., adding a scenario without copying the entire requirement).

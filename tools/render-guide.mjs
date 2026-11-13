@@ -75,7 +75,7 @@ const html = `<!doctype html>
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="One READY story. Clear handoffs. Independent verdicts. Meet OhMyOrch's resumable Claude Code and OpenSpec delivery loop.">
+  <meta name="description" content="One READY story, one OpenSpec change: propose, apply, verify, archive. Meet OhMyOrch's resumable Claude Code delivery loop.">
   <meta name="theme-color" content="#ffffff">
   <title>OhMyOrch — a delivery loop you can follow</title>
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">

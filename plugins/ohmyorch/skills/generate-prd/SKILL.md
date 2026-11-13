@@ -14,7 +14,7 @@ metadata:
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/contract.md` and the applicable bundled rules before acting. Run `"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" doctor --json` and stop on FAIL/UNSUPPORTED checks. Resolve every PRD/SPECS/CODEBASE reference through its `documents` mapping. These artifact names never imply a root-only layout. Use concrete resolved paths in Read/Write/Edit/Bash calls; do not copy plugin code/rules into the project. Resolve project files from the explicit project root and bundled files from the plugin root.
 
-Inline path substitution supplies text, not automatic Bash environment variables. Shell-escape each substituted path/argument as a literal argument; never evaluate user `$ARGUMENTS` as shell code. Essential rules also reach delegated agents directly through the `ohmyorch:contract` preload. Pass project root, change, story, configured artifacts and prior evidence explicitly when delegating. Reviewer/tester agents persist their own selected verdict; the caller reads and validates it.
+Inline path substitution supplies text, not automatic Bash environment variables. Shell-escape each substituted path/argument as a literal argument; never evaluate user `$ARGUMENTS` as shell code. Essential rules also reach delegated agents directly through the `ohmyorch:contract` preload. Pass project root, change, story, configured artifacts and prior evidence explicitly when delegating.
 Generate or update `PRD.md` from product source material while keeping desired
 behavior strictly separate from the system's current state.
 
@@ -53,7 +53,7 @@ If material changes make it stale, surface that before continuing:
 
 ```text
 Stale context: CODEBASE.md describes <rev>; HEAD is <rev> (<n> commits, <files> touched).
-Options: (a) refresh with /ohmyorch:analyze-codebase, (b) continue with a recorded staleness note.
+Options: (a) refresh with /ohmyorch:analyze-codebase, (b) continue with this line in PRD.md: CODEBASE Context: consumed (<recorded revision>, staleness accepted)
 ```
 
 Do not treat a known-stale file as current without saying so. If the recorded revision
@@ -64,7 +64,7 @@ report:
 
 ```text
 Codebase context missing: a codebase is present but CODEBASE.md does not exist.
-Options: (a) run /ohmyorch:analyze-codebase first (recommended), (b) record an explicit skip decision.
+Options: (a) run /ohmyorch:analyze-codebase first (recommended), (b) record an explicit skip decision in PRD.md: CODEBASE Context: skipped (<reason>)
 ```
 
 Run `/ohmyorch:analyze-codebase` first, or require an explicit Product Manager decision to skip

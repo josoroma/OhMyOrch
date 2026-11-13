@@ -69,4 +69,17 @@ context is still context, but it may describe an interface that no longer exists
 Before a material generation, check whether the recorded revision still matches
 reality. When it does not, refresh the analysis or record an explicit decision to
 proceed with the older description. The preflight guard performs this check when
-`CODEBASE.md` contains an `Analyzed revision:` line.
+`CODEBASE.md` contains an `Analyzed revision:` line. Commits that touch only the
+three mapped documents do not make the analysis stale.
+
+Two recorded decisions let a `PRD.md` or `SPECS.md` write proceed without
+re-analysis. The line goes in the document being written, and the same write may
+add it:
+
+- `CODEBASE Context: skipped (<reason>)`, when a codebase exists but `CODEBASE.md`
+  does not;
+- `CODEBASE Context: consumed (<revision>, staleness accepted)`, naming the revision
+  `CODEBASE.md` records, when the analysis is stale.
+
+Delivery bookkeeping in `SPECS.md` (`Status:`, `Change:`, task ticks and Work Item
+Status rows) is not a material update and never needs either.

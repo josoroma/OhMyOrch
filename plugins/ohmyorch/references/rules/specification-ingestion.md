@@ -21,7 +21,7 @@ If a story seems to need a decision the sources do not make, that is a finding.
 Record it as `NEEDS CLARIFICATION` or `BLOCKED` and surface it. Do not choose an
 interpretation privately and write it as though it were decided — a fabricated
 requirement is indistinguishable from a real one once it is in the backlog, and
-it will be implemented, reviewed, and tested as if someone had asked for it.
+it will be implemented and verified as if someone had asked for it.
 
 The only exception is a clarification from the human Product Manager, who is the
 final product authority. When that happens, the source document should be updated
@@ -73,6 +73,6 @@ do X" without a product decision supporting it.
 ## Story identity
 
 Identifiers (`US-8.1`, `EPIC-8`) are assigned once and never reused or
-renumbered. Review and test artifacts reference these identifiers, and
+renumbered. OpenSpec changes and their artifacts reference these identifiers, and
 renumbering breaks the trail (NFR-002). A withdrawn story keeps its identifier
 and is marked accordingly.

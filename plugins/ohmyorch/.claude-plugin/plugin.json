@@ -1,7 +1,7 @@
 {
   "name": "ohmyorch",
-  "version": "0.0.1",
-  "description": "Spec-driven delivery with independent planning, implementation, review, testing and resumable OpenSpec gates.",
+  "version": "0.1.0",
+  "description": "Spec-driven delivery from a SPECS backlog: each story is one OpenSpec change — propose, apply, verify, archive.",
   "author": {
     "name": "OhMyOrch maintainers"
   },
@@ -10,7 +10,7 @@
   "keywords": [
     "openspec",
     "delivery",
-    "review",
+    "specs",
     "orchestration"
   ],
   "metadata": {

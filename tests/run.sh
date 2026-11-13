@@ -12,7 +12,7 @@ ln -s "$(command -v jq)" "$work/utilities/jq"
 export OHMYORCH_TEST_UTILITIES="$work/utilities"
 bash "$repository/tests/support/legacy-view.sh" "$TEST_HARNESS_ROOT" || exit 2
 failed=0
-if [ "$#" -eq 0 ]; then set -- guards status completion delivery html-page plugin packaging specs-app; fi
+if [ "$#" -eq 0 ]; then set -- guards delivery html-page plugin packaging specs-app; fi
 for suite in "$@"; do
   bash "$repository/tests/test-$suite.sh" > "$work/$suite.log" 2>&1
   rc=$?

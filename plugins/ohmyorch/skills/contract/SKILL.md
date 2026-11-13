@@ -1,6 +1,6 @@
 ---
 name: contract
-description: Shared artifact, authority and role contracts. Load before any OhMyOrch workflow.
+description: Shared artifact and authority contract, preloaded by the authoring agents. The deliver skill opens it only when a guard refuses, a command fails or a rule is unclear.
 user-invocable: false
 allowed-tools: Read, Grep, Glob, Bash
 ---

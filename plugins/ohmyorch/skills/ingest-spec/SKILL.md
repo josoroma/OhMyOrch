@@ -14,9 +14,9 @@ metadata:
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/contract.md` and the applicable bundled rules before acting. Run `"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" doctor --json` and stop on FAIL/UNSUPPORTED checks. Resolve every PRD/SPECS/CODEBASE reference through its `documents` mapping. These artifact names never imply a root-only layout. Use concrete resolved paths in Read/Write/Edit/Bash calls; do not copy plugin code/rules into the project. Resolve project files from the explicit project root and bundled files from the plugin root.
 
-Inline path substitution supplies text, not automatic Bash environment variables. Shell-escape each substituted path/argument as a literal argument; never evaluate user `$ARGUMENTS` as shell code. Essential rules also reach delegated agents directly through the `ohmyorch:contract` preload. Pass project root, change, story, configured artifacts and prior evidence explicitly when delegating. Reviewer/tester agents persist their own selected verdict; the caller reads and validates it.
+Inline path substitution supplies text, not automatic Bash environment variables. Shell-escape each substituted path/argument as a literal argument; never evaluate user `$ARGUMENTS` as shell code. Essential rules also reach delegated agents directly through the `ohmyorch:contract` preload. Pass project root, change, story, configured artifacts and prior evidence explicitly when delegating.
 Create or incrementally update `SPECS.md`: the iterable, source-traceable product
-backlog the Product Manager selects work from.
+backlog that `/ohmyorch:deliver` delivers from.
 
 **This skill writes exactly one artifact: `SPECS.md`.** It never modifies application
 source code or `PRD.md`.
@@ -52,13 +52,15 @@ dependencies, and compatibility concerns. Acceptance criteria must still come fr
 product sources only — never from code.
 
 If the recorded revision is materially behind HEAD, surface the staleness before
-treating the file as current.
+treating the file as current: refresh with `/ohmyorch:analyze-codebase`, or continue
+and record `CODEBASE Context: consumed (<recorded revision>, staleness accepted)` in
+`SPECS.md`.
 
 **Case B — a meaningful codebase exists but `CODEBASE.md` is absent.** Stop and report:
 
 ```text
 Codebase context missing: a codebase is present but CODEBASE.md does not exist.
-Options: (a) run /ohmyorch:analyze-codebase first (recommended), (b) record an explicit skip decision.
+Options: (a) run /ohmyorch:analyze-codebase first (recommended), (b) record an explicit skip decision in SPECS.md: CODEBASE Context: skipped (<reason>)
 ```
 
 Run `/ohmyorch:analyze-codebase` first, or require an explicit skip decision.
@@ -85,6 +87,8 @@ Delegate to the `ohmyorch:spec-ingestor` agent with:
 
 - do not duplicate equivalent requirements;
 - preserve existing Epic and User Story identifiers;
+- keep each existing story's `Status:` and `Change:` lines and task ticks exactly:
+  they are delivery state, not ingested content;
 - add only newly supported requirements;
 - flag changed or conflicting requirements for Product Manager review rather than
   silently rewriting them;

@@ -1,121 +1,111 @@
 # OpenSpec Workflow
 
-Rules for operating the OpenSpec change lifecycle. Source: `CLAUDE.md`,
-`PRD.md` section 8, `SPECS.md` US-8.2.
+Rules for the OpenSpec change lifecycle. Each `SPECS.md` story is delivered as one
+change that follows the upstream OpenSpec 1.13.2 flow.
 
 ## The lifecycle
 
 ```text
 SPECS.md READY story
-   -> /ohmyorch:opsx-explore     understand problem + repository (no implementation)
-   -> /ohmyorch:opsx-propose     proposal.md, delta specs, design.md, tasks.md
-   -> implementation-plan.md   (Planner handoff)
-   -> /ohmyorch:opsx-apply       implement approved tasks
-   -> review.md         (Reviewer findings)
-   -> /ohmyorch:opsx-verify      verify implementation against specification
-   -> test-report.md    (Tester acceptance evidence)
-   -> /ohmyorch:opsx-archive     archive change, update canonical specs
-   -> SPECS.md story marked DONE
+   -> propose   /ohmyorch:opsx-propose   proposal.md, specs/, design.md (only when needed), tasks.md
+   -> apply     /ohmyorch:opsx-apply     implement tasks, tick tasks.md
+   -> verify    /ohmyorch:opsx-verify    advisory check of the implementation against the change
+   -> archive   openspec archive <id> -y merges delta specs, moves the change to changes/archive/
+   -> story marked DONE in SPECS.md
 ```
 
-One bounded change at a time. `SPECS.md` is a backlog, not one large prompt.
+`/ohmyorch:opsx-explore` is optional: use it only when a story or the affected code
+is unclear. There are no other stages, and the main session performs every step.
 
-## Artifacts are the state
+One story, one change; one active change at a time. `SPECS.md` is a backlog, not one
+large prompt.
 
-The change directory is the source of truth:
+## The change directory is the state
 
 ```text
 openspec/changes/<change>/
-  proposal.md             why, and what is in scope
-  specs/                  the delta specifications
-  design.md               how, when a design decision is needed
-  tasks.md                the implementation checklist
-  implementation-plan.md  the Planner handoff
-  review.md               the Reviewer verdict
-  test-report.md          the Tester evidence
+  proposal.md   why, and what is in scope
+  specs/        the delta specifications
+  design.md     how, only when a design decision is needed
+  tasks.md      the implementation checklist
 ```
 
-A fresh session resumes by reading these files. State that exists only in a chat
-transcript does not exist (BR-004, NFR-003).
+These four are OpenSpec's own artifacts and the only record of a change. `tasks.md`
+is the only progress tracker. Do not add plan, review, test-report, status or
+completion files.
 
-## Durable state versus derived state
+A fresh session resumes by reading this directory. State that exists only in a chat
+transcript does not exist.
 
-`status.md` records the stage a change reached, its owner, and its blockers. It holds
-two kinds of content and the distinction matters:
-
-- The **gates table, `State`, `Current owner`, and Resume line are derived** from
-  `"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" workflow-status`. Never hand-edit them; refresh with
-  `"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" --session-id "${CLAUDE_SESSION_ID}" status --change <name>`. An editable gate table is a second source of
-  truth that can silently disagree with the reporter.
-- The **`## Blockers` section is authored**, and sits between
-  `BEGIN/END AUTHORED: blockers` so a refresh preserves it rather than replacing it.
-
-Advancing a gate is a state change, so refresh `status.md` with it. A recorded state
-that no longer matches the repository is worse than no state, because a resuming
-session trusts it:
+## Inspecting a change
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" --session-id "${CLAUDE_SESSION_ID}" status --resume --change <name>      # where to continue
-"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" validate-status --change <name>      # is the record still current?
+"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" delivery next   # derived next action of the recorded goal
+openspec status --change <id>      # artifact state of one change
+openspec list                      # active changes and their task progress
+openspec validate <id> --strict    # structure of the change and its delta specs
 ```
+
+All four only read. Run `openspec` from the project root.
+
+## Verify
+
+`/ohmyorch:opsx-verify` is advisory and writes no file. It reports completeness,
+correctness and coherence of the implementation against the change's artifacts.
+
+- Verification is evidence-based. Never call a scenario passing without having
+  observed it: a test you ran, output you read, or code you inspected. A check you
+  skipped is not a pass.
+- In the delivery loop these are CRITICAL whatever rank `/ohmyorch:opsx-verify` gives
+  them: an acceptance scenario of the story that is not implemented, whose observed
+  result contradicts its `Then`, or for which there is no observed evidence; and a
+  project test that fails because of this change. A test that was already failing
+  for an unrelated reason is reported, not turned into a task.
+- Each CRITICAL finding becomes an unticked task appended to `tasks.md`, describing
+  the fix. That returns the change to apply. Nothing else records a finding.
+- With no CRITICAL finding, archive.
 
 ## Archival
 
-> **A change MUST NOT be archived while any completion condition is unmet.** (US-8.2, US-10.1)
-
-Blocking review findings and failing acceptance tests are the two clearest
-prohibitions, but the rule is general: archival requires every condition to pass.
-
-Two checks apply, and they are **not the same list**:
+Archive with the CLI, as a standalone Bash call:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" workflow-status --change <name>   # the seven workflow gates
-"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" --session-id "${CLAUDE_SESSION_ID}" completion-gate --change <name>   # the four completion conditions
+openspec archive <id> -y
 ```
 
-The gate chain answers *"where is this change in the workflow?"* The completion gate
-answers *"may this change be shipped?"* Neither contains the other — OpenSpec
-verification is a completion condition with no corresponding gate — so run both.
+- The archive guard refuses the command while `tasks.md` has an unfinished task,
+  counted as OpenSpec counts them: any checkbox marker other than `x`. Finish the
+  task (`/ohmyorch:opsx-apply <id>`), or remove a task that no longer applies, then
+  archive.
+- `openspec archive` itself validates the delta specs, merges them into
+  `openspec/specs/` and moves the change to `openspec/changes/archive/`. Invalid delta
+  specs stop it: fix them, do not skip validation.
+- The command must stand alone with a literal change id, which may be quoted. A
+  chained, multi-line or variable-built form, or one with global options, is refused.
+- Never archive by hand. Moving or editing the files yourself skips the validation
+  and the merge. `/ohmyorch:opsx-archive` is upstream's interactive archive workflow;
+  the delivery loop does not use it.
 
-The guard `"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" guard-archive` rejects archival mechanically, deferring to
-`completion-gate.sh` when present and to the gate chain otherwise, so there is exactly
-one source of truth for the verdict.
+## DONE only after archive
 
-Do not archive by editing files directly. Archival is an OpenSpec operation that
-updates the canonical specs; performing it by hand bypasses spec synchronisation.
+Set a story's `Status: DONE` in `SPECS.md` only after its change is archived, and
+point the story's `Change:` line at the archived path. The story-done guard refuses a
+`SPECS.md` write that introduces `Status: DONE` while the story's change is still
+active under `openspec/changes/`.
 
-Mark the story `DONE` in `SPECS.md` **only after** a successful archive, then refresh
-the durable record. This transition is enforced, not merely documented:
-`"${CLAUDE_PLUGIN_ROOT}/bin/ohmyorch" --project-root "${CLAUDE_PROJECT_DIR}" guard-story-done` rejects a `SPECS.md` write that would introduce
-`Status: DONE` while the change is not archive-eligible.
-
-## Status vocabulary
-
-Story states:
+## Story status vocabulary
 
 ```text
 READY | NEEDS CLARIFICATION | BLOCKED | IN PROGRESS | DONE
 ```
 
-Change states:
-
-```text
-PROJECT_DISCOVERY | CODEBASE_ANALYSIS | CODEBASE_READY | SOURCE_DOCUMENTS
-| PRD_GENERATION | PRD_READY | SPEC_INGESTION | SPECS_READY | SELECTED
-| EXPLORING | PROPOSED | PLANNED | IMPLEMENTING | REVIEWING
-| CHANGES_REQUESTED | TESTING | TEST_FAILED | ACCEPTED | ARCHIVED | BLOCKED
-```
-
-Use these values exactly. Do not invent intermediate states; if the correct state
-is unclear, the change is `BLOCKED` and the Product Manager decides.
+Use these values exactly. Delivery works only on `READY` and `IN PROGRESS` stories and
+sets `IN PROGRESS` and `DONE` itself. Any other status needs a human decision first.
 
 ## Generated files
 
-The seven bundled `skills/opsx-*` prompts derive from OpenSpec 1.13.2 and carry local plugin/role/path adaptations. Regenerate only in a maintainer scratch project and reapply/review those adaptations. Consumer `openspec update` does not update installed plugin code and must not recreate standalone commands or skills. Follow `references/openspec-provenance.md`.
-
-## Scope discipline
-
-The Planner predicts which files a change touches. That prediction is a contract,
-not a suggestion. A file outside the prediction means either the plan was
-incomplete or the work has drifted; in both cases, stop and re-plan rather than
-expanding scope silently (BR-003).
+The seven bundled `skills/opsx-*` prompts are the skills OpenSpec 1.13.2 generates.
+They differ from upstream only by the plugin namespace and one boundary paragraph.
+Regenerate them only in a maintainer scratch project, then reapply those two
+adaptations; see `references/openspec-provenance.md`. Consumer `openspec update` does
+not update installed plugin code and must not recreate standalone commands or skills.

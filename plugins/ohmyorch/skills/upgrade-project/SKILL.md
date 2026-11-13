@@ -5,7 +5,7 @@ disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
-Preview `upgrade-project --dry-run`. Schema 1 is current. Unsupported future schema has no guessed upgrade. Legacy counters are archived explicitly; goal/history remains. Use --apply after review. To recover use --rollback <operation-id> --dry-run, then --apply; rollback refuses concurrent edits.
+Preview `upgrade-project --dry-run`. Schema 1 is current. Unsupported future schema has no guessed upgrade. Legacy counters are archived explicitly; goal/history remains. Use --apply after review. To recover use --rollback <operation-id> --dry-run, then --apply; rollback refuses concurrent edits. Upgrade never changes managed guidance; after a plugin update also preview `/ohmyorch:adapt-project --dry-run`.
 
 Use the installed code root and explicit project root:
 

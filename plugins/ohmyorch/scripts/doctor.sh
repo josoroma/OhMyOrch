@@ -18,7 +18,7 @@ for executable in bash jq git shasum awk sed grep find mktemp; do
   if command -v "$executable" >/dev/null 2>&1; then check "$executable" PASS 'available'
   else check "$executable" FAIL 'install this prerequisite explicitly'; fi
 done
-for bundled in workflow-status completion-gate validate-product-artifacts validate-implementation-plan validate-review validate-test-report validate-status validate-verification delivery guard-archive guard-story-done guard-context-preflight guard-planning-handoff check-write-scope guard-delivery-loop; do
+for bundled in validate-product-artifacts delivery guard-archive guard-story-done guard-context-preflight guard-delivery-loop; do
   if [ -x "$OHMYORCH_CODE_ROOT/scripts/$bundled.sh" ]; then check "bundled-$bundled" PASS 'available'
   else check "bundled-$bundled" FAIL 'installed payload incomplete; reinstall the plugin'; fi
 done

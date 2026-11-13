@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="One READY story. Clear handoffs. Independent verdicts. Meet OhMyOrch's resumable Claude Code and OpenSpec delivery loop.">
+  <meta name="description" content="One READY story, one OpenSpec change: propose, apply, verify, archive. Meet OhMyOrch's resumable Claude Code delivery loop.">
   <meta name="theme-color" content="#ffffff">
   <title>OhMyOrch — a delivery loop you can follow</title>
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
@@ -31,8 +31,8 @@
           <li><a href="#start-in-a-real-project">Start in a real project</a></li>
           <li><a href="#initialize-deliberately">Initialize deliberately</a></li>
           <li><a href="#turn-approved-intent-into-ready-work">Turn approved intent into READY work</a></li>
-          <li><a href="#follow-the-owners-and-gates">Follow the owners and gates</a></li>
-          <li><a href="#meet-the-eight-agents">Meet the eight agents</a></li>
+          <li><a href="#follow-the-four-steps">Follow the four steps</a></li>
+          <li><a href="#meet-the-three-authoring-agents">Meet the three authoring agents</a></li>
           <li><a href="#inspect-without-advancing">Inspect without advancing</a></li>
           <li><a href="#pause-repair-and-resume">Pause, repair, and resume</a></li>
           <li><a href="#make-the-finish-explicit">Make the finish explicit</a></li>
@@ -45,7 +45,7 @@
           <li><a href="#sources">Sources</a></li>
         </ol></nav>
       </details>
-      <p class="candidate">0.0.1<br>Claude Code plugin</p>
+      <p class="candidate">0.1.0<br>Claude Code plugin</p>
     </aside>
     <main id="guide" tabindex="-1">
       <article>
@@ -56,15 +56,15 @@
 </figure>
 <p><img src="images/OhMyOrch.png" alt="OhMyOrch: a cyan and violet loop connecting an agent, a specification, code, and approval" class="brand-image" decoding="async" width="1448" height="1086" fetchpriority="high"></p>
 <p><strong>Pick a READY story</strong></p>
-<p>Follow clear handoffs and keep the evidence when you finish.</p>
-<p>OhMyOrch brings a repeatable delivery loop to Claude Code. The main session coordinates one OpenSpec change at a time, delegates each stage to its owner, and derives the next action from project artifacts. You can see what passed, what needs attention, and where to resume.</p>
-<p>OhMyOrch <strong>0.0.1</strong> is the version published in this repository. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.</p>
+<p>Propose it, apply it, verify it, archive it.</p>
+<p>OhMyOrch brings a repeatable delivery loop to Claude Code. Each READY story in your <code>SPECS.md</code> backlog becomes one OpenSpec change. The main session proposes the change, applies its tasks, verifies the result, archives it, and marks the story DONE. The next action is always derived from project files, so you can see what is finished, what is pending, and where to resume.</p>
+<p>OhMyOrch <strong>0.1.0</strong> is the version in this repository; it is not tagged, and the last tagged release is 0.0.1. The walkthrough video above was recorded for 0.0.1 and predates the propose, apply, verify, archive flow this guide describes. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.</p>
 <h2 id="why-the-loop-is-useful">Why the loop is useful</h2>
 <p>A large goal gets a small working unit: one independently verifiable story, one change, one next action. An epic becomes a sequence of those changes. Task focus still carries the parent story's acceptance criteria.</p>
-<p>Each handoff has a place to land. The implementation plan tells the implementer what to build and check. The reviewer records findings. The tester records acceptance evidence. The coordinator reads those files and decides what comes next.</p>
-<p>A failed verdict becomes history, remediation tasks become visible, and fresh implementation, review, and testing follow. A missing product decision becomes a blocker. A new session can pick up from these files.</p>
+<p>The record is OpenSpec's own. A change holds <code>proposal.md</code>, delta <code>specs/</code>, <code>tasks.md</code> and, only when the change needs it, <code>design.md</code>. <code>tasks.md</code> is the only progress tracker: a task is ticked when it is really done.</p>
+<p>Problems stay visible in the same files. A CRITICAL verify finding becomes a new unticked task, so the change returns to apply. A missing product decision becomes a blocker, and the loop stops for a human. A new session picks up from these files, not from chat memory.</p>
 <h3 id="start-the-whole-loop-with-one-command">Start the whole loop with one command</h3>
-<p>In an initialized project, run <strong><code>/ohmyorch:deliver &lt;target&gt;</code></strong> in Claude Code. It reads the configured <code>SPECS.md</code> backlog and coordinates selection, planning, implementation, independent review, acceptance testing, completion checks, archival, and the DONE transition. For example, to deliver an existing epic:</p>
+<p>In an initialized project, run <strong><code>/ohmyorch:deliver &lt;target&gt;</code></strong> in Claude Code. It reads the configured <code>SPECS.md</code> backlog and, for each story, proposes the change, applies its tasks, verifies the implementation, archives the change, and marks the story DONE. For example, to deliver an existing epic:</p>
 <pre><code class="language-text">/ohmyorch:deliver EPIC-1
 </code></pre>
 <p>Choose the scope that matches your backlog:</p>
@@ -100,10 +100,10 @@
 </tbody>
 </table></div>
 <p>These IDs and task text are examples; use targets that actually exist in your mapped <code>SPECS.md</code>. Feature selection uses the story's <code>US-N.M</code> ID. Stories must be READY with approved acceptance criteria and satisfied dependencies. The loop continues until the goal is COMPLETE or a blocker requires a human decision. Resolve the blocker and repeat the same command to resume.</p>
-<p><img src="images/delivery-loop.svg" alt="Ordered delivery stages with remediation and a separate completion decision" class="diagram" decoding="async" loading="lazy" width="1080" height="680"></p>
+<p><img src="images/delivery-loop.svg" alt="One READY story moves through propose, apply, verify, and archive, then is marked DONE" class="diagram" decoding="async" loading="lazy" width="1080" height="626"></p>
 <h2 id="start-in-a-real-project">Start in a real project</h2>
 <p>Actual delivery needs an authenticated Claude Code session. Prerequisites are OpenSpec <strong>1.13.2</strong>, Bash <strong>3.2+</strong>, jq <strong>1.6+</strong>, Git, shasum, and standard Unix utilities. OpenSpec is installed separately and has its own Node requirements; the bundled plugin runtime uses Bash and jq.</p>
-<p>Claude Code <strong>2.1.292</strong> is the recorded preferred validation target. Format and isolated marketplace/cache checks also passed on <strong>2.1.285</strong>. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.</p>
+<p>Claude Code <strong>2.1.292</strong> is the recorded preferred validation target. For 0.0.1, format and isolated marketplace/cache checks passed on it and on <strong>2.1.285</strong>. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.</p>
 <p>With a checkout of this version, run from your consuming project:</p>
 <pre><code class="language-bash">claude --plugin-dir /absolute/checkout/plugins/ohmyorch
 </code></pre>
@@ -133,6 +133,8 @@ claude plugin install ohmyorch@ohmyorch-marketplace --scope local
 <p>Analysis produces descriptive CODEBASE evidence. Adaptation creates owned project guidance from actual evidence and records unknowns. Nested guidance requires <code>--nested</code> and evidence for the directory. Surrounding human-authored text survives.</p>
 <h2 id="turn-approved-intent-into-ready-work">Turn approved intent into READY work</h2>
 <p>Use <code>/ohmyorch:generate-prd</code> with human-approved requirements and <code>/ohmyorch:ingest-spec</code> with an approved source. Codebase observations explain what exists; product decisions define what should change. Missing behavior remains NEEDS CLARIFICATION or BLOCKED until a human resolves it.</p>
+<p>Before a write to the mapped PRD or SPECS, a hook checks that the CODEBASE context is current. It refuses the write when the project has existing code but no CODEBASE document, or when files have changed since the revision that CODEBASE records. Run <code>/ohmyorch:analyze-codebase</code>, or record your decision in the document being written: <code>CODEBASE Context: skipped (&lt;reason&gt;)</code> when there is no CODEBASE document, or <code>CODEBASE Context: consumed (&lt;revision&gt;, staleness accepted)</code> for the recorded revision when it is stale. Commits that touch only the mapped PRD, SPECS, and CODEBASE do not make the analysis stale.</p>
+<p>Delivery bookkeeping in SPECS never needs that check: <code>Status:</code> and <code>Change:</code> lines, task ticks, and the story and task rows of the <code>## Work Item Status</code> table. Adding, rewording, moving, or deleting a task line is a material edit and is checked.</p>
 <p>Start when the selected story exists, is READY, has acceptance scenarios and source traceability, and its dependencies are satisfied. The following IDs are examples; choose real ones from your backlog:</p>
 <pre><code class="language-text">/ohmyorch:deliver US-1.1
 </code></pre>
@@ -140,58 +142,85 @@ claude plugin install ohmyorch@ohmyorch-marketplace --scope local
 <pre><code class="language-text">/ohmyorch:deliver EPIC-1
 </code></pre>
 <p>Task focus uses <code>/ohmyorch:deliver US-1.1#2</code> or a uniquely matching task description. The parent story still supplies acceptance; checking one task does not approve the story.</p>
-<h2 id="follow-the-owners-and-gates">Follow the owners and gates</h2>
-<p>The main session is the coordinator and Product Manager. It selects work, persists read-only specialists' handoffs, evaluates gates, records status, and owns archival and backlog transitions. Technical stages are delegated.</p>
+<h2 id="follow-the-four-steps">Follow the four steps</h2>
+<p>The main session performs every step. Each step leaves its result in OpenSpec's own artifacts, and a change has no other files.</p>
 <div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
 <thead>
 <tr>
-<th>Gate</th>
-<th>Owner</th>
-<th>Evidence the next stage reads</th>
+<th>Step</th>
+<th>Command</th>
+<th>What it leaves on disk</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1. Selection</td>
-<td>Main coordinator</td>
-<td>Selected story and one OpenSpec change</td>
+<td>1. Propose</td>
+<td><code>/ohmyorch:opsx-propose &lt;change&gt;</code></td>
+<td><code>openspec/changes/&lt;change&gt;/</code> with <code>proposal.md</code>, delta <code>specs/</code>, <code>tasks.md</code> and, only when needed, <code>design.md</code>. The story becomes IN PROGRESS with a <code>Change:</code> line in SPECS.</td>
 </tr>
 <tr>
-<td>2. Planning</td>
-<td><code>ohmyorch:planner</code>, coordinator persists</td>
-<td><code>proposal.md</code>, delta <code>specs/</code>, <code>tasks.md</code></td>
+<td>2. Apply</td>
+<td><code>/ohmyorch:opsx-apply &lt;change&gt;</code></td>
+<td>Product code and tests, with each finished task ticked in <code>tasks.md</code>.</td>
 </tr>
 <tr>
-<td>3. Plan handoff</td>
-<td><code>ohmyorch:planner</code>, coordinator persists</td>
-<td><code>implementation-plan.md</code></td>
+<td>3. Verify</td>
+<td><code>/ohmyorch:opsx-verify &lt;change&gt;</code></td>
+<td>No new file. The report covers completeness, correctness, and coherence; a CRITICAL issue becomes an unticked task in <code>tasks.md</code>.</td>
 </tr>
 <tr>
-<td>4. Implementation</td>
-<td><code>ohmyorch:implementer</code></td>
-<td>Product code/tests and completed tasks</td>
-</tr>
-<tr>
-<td>5. Review</td>
-<td><code>ohmyorch:reviewer</code></td>
-<td>Specialist-authored <code>review.md</code>, no blocking findings</td>
-</tr>
-<tr>
-<td>6. Testing</td>
-<td><code>ohmyorch:tester</code></td>
-<td>Specialist-authored <code>test-report.md</code>, no FAIL</td>
-</tr>
-<tr>
-<td>7. Artifact acceptance</td>
-<td>Main coordinator checks</td>
-<td>Backlog readiness and codebase-context contracts</td>
+<td>4. Archive</td>
+<td><code>openspec archive &lt;change&gt; -y</code></td>
+<td>Delta specs merged into <code>openspec/specs/</code>, and the change moved to <code>openspec/changes/archive/</code>. The story is then marked DONE in SPECS.</td>
 </tr>
 </tbody>
 </table></div>
-<p>After every result, the coordinator derives the next action again. Actions include selection, proposal, planning, implementation, review, testing, reopening, archival, a DONE transition, completion, or escalation. Stored goal text is a human record; current artifacts govern the next step.</p>
-<p>The reviewer and tester persist their own verdicts and return the path and summary. The implementer does not author approval evidence. Blocking findings or FAIL require reopening: preserve the verdict, append remediation tasks, implement fixes, and obtain fresh review and testing.</p>
-<h2 id="meet-the-eight-agents">Meet the eight agents</h2>
-<p>Skills are the commands you invoke. Agents are the specialists those commands delegate to. All eight inherit the session's selected model and preload the shared <code>ohmyorch:contract</code>.</p>
+<p><code>/ohmyorch:opsx-explore</code> is optional. Use it only when a story or the affected code is unclear.</p>
+<p>After every step, the session derives the next action again from SPECS and the change directory. There are six actions:</p>
+<div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Derived when</th>
+<th>What the session does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>propose</code></td>
+<td>The story has no change yet, or the change's planning artifacts are incomplete.</td>
+<td>Creates the change, or authors only what is missing.</td>
+</tr>
+<tr>
+<td><code>apply</code></td>
+<td><code>tasks.md</code> has an unticked task.</td>
+<td>Implements the pending tasks and ticks each one.</td>
+</tr>
+<tr>
+<td><code>verify</code></td>
+<td>Every task is ticked.</td>
+<td>Verifies the change; with no CRITICAL issue, archives it.</td>
+</tr>
+<tr>
+<td><code>mark-done</code></td>
+<td>The change is archived, no active directory has its id, and the story is not DONE.</td>
+<td>Sets the story to DONE and points its <code>Change:</code> line at the archived change.</td>
+</tr>
+<tr>
+<td><code>escalate</code></td>
+<td>The story is not READY or IN PROGRESS, a dependency is unfinished, or another change is still active.</td>
+<td>Stops and reports the decision a human must make.</td>
+</tr>
+<tr>
+<td><code>complete</code></td>
+<td>Every story in the goal is DONE.</td>
+<td>Reports the result.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Planning is complete when the change has <code>proposal.md</code>, at least one <code>.md</code> file under <code>specs/</code>, and a <code>tasks.md</code> with task checkboxes. <code>design.md</code> is never required, and a change whose <code>.openspec.yaml</code> declares <code>skip_specs: true</code> needs no <code>specs/</code>. Tasks are counted the way OpenSpec counts them: a checkbox with any marker other than <code>x</code> is unfinished. Only one change is active at a time. Stored goal text is a human record; current files govern the next step.</p>
+<h2 id="meet-the-three-authoring-agents">Meet the three authoring agents</h2>
+<p>Skills are the commands you invoke. Delivery runs in the main session, without per-step agents. Three agents support the documents that come before delivery: each inspects and authors, and the calling skill persists what it returns. All three inherit the session's selected model and preload the shared <code>ohmyorch:contract</code>.</p>
 <div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
 <thead>
 <tr>
@@ -203,12 +232,12 @@ claude plugin install ohmyorch@ohmyorch-marketplace --scope local
 <tbody>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/agents/codebase-analyst.md"><code>ohmyorch:codebase-analyst</code></a></td>
-<td>Inspect actual code and return evidence-backed CODEBASE content; the coordinator persists it.</td>
+<td>Inspect actual code and return evidence-backed CODEBASE content.</td>
 <td><code>/ohmyorch:analyze-codebase</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/agents/product-specifier.md"><code>ohmyorch:product-specifier</code></a></td>
-<td>Turn approved product sources into PRD content; the coordinator persists it.</td>
+<td>Turn approved product sources into PRD content.</td>
 <td><code>/ohmyorch:generate-prd docs/approved-brief.md</code></td>
 </tr>
 <tr>
@@ -216,41 +245,10 @@ claude plugin install ohmyorch@ohmyorch-marketplace --scope local
 <td>Return a source-traceable SPECS backlog with stories and acceptance scenarios.</td>
 <td><code>/ohmyorch:ingest-spec</code></td>
 </tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/agents/planner.md"><code>ohmyorch:planner</code></a></td>
-<td>Author proposal/spec/task handoffs and the repository-aware implementation plan.</td>
-<td><code>/ohmyorch:plan-feature add-password-reset</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/agents/implementer.md"><code>ohmyorch:implementer</code></a></td>
-<td>Modify product code and implementation tests; complete the selected change's tasks.</td>
-<td><code>/ohmyorch:opsx-apply add-password-reset</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/agents/reviewer.md"><code>ohmyorch:reviewer</code></a></td>
-<td>Independently assess the change, record OpenSpec verification, and persist <code>review.md</code>.</td>
-<td><code>/ohmyorch:review-feature add-password-reset</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/agents/tester.md"><code>ohmyorch:tester</code></a></td>
-<td>Independently test acceptance criteria and persist <code>test-report.md</code> with evidence.</td>
-<td><code>/ohmyorch:test-feature add-password-reset</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/agents/product-manager.md"><code>ohmyorch:product-manager</code></a></td>
-<td>Select eligible work, evaluate gates, and control archival/backlog transitions. During <code>deliver</code>, the main session performs this role.</td>
-<td><code>/ohmyorch:deliver US-1.1</code> or <code>/ohmyorch:product-iteration US-1.1</code></td>
-</tr>
 </tbody>
 </table></div>
-<p>Analyst, specifier, ingestor, and planner have Read/Grep/Glob/Bash tool budgets and return authored content. Implementer, reviewer, and tester also have Write/Edit; each writes within its role's scope. Product Manager also has Agent for delegation. Read-only roles do not use Bash to bypass their write boundary. The reviewer and tester report defects; the implementer repairs them.</p>
-<p>Use the entry-point skills for routine work; the delivery command delegates the stages in order. To request a specific specialist in conversation, name the agent and supply the selected change, mapped project documents, and approved scope. For example, when <code>add-password-reset</code> is the selected implemented change and the review preconditions pass:</p>
-<pre><code class="language-text">Use the ohmyorch:reviewer agent to review add-password-reset.
-Read its approved specs, tasks, implementation plan, and mapped project context.
-Persist only the selected change's review.md, including OpenSpec verification.
-Return the artifact path, verdict, and actionable findings to this session.
-</code></pre>
-<p>The reviewer persists the verdict; the coordinator reads and validates it. A blocking finding sends the change through reopening, implementation, fresh review, and fresh testing.</p>
+<p>Each agent has a Read/Grep/Glob/Bash tool budget, with no Write or Edit, and its prompt declares it read-only. The root hook dispatcher enforces the same rule for file tools: a Write, Edit, or MultiEdit from any <code>ohmyorch:*</code> agent is refused, so authored content returns to the main session.</p>
+<p>Use the entry-point skills for routine work. Each one delegates to its agent and then writes the mapped document.</p>
 <h2 id="inspect-without-advancing">Inspect without advancing</h2>
 <p>The CLI gives precise answers from the files. Run these in an initialized consumer project; set the plugin directory and change ID to actual values:</p>
 <pre><code class="language-bash">plugin_dir=/absolute/checkout/plugins/ohmyorch
@@ -258,12 +256,11 @@ project_root=&quot;$(pwd -P)&quot;
 change_id=your-change-id
 
 &quot;$plugin_dir/bin/ohmyorch&quot; --project-root &quot;$project_root&quot; delivery next --json
-&quot;$plugin_dir/bin/ohmyorch&quot; --project-root &quot;$project_root&quot; workflow-status --change &quot;$change_id&quot; --json
-&quot;$plugin_dir/bin/ohmyorch&quot; --project-root &quot;$project_root&quot; status --resume --change &quot;$change_id&quot;
-&quot;$plugin_dir/bin/ohmyorch&quot; --project-root &quot;$project_root&quot; completion-gate --change &quot;$change_id&quot; --json
+openspec status --change &quot;$change_id&quot;
+openspec list --json
 </code></pre>
-<p>These calls are read-only. <code>workflow-status</code> reports the seven gates and first incomplete gate. <code>status --resume</code> reports the resume point and authored blockers. <code>completion-gate</code> returns eligibility and the first failing condition; ineligibility exits nonzero.</p>
-<p>Writing status, recording completion, or changing the goal uses the actual Claude session ID through <code>--session-id</code>. Skills supply explicit project/plugin/session context; ordinary Bash does not automatically receive the substitutions as environment variables. The <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/README.md">plugin handbook</a> covers direct mutation and recovery commands.</p>
+<p>These calls are read-only. <code>delivery next --json</code> prints one line for the recorded goal: its <code>target</code>, the derived <code>action</code>, the <code>story</code>, the <code>change</code>, the <code>command</code> to run, and the <code>reason</code>. Pass a target such as <code>US-1.1</code> after <code>next</code> to ask about work that has no goal yet. <code>openspec status --change</code> shows the state of each planning artifact; it lists <code>design.md</code> as not yet written for a change that has none, which is expected because design is optional. <code>openspec list --json</code> reports each active change with its completed and total task counts. Run the <code>openspec</code> commands from the project root.</p>
+<p>Starting, refreshing, stopping, or blocking a goal uses the actual Claude session ID through <code>--session-id</code>. Skills supply explicit project/plugin/session context; ordinary Bash does not automatically receive the substitutions as environment variables. The <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/README.md">plugin handbook</a> covers direct mutation and recovery commands.</p>
 <h2 id="pause-repair-and-resume">Pause, repair, and resume</h2>
 <div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
 <thead>
@@ -279,7 +276,7 @@ change_id=your-change-id
 </tr>
 <tr>
 <td>BLOCKED</td>
-<td>A decision, dependency, reporter failure, or stalled progress needs attention.</td>
+<td>A decision, an unfinished dependency, a failed derivation, or stalled progress needs attention.</td>
 </tr>
 <tr>
 <td>STOPPED</td>
@@ -292,18 +289,18 @@ change_id=your-change-id
 </tbody>
 </table></div>
 <p>By default, three unchanged blocked Stop attempts precede the fourth unchanged Stop, which records BLOCKED and permits stopping. The counter belongs to the owner session. Another session's Stop does not drive your goal. Claude's continuation limits also apply. <a href="https://code.claude.com/docs/en/hooks">Official Stop hook behavior</a>.</p>
-<p>Resume a resolved BLOCKED or STOPPED goal with <code>/ohmyorch:deliver</code> and the <strong>same target</strong>. An ownership conflict requires explicit <code>--takeover</code> by the coordinator using the new actual session ID. No lease expiry is inferred. Refresh derived status; preserve authored blockers and earlier evidence. Deleting runtime directories is not a resume procedure.</p>
+<p>When the session finds in the middle of a change that a human decision is missing, the derived action does not change, so the Stop hook would keep refusing the stop. The session records the decision needed with <code>delivery block --reason '&lt;story id: the decision needed&gt;'</code>, reports it, and stops; the goal becomes BLOCKED with that reason. The same applies when an OpenSpec step tells the session to pause, ask the user, or wait for guidance. This is only for a missing human decision, never for work that is merely hard.</p>
+<p>Resume a resolved BLOCKED or STOPPED goal with <code>/ohmyorch:deliver</code> and the <strong>same target</strong>. Completed stories are not redone, because every step is derived from the repository. To redo a DONE story, set it back to READY with a new <code>Change:</code> id; with the same id it would be marked DONE again. An ownership conflict requires explicit <code>--takeover</code> from the session that takes over, using its actual session ID. No lease expiry is inferred. Notes you write between the AUTHORED markers in <code>openspec/delivery/goal.md</code> survive every refresh; the rest of that file is rewritten. Deleting runtime directories is not a resume procedure.</p>
 <h2 id="make-the-finish-explicit">Make the finish explicit</h2>
-<p>Seven progress gates and four completion conditions answer different questions. Passing the gates does not by itself authorize archival. The completion check evaluates:</p>
+<p>A story finishes in three moves, in this order:</p>
 <ol>
-<li>Required tasks are complete.</li>
-<li>Review has no blocking findings.</li>
-<li>Acceptance evidence satisfies the current test-report policy.</li>
-<li>OpenSpec validation/recorded verification has no blocking mismatch.</li>
+<li><strong>Verify is advisory.</strong> <code>/ohmyorch:opsx-verify</code> reports on completeness, correctness, and coherence, and writes no file. A CRITICAL issue becomes a new unticked task in <code>tasks.md</code>, which returns the change to apply. In this loop two kinds of finding are CRITICAL whatever rank <code>/ohmyorch:opsx-verify</code> gives them: an acceptance scenario of the story that is not implemented, whose observed result contradicts its <code>Then</code>, or for which there is no observed evidence; and a project test that fails because of this change. A test that was already failing for an unrelated reason is reported, not turned into a task. A scenario counts as passing only with evidence the session actually observed.</li>
+<li><strong>Archive needs every task ticked.</strong> <code>openspec archive &lt;id&gt; -y</code> runs as a separate, standalone Bash call. A hook refuses it while <code>tasks.md</code> still has an unticked task. OpenSpec then validates the delta specs, merges them into <code>openspec/specs/</code>, and moves the change to <code>openspec/changes/archive/</code>. Invalid delta specs stop the archive.</li>
+<li><strong>DONE needs the archive.</strong> A SPECS edit that sets a story to <code>Status: DONE</code> is refused while that story's change is still active. After the archive, set the story to DONE and point its <code>Change:</code> line at the archived change.</li>
 </ol>
-<p>The coordinator records <code>completion.md</code>, archives with a separate standalone <code>openspec archive &lt;id&gt; -y</code> Bash call, and then marks the story DONE. An epic moves to the next story. Preserve that order even where a legacy predicate is less strict; see the boundaries below.</p>
+<p>An epic then moves to its next story.</p>
 <h2 id="know-where-files-belong">Know where files belong</h2>
-<p><img src="images/plugin-and-project.svg" alt="Installed code is separate from project intent, evidence, and private runtime state" class="diagram" decoding="async" loading="lazy" width="1080" height="570"></p>
+<p><img src="images/plugin-and-project.svg" alt="Installed code is separate from project documents, OpenSpec changes, and private runtime state" class="diagram" decoding="async" loading="lazy" width="1080" height="570"></p>
 <div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
 <thead>
 <tr>
@@ -322,11 +319,15 @@ change_id=your-change-id
 </tr>
 <tr>
 <td><code>openspec/changes/&lt;id&gt;/</code></td>
-<td>Proposal, specs/tasks, implementation plan, verdicts, status, completion, remediation history</td>
+<td>The active change: <code>proposal.md</code>, delta <code>specs/</code>, <code>tasks.md</code>, optional <code>design.md</code></td>
 </tr>
 <tr>
-<td><code>openspec/delivery/goal.md</code> and archived changes</td>
-<td>Durable goal and completed work</td>
+<td><code>openspec/specs/</code> and <code>openspec/changes/archive/</code></td>
+<td>Canonical specs merged at archive, and completed changes</td>
+</tr>
+<tr>
+<td><code>openspec/delivery/goal.md</code></td>
+<td>The recorded delivery goal: derived sections plus your authored notes</td>
 </tr>
 <tr>
 <td>Project config, ledger, managed bases</td>
@@ -340,7 +341,7 @@ change_id=your-change-id
 </table></div>
 <p>Update and uninstall preserve project documents/state. Initialization, adaptation, project upgrades, and reset are separate explicit operations. This publisher repository keeps consumer scaffolding in bundled templates for bootstrap into your project.</p>
 <h2 id="choose-the-right-skill">Choose the right skill</h2>
-<p>There are <strong>24 skills: 23 public commands and one internal contract</strong>. Invoke public skills as <code>/ohmyorch:&lt;name&gt;</code>. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.</p>
+<p>There are <strong>20 skills: 19 public commands and one internal contract</strong>. Invoke public skills as <code>/ohmyorch:&lt;name&gt;</code>. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.</p>
 <h3 id="initialize-and-maintain-a-project">Initialize and maintain a project</h3>
 <p>Lifecycle changes are manually invoked. Preview first, inspect the proposed files, and apply the reviewed operation explicitly.</p>
 <div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
@@ -419,15 +420,10 @@ change_id=your-change-id
 <td>Drive or resume an epic, story, or task-focused goal through the whole loop.</td>
 <td><code>/ohmyorch:deliver EPIC-1</code></td>
 </tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/product-iteration/SKILL.md"><code>product-iteration</code></a></td>
-<td>Run or resume one story from its first incomplete gate.</td>
-<td><code>/ohmyorch:product-iteration US-1.1</code></td>
-</tr>
 </tbody>
 </table></div>
 <h3 id="work-on-a-selected-change">Work on a selected change</h3>
-<p>Most stage commands take an OpenSpec change ID; <code>opsx-explore</code> also accepts a story or an exploratory question. Use them when that stage's preconditions pass. <code>deliver</code> calls for the appropriate stage and specialist as it advances.</p>
+<p>These seven commands are the OpenSpec workflows under the plugin's namespace. Each takes an OpenSpec change ID; <code>opsx-explore</code> also accepts a story or an open question. <code>deliver</code> runs propose, apply, and verify for you as it advances. Use the commands directly when you work on a change by hand.</p>
 <div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
 <thead>
 <tr>
@@ -439,12 +435,12 @@ change_id=your-change-id
 <tbody>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/opsx-explore/SKILL.md"><code>opsx-explore</code></a></td>
-<td>Investigate an idea or clarify the selected story before implementation.</td>
+<td>Think through an idea or clarify a story before proposing. Optional.</td>
 <td><code>/ohmyorch:opsx-explore US-1.1</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/opsx-propose/SKILL.md"><code>opsx-propose</code></a></td>
-<td>Author the selected change's proposal, delta specs, and tasks.</td>
+<td>Create the change and author its proposal, delta specs, tasks and, when needed, design.</td>
 <td><code>/ohmyorch:opsx-propose add-password-reset</code></td>
 </tr>
 <tr>
@@ -453,38 +449,23 @@ change_id=your-change-id
 <td><code>/ohmyorch:opsx-update add-password-reset</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/plan-feature/SKILL.md"><code>plan-feature</code></a></td>
-<td>Get a repository-aware implementation-plan handoff from the planner.</td>
-<td><code>/ohmyorch:plan-feature add-password-reset</code></td>
-</tr>
-<tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/opsx-apply/SKILL.md"><code>opsx-apply</code></a></td>
-<td>Delegate the approved implementation/tasks to the implementer.</td>
+<td>Implement the pending tasks and tick each one in <code>tasks.md</code>.</td>
 <td><code>/ohmyorch:opsx-apply add-password-reset</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/review-feature/SKILL.md"><code>review-feature</code></a></td>
-<td>Obtain a reviewer-authored verdict with OpenSpec verification.</td>
-<td><code>/ohmyorch:review-feature add-password-reset</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/test-feature/SKILL.md"><code>test-feature</code></a></td>
-<td>Obtain a tester-authored acceptance report with criterion-level evidence.</td>
-<td><code>/ohmyorch:test-feature add-password-reset</code></td>
-</tr>
-<tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/opsx-verify/SKILL.md"><code>opsx-verify</code></a></td>
-<td>Assess implementation completeness, correctness, and coherence.</td>
+<td>Check the implementation against the change for completeness, correctness, and coherence. Advisory.</td>
 <td><code>/ohmyorch:opsx-verify add-password-reset</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/opsx-sync/SKILL.md"><code>opsx-sync</code></a></td>
-<td>Merge approved delta specs into canonical specs.</td>
+<td>Merge a change's delta specs into the canonical specs without archiving.</td>
 <td><code>/ohmyorch:opsx-sync add-password-reset</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/opsx-archive/SKILL.md"><code>opsx-archive</code></a></td>
-<td>Request archival of a change that satisfies the completion policy.</td>
+<td>Archive a finished change interactively, with a spec-sync prompt. <code>deliver</code> uses the <code>openspec archive &lt;id&gt; -y</code> command instead.</td>
 <td><code>/ohmyorch:opsx-archive add-password-reset</code></td>
 </tr>
 </tbody>
@@ -506,39 +487,43 @@ change_id=your-change-id
 </tr>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/contract/SKILL.md"><code>contract</code></a></td>
-<td>Supply shared artifact, authority, and role guidance to skills/agents.</td>
+<td>Supply the shared operational contract to skills and agents.</td>
 <td>Internal preload: <code>ohmyorch:contract</code>; not a slash command.</td>
 </tr>
 </tbody>
 </table></div>
 <p><code>generate-html-page</code> produces a self-contained themed page with evidence sources, light/dark modes, accessible SVGs, and a bundled validator. This public guide is a separate website with repository-hosted images and SVG assets.</p>
-<p>Bundled CLI operations include <code>delivery</code>, <code>workflow-status</code>, <code>status</code>, <code>completion-gate</code>, <code>check-scope</code>, <code>check-write-scope</code>, validators for product artifacts, plans, reviews, test reports, status, verification, and HTML pages, and <code>run-project-validation</code>. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.</p>
+<p>The bundled CLI has 14 operations: <code>doctor</code>, <code>bootstrap</code>, <code>adapt-project</code>, <code>upgrade-project</code>, <code>migrate-legacy</code>, <code>harness-reset</code>, <code>delivery</code>, <code>validate-product-artifacts</code>, <code>validate-html-page</code>, <code>guard-context-preflight</code>, <code>guard-story-done</code>, <code>guard-archive</code>, <code>guard-delivery-loop</code>, and <code>run-project-validation</code>. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.</p>
 <h2 id="walk-through-one-feature">Walk through one feature</h2>
 <p>Suppose your approved product brief describes password reset, and ingestion produces a READY story <code>US-1.1</code> in <code>EPIC-1</code>. In your initialized consumer project:</p>
 <ol>
-<li>Run <code>/ohmyorch:analyze-codebase</code> for an existing application. The analyst returns current-state evidence; the coordinator persists the mapped CODEBASE document.</li>
+<li>Run <code>/ohmyorch:analyze-codebase</code> for an existing application. The analyst returns current-state evidence; the skill persists the mapped CODEBASE document.</li>
 <li>Run <code>/ohmyorch:generate-prd docs/approved-brief.md</code>, then <code>/ohmyorch:ingest-spec</code>. Review the resulting intent, traceability, acceptance scenarios, and dependencies. Resolve missing decisions before marking work READY.</li>
-<li>Run <code>/ohmyorch:deliver US-1.1</code>. The main coordinator selects the story; the planner authors the handoffs; the implementer builds the change; reviewer and tester independently persist their verdicts. Findings reopen the change for fresh work and checks.</li>
-<li>When the completion policy passes, the coordinator records completion, archives the change, and marks the story DONE. The goal becomes COMPLETE. Inspect the archived plan, tasks, verdicts, status, completion record, and any remediation history in your project.</li>
+<li>Run <code>/ohmyorch:deliver US-1.1</code>. The session proposes one change for the story: <code>proposal.md</code>, a delta spec with a scenario for every acceptance scenario of the story, and <code>tasks.md</code>. It sets the story to IN PROGRESS, then applies the tasks and ticks each one when it is done.</li>
+<li>With every task ticked, the session verifies the change. A CRITICAL finding becomes a new task, and the loop returns to apply. With none, the session runs <code>openspec archive &lt;change&gt; -y</code>, marks the story DONE, and the goal becomes COMPLETE. Inspect the archived proposal, specs, and ticked tasks under <code>openspec/changes/archive/</code>, and the merged requirements under <code>openspec/specs/</code>.</li>
 </ol>
 <p>For every story in that epic, choose <code>/ohmyorch:deliver EPIC-1</code>. To prioritize its second task while still delivering the parent story, choose <code>/ohmyorch:deliver US-1.1#2</code>. When a run is BLOCKED or STOPPED, resolve its cause and repeat the same target to resume from the derived next action. The guide's examples describe expected behavior; authenticated full-lifecycle evidence remains a release gate.</p>
 <h2 id="update-or-recover-deliberately">Update or recover deliberately</h2>
 <pre><code class="language-text">/plugin marketplace update ohmyorch-marketplace
 /plugin update ohmyorch@ohmyorch-marketplace
 /ohmyorch:upgrade-project --dry-run
+/ohmyorch:adapt-project --dry-run
+/ohmyorch:adapt-project --apply
 </code></pre>
-<p>Code update and project-state upgrade are separate. Review the latter before applying. Copied setups use <code>/ohmyorch:migrate-legacy --dry-run</code>, then apply the exact reviewed plan ID. Do not enable old and plugin hooks together.</p>
+<p>Code update and project-state upgrade are separate. Review the latter before applying. Managed guidance changes only when you review and apply <code>/ohmyorch:adapt-project</code>. After updating from 0.0.1, the project's <code>CLAUDE.md</code> block and <code>.claude/rules/ohmyorch-*-standards.md</code> still describe the removed flow until you do, and <code>/ohmyorch:upgrade-project</code> does not change them. Adaptation also refreshes an <code>openspec/config.yaml</code> that is unchanged since bootstrap scaffolded it; an edited one is left alone and its old <code>context:</code> line must be changed by hand. The <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/CHANGELOG.md">changelog</a> gives that line under &quot;Upgrading from 0.0.1&quot;, with the <code>delivery stop</code> step for a goal that is still owned and the step for an in-flight change with open review findings.</p>
+<p>Copied setups use <code>/ohmyorch:migrate-legacy --dry-run</code>, then apply the exact reviewed plan ID. Do not enable old and plugin hooks together.</p>
 <p>Reset defaults to owned managed guidance; full workflow reset is a separately reviewed scope:</p>
 <pre><code class="language-text">/ohmyorch:harness-reset --scope managed --dry-run
 /ohmyorch:harness-reset --scope workflow --dry-run
 </code></pre>
 <p>Applied lifecycle operations report recovery IDs. Rollback verifies affected-file backups and current hashes, preserving subsequent edits. Recovery requires the retained backup directory; an ID alone cannot restore files. Read the <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/README.md">handbook</a> and <a href="https://github.com/josoroma/OhMyOrch/blob/main/docs/distribution.md">distribution guide</a> for scope-specific commands.</p>
 <h2 id="know-the-current-boundaries">Know the current boundaries</h2>
-<p>Root hooks use Claude's scoped identity fields for supported Write/Edit/MultiEdit payloads, intercept supported standalone archive commands, and evaluate only the owner's Stop events. They are workflow guardrails. Arbitrary Bash/MCP writes and renamed executables can bypass file-tool checks. PostToolUse reports findings after a write; it cannot undo it.</p>
-<p>Legacy acceptance allows some partial/mixed PASS/UNVERIFIED reports; all-UNVERIFIED/no-positive-evidence fails. Recorded verification text has a VERIFIED/UNVERIFIED substring ambiguity. The old DONE predicate can allow an eligible active change before archival, so archive-before-DONE also remains a coordinator contract. Eligibility does not prove every criterion received full verified coverage. These behaviors were preserved during the format migration.</p>
+<p>Root hooks use Claude's scoped identity fields for supported Write/Edit/MultiEdit payloads, intercept supported standalone archive commands, and evaluate only the owner's Stop events. They are workflow guardrails. Arbitrary Bash/MCP writes and renamed executables can bypass file-tool checks. The archive guard sees only the <code>openspec archive</code> command; a change archived any other way is not checked. PostToolUse reports findings after a write; it cannot undo it.</p>
+<p>In an activated project the hooks refuse a Write, Edit, or MultiEdit whose target is outside the project. That includes Claude's own plan, memory, and scratch files when they are written with those tools.</p>
+<p>Verify is advisory and is not independent evidence: the session that wrote the code also checks it. The two guards confirm only that every task is ticked before archive and that the change is archived before DONE. They do not show that a task was done well or that every scenario was exercised. A human reviews the diff before relying on a delivered story.</p>
 <p>Native Windows, custom OpenSpec schemas, registered/global stores, and unsupported prospective file-tool payloads are outside this implementation's supported scope. Linux/macOS CI is configured; recorded local execution was macOS. Authenticated role identity/denials and the complete live lifecycle remain public release gates.</p>
 <h2 id="build-and-inspect-the-source">Build and inspect the source</h2>
-<p>The plugin has one runtime under <code>plugins/ohmyorch/</code>. Seven reference contracts are explicitly loaded through skills and agents. It bundles no MCP server, global default agent, consumer permissions, or install-time project mutation.</p>
+<p>The plugin has one runtime under <code>plugins/ohmyorch/</code>. Six rule references sit beside the shared contract; skills and agents read them explicitly. It bundles no MCP server, global default agent, consumer permissions, or install-time project mutation.</p>
 <p>Maintainers generate the HTML guide from this Markdown:</p>
 <pre><code class="language-bash">npm ci --ignore-scripts
 npm run docs:build
@@ -548,7 +533,7 @@ npm run test:marketplace
 </code></pre>
 <p>Documentation uses local assets and system fonts. Plugin packaging excludes publisher assets/tools/tests and all consumer state. Public packaging requires license and live-test evidence. See the <a href="https://github.com/josoroma/OhMyOrch/blob/main/.github/workflows/plugin-release.yml">release workflow</a>.</p>
 <h2 id="sources">Sources</h2>
-<p>Features are defined by the current <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/deliver/SKILL.md">delivery skill</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/references/contract.md">operational contract</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/scripts/workflow-status.sh">workflow reporter</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/scripts/completion-gate.sh">completion gate</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/hooks/dispatch.sh">root dispatcher</a>, and <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/lib/lifecycle.sh">lifecycle engine</a>.</p>
+<p>Features are defined by the current <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/deliver/SKILL.md">delivery skill</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/references/contract.md">operational contract</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/scripts/delivery.sh">delivery engine</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/scripts/guard-archive.sh">archive guard</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/scripts/guard-story-done.sh">story guard</a>, <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/hooks/dispatch.sh">root dispatcher</a>, and <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/lib/lifecycle.sh">lifecycle engine</a>. The seven <code>opsx-*</code> skills are the prompts OpenSpec 1.13.2 generates, with the plugin namespace and one boundary paragraph; see the <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/references/openspec-provenance.md">OpenSpec provenance note</a>.</p>
 <p>The <a href="https://github.com/josoroma/OhMyOrch/blob/main/docs/plan/PLUGIN-IMPLEMENTATION.md">implementation record</a> separates regression/cache evidence from pending authenticated tests. The <a href="https://github.com/josoroma/OhMyOrch/blob/main/docs/plan/plugin-release-readiness.json">release checklist</a> governs public packaged artifacts and support claims. Integration guidance comes from official <a href="https://code.claude.com/docs/en/plugins/create">plugin development</a>, <a href="https://code.claude.com/docs/en/plugins/cli-reference">plugin commands</a>, and <a href="https://code.claude.com/docs/en/hooks">hooks</a> documentation.</p>
 <p>The website uses the supplied <a href="https://ui.shadcn.com/create?preset=b2D0wqNxT">shadcn Luma preset</a> light/dark tokens, with rounded surfaces, soft elevation, and open spacing informed by the official <a href="https://ui.shadcn.com/docs/changelog/2026-03-luma">Luma introduction</a> and <a href="https://ui.shadcn.com/docs/theming">theme conventions</a>.</p>
       </article>

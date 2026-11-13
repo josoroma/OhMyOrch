@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: Read-only plugin and project diagnostics. Use before workflow operations.
+description: Read-only plugin and project diagnostics. Use when a command fails or the setup is in doubt.
 allowed-tools: Read, Grep, Glob, Bash
 ---
 

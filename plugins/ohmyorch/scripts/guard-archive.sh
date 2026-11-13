@@ -1,22 +1,27 @@
 #!/usr/bin/env bash
 #
-# guard-archive.sh — US-8.2 guard: no premature archival
+# guard-archive.sh — no archive while tasks.md has unfinished tasks
 #
-# Scenario implemented:
-#   Given a change has blocking review findings or failing acceptance tests
-#   When  archive is requested through the harness
-#   Then  the harness MUST reject archival
+# Upstream `openspec archive` asks for confirmation when a change still has
+# incomplete tasks. A non-interactive `openspec archive <id> -y` skips that
+# question, so this guard makes the same check non-bypassable:
 #
-# The verdict is not recomputed here. It is delegated to workflow-status.sh, the
-# single owner of the 7-gate state model (US-3.1), and read from its
-# `archiveEligible` field. Duplicating the gate logic would create a second
-# source of truth that could silently disagree with the first.
+#   Given a change whose tasks.md has at least one unfinished task
+#   When  `openspec archive <id>` is requested
+#   Then  the archive MUST be refused until every task is ticked
 #
-# Wired as a PreToolUse hook on Bash. Archival reaches OpenSpec through the CLI,
-# so intercepting the command is what actually prevents the state change; the
-# bundled references/rules/openspec.md tells the agent what it should do.
+# That is the whole predicate. tasks.md is the only tracking file of a change,
+# so nothing else is consulted and no other script is spawned. `openspec archive`
+# itself validates the delta specs (blocking) and merges them; this guard does
+# not duplicate that.
 #
-# Fails open when the harness is not in use or no change is active.
+# The plugin dispatcher (hooks/dispatch.sh, pre-bash) calls it with
+# `--change <id> --quiet` for a standalone literal `openspec archive <id>`.
+# `--hook` reads a raw PreToolUse Bash payload for direct use.
+#
+# Allows whenever there is nothing of ours to block: no change is active, the
+# named change is not an active directory (archived or unknown — OpenSpec
+# reports its own error), or the change has no task checklist.
 #
 # Usage:
 #   guard-archive.sh --hook                     # PreToolUse JSON on stdin
@@ -35,18 +40,17 @@ CHANGE=""
 AS_JSON=0
 QUIET=0
 
-c_reset=""; c_red=""; c_dim=""; c_yellow=""; c_green=""
+c_reset=""; c_red=""; c_green=""
 if [ -t 2 ] && [ -z "${NO_COLOR:-}" ]; then
-  c_reset=$'\033[0m'; c_red=$'\033[31m'; c_dim=$'\033[2m'
-  c_yellow=$'\033[33m'; c_green=$'\033[32m'
+  c_reset=$'\033[0m'; c_red=$'\033[31m'; c_green=$'\033[32m'
 fi
 
 usage() {
   cat <<'EOF'
 Usage: guard-archive.sh (--hook | --change <name>) [--json] [--quiet]
 
-Rejects archive when the change is not archive-eligible (US-8.2): unresolved
-review findings, failing acceptance tests, or any other incomplete gate.
+Rejects `openspec archive` while the change's tasks.md has unfinished tasks.
+A change with every task ticked, or with no task checklist, may be archived.
 
 Options:
   --hook            Read Claude Code hook JSON on stdin (PreToolUse)
@@ -80,11 +84,9 @@ if [ "$HOOK_MODE" -eq 1 ]; then
     *) exit 0 ;;
   esac
 
-  # The command string alone. A greedy sed capture (`"\(.*\)"`) ran to the LAST
-  # quote in the payload, and Claude Code's Bash payload always carries a
-  # `description` after `command` — so the parsed change name became
-  # `the change"}}`, the gates were evaluated for a change that does not exist, and
-  # archival was ALLOWED. This reads exactly one JSON string, decoding escapes.
+  # The command string alone, read as exactly one JSON string with its escapes
+  # decoded. Claude Code's Bash payload carries a `description` after `command`;
+  # parsing the payload as text would pick up words from that prose.
   CMD=$(jq -er '.tool_input.command // "" | select(type=="string")' <<< "$HOOK_INPUT") || exit 2
 
   # Judge the command, not the description: "archive" in prose is not archival.
@@ -94,8 +96,8 @@ if [ "$HOOK_MODE" -eq 1 ]; then
     *) exit 0 ;;
   esac
 
-  # `--help` / `-h` describes archival; it does not perform it. Match whole tokens:
-  # the old `*archive*-h*` glob also matched `-hooks`, `--hard`, `-hello`.
+  # `--help` / `-h` describes archival; it does not perform it. Match whole
+  # tokens: a `*archive*-h*` glob would also match `-hooks`, `--hard`, `-hello`.
   if printf ' %s ' "${CMD:-$HOOK_INPUT}" | grep -qE '[[:space:]](-h|--help)[[:space:]"]'; then
     exit 0
   fi
@@ -122,76 +124,36 @@ fi
 # Nothing to archive: do not stand in the way of a no-op.
 [ -n "$CHANGE" ] || exit 0
 
-# Delegate the verdict. A missing reporter means the harness is not installed
-# here, in which case this guard has no opinion.
-if [ ! -x "${OHMYORCH_CODE_ROOT}/scripts/workflow-status.sh" ]; then
-  [ "$QUIET" -eq 1 ] || printf 'ALLOW  workflow-status.sh unavailable; no gate data\n' >&2
-  exit 0
+# The predicate. A change that is not an active directory (archived or unknown)
+# is not ours to block: it counts as having no checklist, like an active change
+# without tasks.md or without checkboxes.
+TASKS="openspec/changes/$CHANGE/tasks.md"
+TASKS_DONE=0; TASKS_TOTAL=0
+if [ -d "openspec/changes/$CHANGE" ]; then
+  PROGRESS=$(ohmyorch_tasks_progress "$TASKS")
+  read -r TASKS_DONE TASKS_TOTAL <<< "$PROGRESS"
 fi
 
-STATUS_JSON=$("${OHMYORCH_CODE_ROOT}/scripts/workflow-status.sh" --change "$CHANGE" --json 2>/dev/null)
-STATUS_RC=$?
-# 1 = no active change, 2 = usage. Neither is a reason to block archival.
-[ "$STATUS_RC" -ne 0 ] && exit 0
-
-# Note: BSD sed BRE has no `\|` alternation, so this is two separate commands
-# rather than one pattern with a `true|false` group. A single alternation group
-# matches nothing on macOS and would silently report "no verdict".
-ELIGIBLE=$(printf '%s' "$STATUS_JSON" \
-  | sed -n 's/.*"archiveEligible":[[:space:]]*\(true\).*/\1/p; s/.*"archiveEligible":[[:space:]]*\(false\).*/\1/p' \
-  | head -1)
-FIRST=$(printf '%s' "$STATUS_JSON" \
-  | sed -n 's/.*"firstIncompleteGate":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-
-# Unparseable status cannot be treated as approval.
-if [ -z "$ELIGIBLE" ]; then
-  [ "$QUIET" -eq 1 ] || printf 'ALLOW  could not read archive eligibility; not blocking\n' >&2
-  exit 0
-fi
-
-# Completion gate — the US-10.1 four conditions (EPIC-10).
-#
-# The gate chain and the definition of done are not the same list, and neither is a
-# superset of the other. Two conditions are checked nowhere else:
-#
-#   * OpenSpec verification (condition 4) has no gate at all.
-#   * A review that DECLARES a blocking verify mismatch passes the gate chain, since
-#     the recorded `OpenSpec verify:` line was never evaluated.
-#
-# So when the completion gate is available its verdict is authoritative for archival,
-# and the gate chain is reported alongside it rather than instead of it.
-COMPLETION=""
-if [ -x "${OHMYORCH_CODE_ROOT}/scripts/completion-gate.sh" ]; then
-  COMPLETION=$("${OHMYORCH_CODE_ROOT}/scripts/completion-gate.sh" --change "$CHANGE" --json 2>/dev/null)
-  C_ELIGIBLE=$(printf '%s' "$COMPLETION" \
-    | sed -n 's/.*"eligible":[[:space:]]*\(true\).*/\1/p; s/.*"eligible":[[:space:]]*\(false\).*/\1/p' | head -1)
-  if [ -n "$C_ELIGIBLE" ]; then
-    ELIGIBLE="$C_ELIGIBLE"
-    C_FIRST=$(printf '%s' "$COMPLETION" \
-      | sed -n 's/.*"firstFailingCondition":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-    [ -n "$C_FIRST" ] && FIRST="$C_FIRST"
-  fi
-fi
-
-if [ "$ELIGIBLE" = "true" ]; then
+if [ "$TASKS_TOTAL" -eq 0 ] || [ "$TASKS_DONE" -eq "$TASKS_TOTAL" ]; then
   if [ "$AS_JSON" -eq 1 ]; then
-    printf '{ "change": "%s", "archiveEligible": true, "blocked": false }\n' "$CHANGE"
-  else
-    [ "$QUIET" -eq 1 ] || printf '%sALLOW%s  %s is archive-eligible\n' "$c_green" "$c_reset" "$CHANGE" >&2
+    jq -rn --arg change "$CHANGE" \
+      '"{ \"change\": \($change|tojson), \"archiveEligible\": true, \"blocked\": false }"'
+  elif [ "$QUIET" -ne 1 ]; then
+    if [ "$TASKS_TOTAL" -eq 0 ]; then
+      printf '%sALLOW%s  %s: no task checklist\n' "$c_green" "$c_reset" "$CHANGE" >&2
+    else
+      printf '%sALLOW%s  %s: %s/%s tasks complete\n' "$c_green" "$c_reset" "$CHANGE" "$TASKS_DONE" "$TASKS_TOTAL" >&2
+    fi
   fi
   exit 0
 fi
 
+# The block message is the instruction the agent continues with. It always prints.
+printf '%sBLOCKED%s  archive %s\n' "$c_red" "$c_reset" "$CHANGE" >&2
+printf '  %s/%s tasks complete in %s.\n' "$TASKS_DONE" "$TASKS_TOTAL" "$TASKS" >&2
+printf '  Finish the remaining tasks (/ohmyorch:opsx-apply %s) or remove tasks that no longer apply, then archive.\n' "$CHANGE" >&2
 if [ "$AS_JSON" -eq 1 ]; then
-  printf '{ "change": "%s", "archiveEligible": false, "blocked": true, "firstIncompleteGate": "%s" }\n' \
-    "$CHANGE" "$FIRST"
-else
-  printf '%sBLOCKED%s  archive %s\n' "$c_red" "$c_reset" "$CHANGE" >&2
-  printf '  %sChange is not archive-eligible.%s\n' "$c_dim" "$c_reset" >&2
-  [ -n "$FIRST" ] && printf '  First failing condition: %s\n' "$FIRST" >&2
-  printf '\n' >&2
-  printf '  %sUS-10.1: every completion condition must pass before a change is archived.%s\n' \
-    "$c_yellow" "$c_reset" >&2
-  printf '  Run ohmyorch completion-gate --change %s for the four conditions.\n' "$CHANGE" >&2
+  jq -rn --arg change "$CHANGE" --arg reason "$TASKS_DONE/$TASKS_TOTAL tasks complete" \
+    '"{ \"change\": \($change|tojson), \"archiveEligible\": false, \"blocked\": true, \"reason\": \($reason|tojson) }"'
 fi
 exit 2

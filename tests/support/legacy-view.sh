@@ -5,7 +5,6 @@ repository=$(cd -- "$(dirname -- "$0")/../.." && pwd -P)
 target="$1"
 mkdir -p "$target/scripts/templates" "$target/.claude/rules"
 cp -R "$repository/tests/fixtures" "$target/scripts/fixtures"
-cp "$repository/plugins/ohmyorch/templates/artifacts/"*.md "$target/scripts/templates/"
 cp "$repository/plugins/ohmyorch/templates/html-page.html" "$target/scripts/templates/"
 cp "$repository/plugins/ohmyorch/README.md" "$target/README.md"
 cp "$repository/plugins/ohmyorch/README.md" "$target/scripts/README.md"

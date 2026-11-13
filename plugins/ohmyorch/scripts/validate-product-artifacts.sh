@@ -387,6 +387,11 @@ check_context_consumption() {
   if [ ! -f "$CODEBASE_FILE" ]; then
     if has_context_marker "$file" && describe_marker "$file" | grep -qiE 'CODEBASE Context:[[:space:]]*absent'; then
       pass "records greenfield context: $(describe_marker "$file")"
+    elif has_context_marker "$file" && describe_marker "$file" | grep -qiE 'CODEBASE Context:[[:space:]]*skipped'; then
+      # The preflight's own remedy when no CODEBASE.md exists: never advise
+      # removing the line it asked for.
+      warn "records an explicit skip decision: $(describe_marker "$file")"
+      note "verify the Product Manager intended to skip codebase context (FR-017)"
     elif has_context_marker "$file"; then
       warn "$file declares codebase context but $CODEBASE_FILE does not exist"
       note "remove the marker, or run /ohmyorch:analyze-codebase to create $CODEBASE_FILE"

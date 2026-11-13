@@ -1,41 +1,42 @@
 #!/usr/bin/env bash
 #
-# delivery.sh — US-12.1: resolve a delivery target and derive the next action
+# delivery.sh — resolve a delivery target and derive the next action
 #
-# A delivery goal is one target from SPECS.md — an epic, a user story, or a task —
-# that the harness drives to completion one bounded OpenSpec change at a time
-# (PRD.md FR-019, BR-003). This script answers the only question a goal loop
-# needs answered: "what is the next action, who owns it, and what command
-# performs it?" — and it answers from repository artifacts alone (BR-004).
+# A delivery goal is one target from the mapped SPECS.md — an epic, a user story,
+# or a task. Each story is delivered as one OpenSpec change that follows the
+# upstream flow: propose -> apply -> verify -> archive, then the story is marked
+# DONE. This script answers the only question the loop needs answered: "what is
+# the next action and what command performs it?" — from repository artifacts
+# alone.
 #
 #   EPIC-N       every US-N.* story under "# EPIC-N:", in SPECS.md order
 #   US-N.M       that story
 #   US-N.M#k     task k of that story; the goal delivers the parent story and
 #                records the task as its Focus (a task has no acceptance
-#                criteria of its own, so it cannot be reviewed or accepted alone)
+#                criteria of its own, so it cannot be accepted alone)
 #   <task text>  a task found by case-insensitive substring; must be unique
 #
-# The next action is DERIVED on every call from SPECS.md, workflow-status.sh
-# (the seven gates) and completion-gate.sh (the four US-10.1 conditions). It is
-# never read back from goal.md: a stored action could silently disagree with the
-# gates. goal.md records the last computed action for a human reader only.
+# The next action is DERIVED on every call from SPECS.md and the change
+# directory: which of OpenSpec's own artifacts exist (proposal.md, specs/,
+# tasks.md) and how many task checkboxes are ticked. Nothing else is read, no
+# other script is spawned and `openspec` is never invoked, so a call is cheap
+# and deterministic. The action is never read back from goal.md: goal.md
+# records the last computed action for a human reader only.
 #
-# This script never writes review.md or test-report.md, and never ticks a task.
-# `reopen` MOVES a failing verdict aside (preserving it verbatim) and appends
-# unticked remediation tasks, which re-opens the implementation gate.
+# tasks.md is the only tracking file. This script never writes inside a change
+# directory and never ticks a task.
 #
 # Usage:
 #   delivery.sh resolve <target> [--json]
 #   delivery.sh start   <target>
 #   delivery.sh next    [<target>] [--json]
-#   delivery.sh refresh
-#   delivery.sh reopen  [--change <id>]
+#   delivery.sh refresh [--json]
 #   delivery.sh stop    [--reason <text>]
-#   delivery.sh block   [--reason <text>]     (US-12.2: the loop halts for a human)
+#   delivery.sh block   [--reason <text>]     (the loop halts for a human)
 #
 # Exit codes: 0 success, 1 unknown/ambiguous target or refused, 2 usage error.
 #
-# Dependencies: bash, awk, grep, sed, find — no Node/Python (NFR-001).
+# Dependencies: bash, awk, grep, sed, find, jq — no Node/Python.
 
 set -uo pipefail
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../lib" && pwd -P)/runtime.sh"
@@ -44,48 +45,37 @@ set -- "${OHMYORCH_ARGS[@]+"${OHMYORCH_ARGS[@]}"}"
 
 GOAL_DIR="openspec/delivery"
 GOAL="$GOAL_DIR/goal.md"
-# Per-machine stall counter owned by guard-delivery-loop.sh (US-12.2). Every goal
-# status transition clears it, so a resumed goal counts stalls from zero.
+# Per-machine stall counter owned by guard-delivery-loop.sh. Every goal status
+# transition clears it, so a resumed goal counts stalls from zero.
 LOOP_STATE=".claude/ohmyorch/runtime/${OHMYORCH_SESSION_ID:-direct}/loop.state"
 CHANGES_DIR="openspec/changes"
 TODAY=$(date +%Y-%m-%d)
-# Render installed-code commands with literal, shell-escaped roots. Skills pass
-# the actual session; read-only CLI inspection without one does not impersonate
-# the lease owner.
-printf -v CLI_COMMAND '%q ' "$OHMYORCH_CODE_ROOT/bin/ohmyorch" --project-root "$OHMYORCH_PROJECT_ROOT"
-if [ -n "$OHMYORCH_SESSION_ID" ]; then
-  printf -v CLI_SESSION '%q ' --session-id "$OHMYORCH_SESSION_ID"
-  CLI_COMMAND="$CLI_COMMAND$CLI_SESSION"
-fi
-CLI_COMMAND=${CLI_COMMAND% }
 
-c_reset=""; c_red=""; c_dim=""; c_green=""; c_yellow=""
+c_reset=""; c_red=""; c_green=""
 if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
-  c_reset=$'\033[0m'; c_red=$'\033[31m'; c_dim=$'\033[2m'
-  c_green=$'\033[32m'; c_yellow=$'\033[33m'
+  c_reset=$'\033[0m'; c_red=$'\033[31m'; c_green=$'\033[32m'
 fi
 
 usage() {
   cat <<'EOF'
 Usage: ohmyorch delivery <command> [args]
 
-Resolve a SPECS.md delivery target and derive the next action (US-12.1).
+Resolve a SPECS.md delivery target and derive the next action. Each story is
+one OpenSpec change: propose, apply, verify, archive, then the story is DONE.
 
 Commands:
   resolve <target> [--json]   List the stories a target delivers, with change ids
   start   <target>            Record openspec/delivery/goal.md (Status ACTIVE)
   next    [<target>] [--json] Derive the next action (goal target by default)
-  refresh                     Rewrite goal.md's derived sections
-  reopen  [--change <id>]     Move a failing review/test report to history/ and
-                              append one unticked remediation task per finding
+  refresh [--json]            Rewrite goal.md's derived sections; with --json,
+                              print the derived action as `next --json` does
   stop    [--reason <text>]   Record the goal as STOPPED
   block   [--reason <text>]   Record the goal as BLOCKED (a human decision is
                               needed); `start <same target>` resumes it
 
 Targets:  EPIC-N | US-N.M | US-N.M#k | "<task text>"
 
-Actions:  select propose plan implement review reopen test archive
-          mark-done escalate complete
+Actions:  propose apply verify mark-done escalate complete
 
 Exit codes: 0 success, 1 unknown/ambiguous target or refused, 2 usage error
 EOF
@@ -108,7 +98,7 @@ SPECS="$OHMYORCH_DOC_SPECS"
 #   S  epic  story  status  change  deps(comma)  title
 #   T  story index  done(0|1)  text
 parse_specs() {
-  [ -f "$SPECS" ] || die "SPECS.md not found (looked for docs/SPECS.md and SPECS.md)"
+  [ -f "$SPECS" ] || die "$SPECS not found (the mapped SPECS document)"
   awk '
     function flush() {
       if (story != "") {
@@ -118,7 +108,7 @@ parse_specs() {
       }
       story = ""; status = ""; change = ""; deps = ""; title = ""; sect = ""; ntask = 0
     }
-    { gsub(/\t/, " ") }
+    { sub(/\r$/, ""); gsub(/\t/, " ") }
     /^# EPIC-[0-9]+:/ {
       flush()
       epic = $0; sub(/^# /, "", epic); sub(/:.*$/, "", epic)
@@ -144,7 +134,7 @@ parse_specs() {
     }
     /^Dependencies:/ {
       # Both the bulleted form and an inline "Dependencies: US-1.2" are read;
-      # ignoring the inline form made a dependent story selectable (review O-4).
+      # ignoring the inline form would make a dependent story selectable.
       sect = "deps"; line = $0
       while (match(line, /US-[0-9]+\.[0-9]+/)) {
         id = substr(line, RSTART, RLENGTH)
@@ -189,46 +179,120 @@ story_exists() { [ -n "$(story_field "$1" 3)" ]; }
 # Change ids
 # ---------------------------------------------------------------------------
 
-# Title -> kebab slug: lowercase, drop stop words, first four words.
+# Title -> kebab slug: lowercase, ASCII letters and digits only, drop stop words,
+# first four words. One awk function, shared by slugify and write_goal so both
+# derive the same id; read byte-wise, so no locale changes what a letter is.
+SLUG_AWK='
+function slug(t,    w, n, i, k, out) {
+  t = tolower(t); gsub(/[^a-z0-9]+/, " ", t)
+  n = split(t, w, " "); k = 0; out = ""
+  for (i = 1; i <= n; i++) {
+    if (w[i] ~ /^(a|an|the|and|or|of|to|for|from|in|on|with|by|as|at|is|its)$/) continue
+    out = out (out == "" ? "" : "-") w[i]
+    if (++k == 4) break
+  }
+  return out
+}'
+
 slugify() {
-  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' ' ' | awk '{
-    n = 0; out = ""
-    for (i = 1; i <= NF; i++) {
-      if ($i ~ /^(a|an|the|and|or|of|to|for|from|in|on|with|by|as|at|is|its)$/) continue
-      out = out (out == "" ? "" : "-") $i
-      if (++n == 4) break
-    }
-    print out
-  }'
+  printf '%s\n' "$1" | LC_ALL=C awk "$SLUG_AWK"'{ print slug($0); exit }'
 }
 
-# change_for <story-id>: the Change: line wins, then an existing change directory
-# for the story, then a derived id. `openspec archive` prefixes YYYY-MM-DD-.
-change_for() {
-  local id="$1" ch nm prefix found
+# change_id <Change: value>: sets CHANGE_ID to the id the value names. A trailing
+# "/", the directory part and the YYYY-MM-DD- prefix that `openspec archive` adds
+# are stripped. Shell built-ins only, so a caller in a loop spawns nothing.
+change_id() {
+  CHANGE_ID="${1%/}"; CHANGE_ID="${CHANGE_ID##*/}"
+  CHANGE_ID="${CHANGE_ID#[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-}"
+}
+
+# The change directories, each listing read at most once per run:
+#   ACTIVE_DIRS    the names of the active changes, sorted;
+#   ARCHIVE_PATHS  every directory under the archive, as find prints it;
+#   ARCHIVED_IDS   the archived ids without the YYYY-MM-DD- prefix that
+#                  `openspec archive` adds, sorted. It is derived from
+#                  ARCHIVE_PATHS only when a story has to be found by directory.
+# find lists real directories only, never a symbolic link, and a name that
+# holds a newline is never a change: the lists are read line by line.
+ACTIVE_LOADED=0; ARCHIVE_LOADED=0; ARCHIVED_LOADED=0
+ACTIVE_DIRS=""; ARCHIVE_PATHS=""; ARCHIVED_IDS=""
+load_active_dirs() {
+  [ "$ACTIVE_LOADED" -eq 0 ] || return 0
+  ACTIVE_DIRS=$(find "$CHANGES_DIR" -maxdepth 1 -mindepth 1 -type d -not -name archive \
+    -not -name $'*\n*' 2>/dev/null | sed 's|.*/||' | sort) || true
+  ACTIVE_LOADED=1
+}
+load_archive_paths() {
+  [ "$ARCHIVE_LOADED" -eq 0 ] || return 0
+  ARCHIVE_PATHS=$(find "$CHANGES_DIR/archive" -maxdepth 1 -mindepth 1 -type d \
+    -not -name $'*\n*' 2>/dev/null) || true
+  ARCHIVE_LOADED=1
+}
+load_archived_ids() {
+  [ "$ARCHIVED_LOADED" -eq 0 ] || return 0
+  load_archive_paths
+  ARCHIVED_IDS=$(printf '%s\n' "$ARCHIVE_PATHS" \
+    | sed -n 's|^.*/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-||p' | sort) || true
+  ARCHIVED_LOADED=1
+}
+
+# first_with_prefix <newline-separated list> <prefix>: sets CHANGE_ID to the
+# first entry that starts with the prefix, or returns 1. Shell built-ins only.
+# A miss costs one `case`; a hit walks the list line by line, because bash 3.2
+# takes quadratic time to cut a long string at a pattern.
+first_with_prefix() {
+  local nl=$'\n' line
+  case "$nl$1" in *"$nl$2"*) ;; *) return 1 ;; esac
+  while IFS= read -r line; do
+    case "$line" in "$2"*) CHANGE_ID="$line"; return 0 ;; esac
+  done <<EOF
+$1
+EOF
+  return 1
+}
+
+# change_from_dirs <story-id>: sets CHANGE_ID to the first existing change
+# directory named for the story (us-<n>-<m>-*), active before archived, or
+# returns 1. Once the directories are listed a caller in a loop spawns nothing.
+change_from_dirs() {
+  local prefix
+  prefix="${1#US-}"; prefix="us-${prefix/./-}-"
+  load_active_dirs
+  first_with_prefix "$ACTIVE_DIRS" "$prefix" && return 0
+  load_archived_ids
+  first_with_prefix "$ARCHIVED_IDS" "$prefix"
+}
+
+# change_set <story-id>: sets CHANGE_ID. The Change: line wins, then an existing
+# change directory for the story, then a derived id.
+change_set() {
+  local id="$1" ch nm slug
   ch=$(story_field "$id" 5)
   if [ -n "$ch" ] && [ "$ch" != "-" ]; then
-    ch="${ch%/}"; ch="${ch##*/}"
-    printf '%s' "$ch" | sed 's/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-//'
+    change_id "$ch"
     return
   fi
-  nm=$(printf '%s' "$id" | sed 's/^US-//; s/\./-/')
-  prefix="us-$nm-"
-  found=$(find "$CHANGES_DIR" -maxdepth 1 -mindepth 1 -type d -name "${prefix}*" 2>/dev/null \
-    | sed 's|.*/||' | sort | head -1)
-  if [ -z "$found" ]; then
-    found=$(find "$CHANGES_DIR/archive" -maxdepth 1 -mindepth 1 -type d \
-      -name "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-${prefix}*" 2>/dev/null \
-      | sed 's|.*/||; s/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-//' | sort | head -1)
-  fi
-  if [ -n "$found" ]; then printf '%s' "$found"; return; fi
-  printf 'us-%s-%s' "$nm" "$(slugify "$(story_field "$id" 7)")"
+  change_from_dirs "$id" && return
+  # A title with no ASCII letter or digit, or made of stop words only, has no
+  # slug: OpenSpec refuses a change name that ends in a hyphen.
+  nm="${id#US-}"; nm="${nm/./-}"
+  slug=$(slugify "$(story_field "$id" 7)")
+  CHANGE_ID="us-$nm-${slug:-story}"
 }
 
+# change_archived <id>: a directory with that name exists under the archive,
+# with or without the date prefix. The id is compared with the listing as
+# text: literally, never as a pattern, and without any pathname expansion.
+# `-` and a dot name are not changes. guard-story-done.sh reads "archived" the
+# same way.
 change_archived() {
-  find "$CHANGES_DIR/archive" -maxdepth 1 -mindepth 1 -type d \
-    \( -name "$1" -o -name "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-$1" \) 2>/dev/null \
-    | grep -q .
+  local nl=$'\n' a="$CHANGES_DIR/archive/"
+  case "$1" in ''|-|.*) return 1 ;; esac
+  load_archive_paths
+  case "$nl$ARCHIVE_PATHS$nl" in
+    *"$nl$a$1$nl"*|*"$nl$a"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-"$1$nl"*) return 0 ;;
+  esac
+  return 1
 }
 
 active_changes() {
@@ -245,6 +309,8 @@ active_changes() {
 resolve_target() {
   local t="$1" up sid idx matches count
   R_KIND=""; R_FOCUS="-"; R_STORIES=""
+  # awk would expand an escape in the id it is handed.
+  case "$t" in *\\*) echo "unknown target: $t" >&2; return 1 ;; esac
   load_specs
   up=$(printf '%s' "$t" | tr '[:lower:]' '[:upper:]')
 
@@ -275,7 +341,7 @@ resolve_target() {
       return 0 ;;
   esac
 
-  # Task text. Fail closed on ambiguity rather than choose (NFR-005).
+  # Task text. Fail closed on ambiguity rather than choose.
   matches=$(printf '%s\n' "$ROWS" | NEEDLE="$t" awk -F'\t' '
     $1 == "T" && index(tolower($5), tolower(ENVIRON["NEEDLE"])) > 0 { print $2 "\t" $3 "\t" $5 }')
   count=$(printf '%s' "$matches" | grep -c . || true); count=${count:-0}
@@ -297,56 +363,60 @@ resolve_target() {
 # Next action
 # ---------------------------------------------------------------------------
 
-# set_action <action> <story> <change> <owner> <command> <reason>
+# set_action <action> <story> <change> <command> <reason>
 set_action() {
-  local remaining rendered=''
-  A_ACTION="$1"; A_STORY="$2"; A_CHANGE="$3"; A_OWNER="$4"; A_COMMAND="$5"; A_REASON="$6"
-  remaining="$A_COMMAND"
-  while [[ "$remaining" == *"ohmyorch "* ]]; do
-    rendered="$rendered${remaining%%ohmyorch *}$CLI_COMMAND "
-    remaining=${remaining#*ohmyorch }
-  done
-  A_COMMAND="$rendered$remaining"
+  A_ACTION="$1"; A_STORY="$2"; A_CHANGE="$3"; A_COMMAND="$4"; A_REASON="$5"
+}
+
+# True when at least one `*.md` file exists under the directory, recursively, as
+# upstream's artifact glob `specs/**/*.md` requires. The listing is tested as
+# text: under `pipefail` a reader that stops early would turn a long listing
+# into a failed pipeline.
+has_file_under() {
+  [ -d "$1" ] && [ -n "$(find "$1" -type f -name '*.md' 2>/dev/null | head -1)" ]
 }
 
 # Derive the next action for the stories in R_STORIES. Sets A_* variables.
+# First match wins; the order below is the contract.
 derive_next() {
-  local sid status deps dep dstatus change others ws wrc first detail cg elig ffc blocked=""
+  local sid status deps dep dstatus change others cdir missing progress tdone ttotal blocked=""
   load_specs
 
-  sid=""
-  while IFS= read -r s; do
-    [ -n "$s" ] || continue
-    if [ "$(story_field "$s" 4)" != "DONE" ]; then sid="$s"; break; fi
-  done <<EOF
-$R_STORIES
-EOF
+  # The first story of the goal that is not DONE, in one pass over the rows.
+  sid=$(printf '%s\n' "$ROWS" | GOAL_STORIES="$R_STORIES" awk -F'\t' '
+    $1 == "S" && !($3 in st) { st[$3] = $4 }
+    END {
+      n = split(ENVIRON["GOAL_STORIES"], want, "\n")
+      for (i = 1; i <= n; i++) if (want[i] != "" && st[want[i]] != "DONE") { print want[i]; exit }
+    }')
 
+  # 1. Nothing left to deliver.
   if [ -z "$sid" ]; then
-    set_action complete - - ohmyorch:product-manager "none — every story in the goal is DONE" \
+    set_action complete - - "none — every story in the goal is DONE" \
       "all $(printf '%s\n' "$R_STORIES" | grep -c . || true) story/stories are DONE"
     return
   fi
 
   status=$(story_field "$sid" 4)
-  change=$(change_for "$sid")
+  # Not in a subshell: the directory listing stays cached for write_goal.
+  change_set "$sid"; change="$CHANGE_ID"
 
-  # Readiness (BR-005) comes first: only READY or IN PROGRESS work may proceed.
-  # Checking it after the archived branch let a story a human had put on hold
-  # (NEEDS CLARIFICATION, BLOCKED) be steered to `mark-done` (review F-1, r1).
+  # 2. Readiness comes first: only READY or IN PROGRESS work may proceed. Checking
+  # it before the archived branch keeps a story a human put on hold (NEEDS
+  # CLARIFICATION, BLOCKED) from being steered to `mark-done`.
   case "$status" in
     READY|"IN PROGRESS") ;;
     *)
-      set_action escalate "$sid" "$change" "human-product-manager" \
+      set_action escalate "$sid" "$change" \
         "resolve $sid in $SPECS (a product decision is required)" \
         "$sid is $status, not READY"
       return ;;
   esac
 
-  # Dependencies: every named story must already be DONE. Like readiness, this
-  # runs before the archived branch, whatever state the story's own change is
-  # in: an archived change must not steer a story with an undelivered
-  # dependency into its DONE transition (review F-2, r2).
+  # 3. Dependencies: every named story must already be DONE. Like readiness, this
+  # runs before the archived branch, whatever state the story's own change is in:
+  # an archived change must not steer a story with an undelivered dependency into
+  # its DONE transition.
   deps=$(story_field "$sid" 6)
   if [ -n "$deps" ] && [ "$deps" != "-" ]; then
     for dep in $(printf '%s' "$deps" | tr ',' ' '); do
@@ -357,103 +427,88 @@ EOF
     done
   fi
   if [ -n "$blocked" ]; then
-    set_action escalate "$sid" "$change" "human-product-manager" \
+    set_action escalate "$sid" "$change" \
       "deliver or re-scope the dependency first" \
       "$sid depends on unfinished $blocked"
     return
   fi
 
-  # Archived but not yet DONE: the only remaining step is the guarded DONE edit.
-  if change_archived "$change"; then
-    set_action mark-done "$sid" "$change" ohmyorch:product-manager \
-      "set 'Status: DONE' for $sid in $SPECS (guarded by ohmyorch guard-story-done)" \
+  # 4. Archived, no longer active, and not yet DONE: the only remaining step is
+  # the DONE edit. An active directory with the same id wins over the archive.
+  if [ ! -d "$CHANGES_DIR/$change" ] && change_archived "$change"; then
+    set_action mark-done "$sid" "$change" \
+      "set 'Status: DONE' for $sid in $SPECS and point its Change: line at the archived change" \
       "change $change is archived but $sid is $status"
     return
   fi
 
-  # No change yet: select one, but never alongside another active change.
-  if [ ! -d "$CHANGES_DIR/$change" ]; then
+  # 5-6. No change yet: propose one, but never alongside another active change.
+  cdir="$CHANGES_DIR/$change"
+  if [ ! -d "$cdir" ]; then
     others=$(active_changes | grep -vxF "$change" | tr '\n' ' ' | sed 's/ $//' || true)
     if [ -n "$others" ]; then
-      set_action escalate "$sid" "$change" "human-product-manager" \
+      set_action escalate "$sid" "$change" \
         "finish or archive the active change first" \
         "another change is active: $others (one active change at a time)"
       return
     fi
-    set_action select "$sid" "$change" ohmyorch:product-manager \
-      "openspec new change $change; set $sid to IN PROGRESS with a Change: line; ohmyorch status --change $change" \
+    set_action propose "$sid" "$change" \
+      "/ohmyorch:opsx-propose $change for $sid; then set $sid to IN PROGRESS with a Change: line in $SPECS" \
       "$sid is $status and has no OpenSpec change"
     return
   fi
 
-  # Active change: the gates decide. Capture output and exit code separately.
-  ws=$("${OHMYORCH_CODE_ROOT}/scripts/workflow-status.sh" --change "$change" --json 2>/dev/null); wrc=$?
-  if [ "$wrc" -ne 0 ] || [ -z "$ws" ]; then
-    set_action escalate "$sid" "$change" "human-product-manager" \
-      "inspect ohmyorch workflow-status --change $change" \
-      "the gate reporter could not report (exit $wrc)"
+  # 7. Active change: are OpenSpec's planning artifacts there? Plain file checks.
+  # design.md is conditional upstream and is never required; specs/ must hold at
+  # least one `.md` file unless the change records `skip_specs: true`, read as
+  # YAML reads it: true, True or TRUE, with an optional trailing comment.
+  missing=""
+  [ -f "$cdir/proposal.md" ] || missing="proposal.md"
+  if ! grep -qE '^skip_specs:[[:space:]]*(true|True|TRUE)([[:space:]]+#.*)?[[:space:]]*$' "$cdir/.openspec.yaml" 2>/dev/null; then
+    has_file_under "$cdir/specs" || missing="${missing:+$missing, }specs/"
+  fi
+  [ -f "$cdir/tasks.md" ] || missing="${missing:+$missing, }tasks.md"
+  if [ -n "$missing" ]; then
+    set_action propose "$sid" "$change" \
+      "/ohmyorch:opsx-propose $change for $sid (continue the existing change: author only what is missing)" \
+      "planning incomplete: missing $missing"
     return
   fi
-  first=$(jq -r '.firstIncompleteGate // ""' <<< "$ws")
-  detail=$(jq -r --arg gate "$first" '.gates[]|select(.gate==$gate)|.detail' <<< "$ws")
+  progress=$(ohmyorch_tasks_progress "$cdir/tasks.md")
+  read -r tdone ttotal <<< "$progress"
+  if [ "$ttotal" -eq 0 ]; then
+    set_action propose "$sid" "$change" \
+      "/ohmyorch:opsx-propose $change for $sid (continue the existing change: author only what is missing)" \
+      "planning incomplete: tasks.md has no task checkboxes"
+    return
+  fi
 
-  case "$first" in
-    planning)
-      set_action propose "$sid" "$change" ohmyorch:planner \
-        "/ohmyorch:opsx-explore $sid then /ohmyorch:opsx-propose $change" "gate planning: $detail" ;;
-    plan-handoff)
-      set_action plan "$sid" "$change" ohmyorch:planner "/ohmyorch:plan-feature $change" "gate plan-handoff: $detail" ;;
-    implementation)
-      set_action implement "$sid" "$change" ohmyorch:implementer "/ohmyorch:opsx-apply $change" "gate implementation: $detail" ;;
-    review)
-      if printf '%s' "$detail" | grep -q 'blocking findings'; then
-        set_action reopen "$sid" "$change" ohmyorch:product-manager \
-          "ohmyorch delivery reopen --change $change" "gate review: $detail"
-      else
-        set_action review "$sid" "$change" ohmyorch:reviewer \
-          "/ohmyorch:review-feature $change (includes /ohmyorch:opsx-verify)" "gate review: $detail"
-      fi ;;
-    testing)
-      if printf '%s' "$detail" | grep -q 'reports FAIL'; then
-        set_action reopen "$sid" "$change" ohmyorch:product-manager \
-          "ohmyorch delivery reopen --change $change" "gate testing: $detail"
-      else
-        set_action test "$sid" "$change" ohmyorch:tester "/ohmyorch:test-feature $change" "gate testing: $detail"
-      fi ;;
-    acceptance)
-      set_action escalate "$sid" "$change" "human-product-manager" \
-        "fix the product-artifact contract (ohmyorch validate-product-artifacts)" \
-        "gate acceptance: $detail" ;;
-    "")
-      cg=$("${OHMYORCH_CODE_ROOT}/scripts/completion-gate.sh" --change "$change" --json 2>/dev/null)
-      elig=$(jq -r '.eligible' <<< "$cg")
-      ffc=$(jq -r '.firstFailingCondition // ""' <<< "$cg")
-      if [ "$elig" = "true" ]; then
-        set_action archive "$sid" "$change" ohmyorch:product-manager \
-          "ohmyorch completion-gate --change $change --record; then a separate Bash call: openspec archive $change -y" \
-          "all seven gates and all four completion conditions pass"
-      else
-        set_action escalate "$sid" "$change" "human-product-manager" \
-          "inspect ohmyorch completion-gate --change $change" \
-          "gates pass but completion condition '${ffc:-unknown}' fails"
-      fi ;;
-    *)
-      set_action escalate "$sid" "$change" "human-product-manager" \
-        "inspect ohmyorch workflow-status --change $change" "unmapped gate '$first'" ;;
-  esac
+  # 8. tasks.md is the only tracking file: an unticked task means apply. A
+  # CRITICAL verify finding is recorded as a new unticked task, which lands here.
+  if [ "$tdone" -lt "$ttotal" ]; then
+    set_action apply "$sid" "$change" "/ohmyorch:opsx-apply $change" "$tdone/$ttotal tasks complete"
+    return
+  fi
+
+  # 9. Every task ticked: verify (advisory, writes no file), then archive. The
+  # archived change is picked up by branch 4 on the next call.
+  set_action verify "$sid" "$change" \
+    "/ohmyorch:opsx-verify $change; with no CRITICAL issue, run a separate Bash call: openspec archive $change -y" \
+    "$ttotal/$ttotal tasks complete; verify, then archive"
 }
 
+# One JSON line, or exactly five text lines. The JSON line is fingerprinted by
+# the Stop hook for stall detection, so it carries nothing time-dependent.
 print_action() {
   if [ "${AS_JSON:-0}" -eq 1 ]; then
-    printf '{ "target": %s, "action": %s, "story": %s, "change": %s, "owner": %s, "command": %s, "reason": %s }\n' \
-      "$(jstr "$TARGET")" "$(jstr "$A_ACTION")" "$(jstr "$A_STORY")" "$(jstr "$A_CHANGE")" \
-      "$(jstr "$A_OWNER")" "$(jstr "$A_COMMAND")" "$(jstr "$A_REASON")"
+    jq -rn --arg target "$TARGET" --arg action "$A_ACTION" --arg story "$A_STORY" \
+      --arg change "$A_CHANGE" --arg command "$A_COMMAND" --arg reason "$A_REASON" \
+      '"{ \"target\": \($target|tojson), \"action\": \($action|tojson), \"story\": \($story|tojson), \"change\": \($change|tojson), \"command\": \($command|tojson), \"reason\": \($reason|tojson) }"'
     return
   fi
   printf 'Action:  %s\n' "$A_ACTION"
   printf 'Story:   %s\n' "$A_STORY"
   printf 'Change:  %s\n' "$A_CHANGE"
-  printf 'Owner:   %s\n' "$A_OWNER"
   printf 'Command: %s\n' "$A_COMMAND"
   printf 'Reason:  %s\n' "$A_REASON"
 }
@@ -481,17 +536,34 @@ goal_notes() {
 }
 
 # write_goal <target> <kind> <focus> <status> <reason> <started>
-# Derived sections are rebuilt from SPECS.md and the gates; Notes are preserved.
+# Derived sections are rebuilt from SPECS.md and the change artifacts; Notes are
+# preserved.
 write_goal() {
   local target="$1" kind="$2" focus="$3" gstatus="$4" reason="$5" started="$6"
-  local notes tmp n s
+  local notes tmp n s st ch sl ti rows
   notes=$(goal_notes)
+  # One pass over the rows: "<story> <status> <Change: value> <slug> <title>" per
+  # goal story, in goal order. The slug is never empty, so no field collapses.
+  # A story without a Change: line is resolved below from the cached directory
+  # listing and that slug, as change_set resolves it, without a process per story.
+  # The awk reads bytes, so the title leaves it untouched; its `|` is replaced
+  # below in the session's locale, where a multi-byte character stays whole.
+  rows=$(printf '%s\n' "$ROWS" | GOAL_STORIES="$R_STORIES" LC_ALL=C awk -F'\t' "$SLUG_AWK"'
+    $1 == "S" && !($3 in st) { st[$3] = $4; ch[$3] = $5; ti[$3] = $7 }
+    END {
+      n = split(ENVIRON["GOAL_STORIES"], want, "\n")
+      for (i = 1; i <= n; i++) {
+        s = want[i]; if (s == "") continue
+        sl = slug(ti[s]); if (sl == "") sl = "story"
+        printf "%s\t%s\t%s\t%s\t%s\n", s, st[s], ch[s], sl, ti[s]
+      }
+    }')
   mkdir -p "$GOAL_DIR"
   tmp=$(mktemp "${TMPDIR:-/tmp}/goal.XXXXXX") || die "cannot create temp file"
   {
     printf '# Delivery Goal\n\n'
     printf 'Written by `ohmyorch delivery`. The field table, Stories, and Next Action are\n'
-    printf '**derived** from SPECS.md and the gate reporters: refresh them with\n'
+    printf '**derived** from SPECS.md and the OpenSpec change artifacts: refresh them with\n'
     printf '`ohmyorch delivery refresh`, never hand-edit. Notes between the AUTHORED\n'
     printf 'markers are preserved across refreshes.\n\n'
     printf '| Field | Value |\n|---|---|\n'
@@ -505,19 +577,20 @@ write_goal() {
     printf '## Stories\n\n'
     printf '| # | Story | Change | SPECS status | Title |\n|---|---|---|---|---|\n'
     n=0
-    while IFS= read -r s; do
+    while IFS=$'\t' read -r s st ch sl ti; do
       [ -n "$s" ] || continue
       n=$((n + 1))
-      printf '| %s | %s | %s | %s | %s |\n' "$n" "$s" "$(change_for "$s")" \
-        "$(story_field "$s" 4)" "$(story_field "$s" 7 | tr '|' '/')"
+      if [ "$ch" != "-" ]; then change_id "$ch"
+      elif ! change_from_dirs "$s"; then CHANGE_ID="${s#US-}"; CHANGE_ID="us-${CHANGE_ID/./-}-$sl"
+      fi
+      printf '| %s | %s | %s | %s | %s |\n' "$n" "$s" "$CHANGE_ID" "$st" "${ti//|//}"
     done <<EOF
-$R_STORIES
+$rows
 EOF
     printf '\n## Next Action\n\n'
     printf 'Action: %s\n' "$A_ACTION"
     printf 'Story: %s\n' "$A_STORY"
     printf 'Change: %s\n' "$A_CHANGE"
-    printf 'Owner: %s\n' "$A_OWNER"
     printf 'Command: %s\n' "$A_COMMAND"
     printf 'Reason: %s\n' "$A_REASON"
     printf '\nThis is the last computed action, for reading only. `ohmyorch delivery next`\n'
@@ -525,7 +598,8 @@ EOF
     printf '## Notes\n\n'
     printf '<!-- BEGIN AUTHORED: notes -->\n%s\n<!-- END AUTHORED: notes -->\n' "$notes"
   } > "$tmp"
-  mv "$tmp" "$GOAL"
+  # An unwritable goal directory must not leave the staged copy behind.
+  mv "$tmp" "$GOAL" || { rm -f "$tmp"; return 1; }
 }
 
 # Load the recorded goal's target and resolve it again from SPECS.md.
@@ -546,122 +620,6 @@ refresh_goal() {
 }
 
 # ---------------------------------------------------------------------------
-# reopen
-# ---------------------------------------------------------------------------
-
-# Findings from a blocking review.md: "<finding id: title>\t<remediation>"
-review_findings() {
-  awk '
-    function emit() {
-      if (id != "") printf "%s\t%s\n", id, (rem == "" ? "see the preserved review" : rem)
-      id = ""; rem = ""
-    }
-    /^### Finding / { emit(); id = $0; sub(/^### Finding[ ]*/, "", id); next }
-    /^## /          { emit(); next }
-    id != "" && /^Remediation:/ { rem = $0; sub(/^Remediation:[ ]*/, "", rem) }
-    END { emit() }
-  ' "$1" | tr -d '\r'
-}
-
-# Failures from a failing test-report.md: "<criterion>\t<expected>"
-test_failures() {
-  local out
-  out=$(awk '
-    function emit() {
-      if (id != "") printf "%s\t%s\n", id, (ex == "" ? "see the preserved test report" : ex)
-      id = ""; ex = ""
-    }
-    /^## Failures/ { inf = 1; next }
-    inf && /^## /  { emit(); inf = 0; next }
-    inf && /^### / { emit(); id = $0; sub(/^### [ ]*/, "", id); next }
-    inf && id != "" && /^Expected:/ { ex = $0; sub(/^Expected:[ ]*/, "", ex) }
-    END { emit() }
-  ' "$1")
-  if [ -z "$out" ]; then
-    # No Failures section: fall back to the FAIL rows of the criteria table.
-    out=$(awk -F'|' '{
-      for (i = 2; i <= NF; i++) {
-        c = $i; gsub(/^[ ]+|[ ]+$/, "", c)
-        if (c == "FAIL" && i > 2) {
-          p = $(i - 1); gsub(/^[ ]+|[ ]+$/, "", p)
-          printf "%s\tsee the preserved test report\n", p; break
-        }
-      }
-    }' "$1")
-  fi
-  printf '%s\n' "$out" | tr -d '\r' | grep . || true
-}
-
-do_reopen() {
-  local change="$1" cdir ws first detail round kind findings k line id text preserved
-  cdir="$CHANGES_DIR/$change"
-  [ -d "$cdir" ] || die "change '$change' not found under $CHANGES_DIR"
-  [ -f "$cdir/tasks.md" ] || die "$cdir/tasks.md not found"
-
-  ws=$("${OHMYORCH_CODE_ROOT}/scripts/workflow-status.sh" --change "$change" --json 2>/dev/null)
-  first=$(jq -r '.firstIncompleteGate // ""' <<< "$ws")
-  detail=$(jq -r --arg gate "$first" '.gates[]|select(.gate==$gate)|.detail' <<< "$ws")
-
-  if [ "$first" = "review" ] && printf '%s' "$detail" | grep -q 'blocking findings'; then
-    kind="review"
-  elif [ "$first" = "testing" ] && printf '%s' "$detail" | grep -q 'reports FAIL'; then
-    kind="test-report"
-  else
-    die "nothing to reopen: $change has no blocking review or failing test report (first incomplete gate: ${first:-none})"
-  fi
-
-  mkdir -p "$cdir/history"
-  round=$(find "$cdir/history" -maxdepth 1 -type f -name '*-r[0-9]*.md' 2>/dev/null \
-    | sed -n 's/.*-r\([0-9][0-9]*\)\.md$/\1/p' | sort -n | tail -1)
-  round=$(( ${round:-0} + 1 ))
-
-  if [ "$kind" = "review" ]; then
-    findings=$(review_findings "$cdir/review.md")
-    [ -n "$findings" ] || findings=$(printf 'blocking review\taddress every blocking finding in history/review-r%s.md' "$round")
-  else
-    findings=$(test_failures "$cdir/test-report.md")
-    [ -n "$findings" ] || findings=$(printf 'failing acceptance\tmake every FAIL criterion in history/test-report-r%s.md pass' "$round")
-  fi
-
-  # Preserve verdicts verbatim. Every downstream verdict is re-opened: a test
-  # report describes code that is about to change, and a change made after an
-  # acceptance failure must be reviewed again before retesting (US-7.1).
-  preserved=""
-  if [ -f "$cdir/review.md" ]; then
-    mv "$cdir/review.md" "$cdir/history/review-r$round.md"; preserved="history/review-r$round.md"
-  fi
-  if [ -f "$cdir/test-report.md" ]; then
-    mv "$cdir/test-report.md" "$cdir/history/test-report-r$round.md"
-    preserved="${preserved:+$preserved, }history/test-report-r$round.md"
-  fi
-
-  {
-    printf '\n## R%s. Remediation — reopened %s from %s\n\n' "$round" "$TODAY" "$kind"
-    printf 'Preserved: %s\n\n' "$preserved"
-    k=0
-    while IFS= read -r line; do
-      [ -n "$line" ] || continue
-      k=$((k + 1))
-      id=$(printf '%s' "$line" | awk -F'\t' '{ print $1 }')
-      text=$(printf '%s' "$line" | awk -F'\t' '{ print $2 }')
-      if [ "$kind" = "review" ]; then
-        printf -- '- [ ] R%s.%s Resolve review finding %s — %s\n' "$round" "$k" "$id" "$text"
-      else
-        printf -- '- [ ] R%s.%s Make failing criterion pass: %s — expected: %s\n' "$round" "$k" "$id" "$text"
-      fi
-    done <<EOF
-$findings
-EOF
-  } >> "$cdir/tasks.md"
-
-  [ -x "${OHMYORCH_CODE_ROOT}/scripts/status.sh" ] && "${OHMYORCH_CODE_ROOT}/scripts/status.sh" --change "$change" --quiet >/dev/null 2>&1
-  printf '%sREOPENED%s  %s — round %s from %s\n' "$c_yellow" "$c_reset" "$change" "$round" "$kind"
-  printf '  preserved:   %s\n' "$preserved"
-  printf '  appended:    %s remediation task(s) to %s/tasks.md\n' "$k" "$cdir"
-  printf '  next owner:  ohmyorch:implementer (/ohmyorch:opsx-apply %s), then ohmyorch:reviewer, then ohmyorch:tester\n' "$change"
-}
-
-# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -669,13 +627,11 @@ EOF
 CMD="$1"; shift
 AS_JSON=0
 TARGET=""
-CHANGE_ARG=""
 REASON_ARG=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --json)   AS_JSON=1; shift ;;
-    --change) [ $# -ge 2 ] || die "--change needs a value" 2; CHANGE_ARG="$2"; shift 2 ;;
     --reason) [ $# -ge 2 ] || die "--reason needs a value" 2; REASON_ARG="$2"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     -*) die "unknown option '$1'" 2 ;;
@@ -695,8 +651,10 @@ case "$CMD" in
       sep=""
       while IFS= read -r s; do
         [ -n "$s" ] || continue
+        # Not in a subshell: the directory listing is read once for all stories.
+        change_set "$s"
         printf '%s { "story": %s, "status": %s, "change": %s }' "$sep" "$(jstr "$s")" \
-          "$(jstr "$(story_field "$s" 4)")" "$(jstr "$(change_for "$s")")"
+          "$(jstr "$(story_field "$s" 4)")" "$(jstr "$CHANGE_ID")"
         sep=","
       done <<EOF
 $R_STORIES
@@ -708,8 +666,9 @@ EOF
       while IFS= read -r s; do
         [ -n "$s" ] || continue
         n=$((n + 1))
+        change_set "$s"
         printf '  %2s  %-8s %-20s %-40s %s\n' "$n" "$s" "$(story_field "$s" 4)" \
-          "$(change_for "$s")" "$(story_field "$s" 7)"
+          "$CHANGE_ID" "$(story_field "$s" 7)"
       done <<EOF
 $R_STORIES
 EOF
@@ -749,19 +708,15 @@ EOF
     ;;
 
   refresh)
+    # One derivation both rewrites goal.md and reports the action: the Stop hook
+    # uses --json so a stop attempt derives the goal once, not twice.
     load_goal
     refresh_goal
-    printf 'Wrote %s (Status %s, next action %s)\n' "$GOAL" "$(goal_field Status)" "$A_ACTION"
-    ;;
-
-  reopen)
-    if [ -z "$CHANGE_ARG" ]; then
-      CHANGE_ARG=$(active_changes)
-      [ "$(printf '%s' "$CHANGE_ARG" | grep -c . || true)" = "1" ] \
-        || die "pass --change <id> (active changes: $(printf '%s' "$CHANGE_ARG" | tr '\n' ' '))"
+    if [ "$AS_JSON" -eq 1 ]; then
+      print_action
+    else
+      printf 'Wrote %s (Status %s, next action %s)\n' "$GOAL" "$(goal_field Status)" "$A_ACTION"
     fi
-    do_reopen "$CHANGE_ARG"
-    if [ -f "$GOAL" ]; then load_goal; refresh_goal; fi
     ;;
 
   stop)
@@ -783,20 +738,20 @@ EOF
         if (key == "Reason")  { print "| Reason | " ENVIRON["REASON"] " |"; next }
         if (key == "Updated") { print "| Updated | " today " |"; next }
         print
-      }' "$GOAL" > "$tmp" && mv "$tmp" "$GOAL"
+      }' "$GOAL" > "$tmp" && mv "$tmp" "$GOAL" || rm -f "$tmp"
     fi
     printf 'Goal %s recorded as %s\n' "${TARGET:-?}" "$(goal_field Status)"
     ;;
 
   block)
-    # US-12.2: the delivery loop halts for a human decision. Target, Started, and
-    # Notes are preserved, so `start <same target>` resumes the goal as ACTIVE.
+    # The delivery loop halts for a human decision. Target, Started, and Notes
+    # are preserved, so `start <same target>` resumes the goal as ACTIVE.
     [ -f "$GOAL" ] || die "no delivery goal recorded at $GOAL"
     rm -f "$LOOP_STATE"
     REASON_ARG=$(printf '%s' "${REASON_ARG:-blocked: a Product Manager decision is required}" | tr '\n|' ' /')
     TARGET=$(goal_field Target)
     # A subshell probe: resolve_target exits (via load_specs/die) when SPECS.md is
-    # missing, which would skip the in-place fallback below (review O-2).
+    # missing, which would skip the in-place fallback below.
     if [ -n "$TARGET" ] && ( resolve_target "$TARGET" ) >/dev/null 2>&1 \
        && resolve_target "$TARGET" 2>/dev/null; then
       G_STATUS=$(goal_field Status); G_REASON=$(goal_field Reason); G_STARTED=$(goal_field Started)
@@ -812,7 +767,7 @@ EOF
         if (key == "Reason")  { print "| Reason | " ENVIRON["REASON"] " |"; next }
         if (key == "Updated") { print "| Updated | " today " |"; next }
         print
-      }' "$GOAL" > "$tmp" && mv "$tmp" "$GOAL"
+      }' "$GOAL" > "$tmp" && mv "$tmp" "$GOAL" || rm -f "$tmp"
     fi
     printf 'Goal %s recorded as %s — %s\n' "${TARGET:-?}" "$(goal_field Status)" "$(goal_field Reason)"
     ;;

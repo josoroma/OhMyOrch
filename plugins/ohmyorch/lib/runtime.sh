@@ -8,14 +8,21 @@ ohmyorch_die() { ohmyorch_error "$*"; exit 2; }
 ohmyorch_hash() { shasum -a 256 "$1" | awk '{print $1}'; }
 ohmyorch_json_string() { jq -Rn --arg value "$1" '$value'; }
 
+# Every C0 control character and DEL except newline, for the path check below.
+OHMYORCH_CNTRL=$'\001\002\003\004\005\006\007\010\011\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037\177'
+
 # Reject symlink components before touching a target, including missing children.
+# Every script and hook resolves several paths, so the string work uses shell
+# built-ins only: no process is spawned here.
 ohmyorch_path() (
   shopt -s nullglob dotglob
   local raw="$1" part current rel
-  raw=$(printf '%s' "$raw" | sed 's://*:/:g')
-  if [ "$(uname -s)" = Darwin ]; then
-    case "$raw" in /var/*|/tmp/*) raw="/private$raw" ;; esac
-  fi
+  # Drop trailing newlines and collapse every run of slashes into one.
+  while [[ "$raw" == *$'\n' ]]; do raw=${raw%$'\n'}; done
+  while [[ "$raw" == *//* ]]; do raw="${raw%%//*}/${raw#*//}"; done
+  case "${OSTYPE:-$(uname -s)}" in darwin*|Darwin*)
+    case "$raw" in /var/*|/tmp/*) raw="/private$raw" ;; esac ;;
+  esac
   case "$raw" in
     "$OHMYORCH_PROJECT_ROOT"/*) rel=${raw#"$OHMYORCH_PROJECT_ROOT"/} ;;
     "${OHMYORCH_INPUT_ROOT:-$OHMYORCH_PROJECT_ROOT}"/*) rel=${raw#"${OHMYORCH_INPUT_ROOT:-$OHMYORCH_PROJECT_ROOT}"/} ;;
@@ -23,9 +30,9 @@ ohmyorch_path() (
     *) rel=${raw#./} ;;
   esac
   [ -n "$rel" ] || { ohmyorch_error 'empty managed path'; return 2; }
-  if printf '%s' "$rel" | LC_ALL=C grep -q '[[:cntrl:]]'; then
-    ohmyorch_error 'control characters in path'; return 2
-  fi
+  case "$rel" in *["$OHMYORCH_CNTRL"]*)
+    ohmyorch_error 'control characters in path'; return 2 ;;
+  esac
   current="$OHMYORCH_PROJECT_ROOT"
   local parts=()
   IFS=/ read -r -a parts <<< "$rel"
@@ -63,39 +70,66 @@ ohmyorch_default_doc() {
 ohmyorch_load_config() {
   OHMYORCH_CONFIG="$OHMYORCH_PROJECT_ROOT/.claude/ohmyorch/project.json"
   ohmyorch_path .claude/ohmyorch/project.json >/dev/null || return 2
-  OHMYORCH_ENABLED=false
+  OHMYORCH_ENABLED=false; OHMYORCH_FAST_VALIDATION=false
   if [ -f "$OHMYORCH_CONFIG" ]; then
-    jq -e '
-      type == "object" and
-      ((keys - ["schemaVersion","enabled","documents","openspec","output","delivery","fastValidation"]) | length == 0) and
-      .schemaVersion == 1 and (.enabled | type == "boolean") and
-      (.documents | type == "object") and
-      ((.documents | keys) == ["codebase","prd","specs"]) and
-      ([.documents[]] | all(type == "string" and length > 0 and (test("[\u0000-\u001f\u007f]")|not))) and
-      (.openspec | keys == ["root","schema"]) and
-      .openspec.root == "openspec" and .openspec.schema == "spec-driven" and
-      (.output | keys == ["epicLogs","pages"]) and
-      ([.output[]] | all(type == "string" and length > 0 and (test("[\u0000-\u001f\u007f]")|not))) and
-      (.delivery | keys == ["maxStalls"]) and
-      (.delivery.maxStalls | type == "number" and . >= 0 and . <= 6 and floor == .) and
-      (.fastValidation | keys == ["enabled","script"]) and
-      (.fastValidation.enabled | type == "boolean") and
-      (.fastValidation.script | type == "string" and length > 0 and (test("[\u0000-\u001f\u007f]")|not))
-    ' "$OHMYORCH_CONFIG" >/dev/null 2>&1 || {
+    # One jq process validates the schema and emits every value on its own line:
+    # nine named fields, then the six configured paths in their file order. The
+    # schema rejects control characters, so a value can never span two lines.
+    # Every script and hook pays for this, which is why it is a single spawn.
+    # The file is slurped so that anything but exactly one document is rejected.
+    local values configured index=0
+    values=$(jq -rs '
+      if length == 1 then .[0] else error("unsupported") end |
+      if (
+        type == "object" and
+        ((keys - ["schemaVersion","enabled","documents","openspec","output","delivery","fastValidation"]) | length == 0) and
+        .schemaVersion == 1 and (.enabled | type == "boolean") and
+        (.documents | type == "object") and
+        ((.documents | keys) == ["codebase","prd","specs"]) and
+        ([.documents[]] | all(type == "string" and length > 0 and (test("[\u0000-\u001f\u007f]")|not))) and
+        (.openspec | keys == ["root","schema"]) and
+        .openspec.root == "openspec" and .openspec.schema == "spec-driven" and
+        (.output | keys == ["epicLogs","pages"]) and
+        ([.output[]] | all(type == "string" and length > 0 and (test("[\u0000-\u001f\u007f]")|not))) and
+        (.delivery | keys == ["maxStalls"]) and
+        (.delivery.maxStalls | type == "number" and . >= 0 and . <= 6 and floor == .) and
+        (.fastValidation | keys == ["enabled","script"]) and
+        (.fastValidation.enabled | type == "boolean") and
+        (.fastValidation.script | type == "string" and length > 0 and (test("[\u0000-\u001f\u007f]")|not))
+      ) then
+        .enabled, .documents.prd, .documents.specs, .documents.codebase,
+        .output.pages, .output.epicLogs, .delivery.maxStalls, .fastValidation.enabled,
+        .fastValidation.script, .documents[], .output[], .fastValidation.script
+      else error("unsupported") end
+    ' "$OHMYORCH_CONFIG" 2>/dev/null) || values=''
+    while IFS= read -r configured; do
+      case "$index" in
+        0) OHMYORCH_ENABLED=$configured ;;
+        1) OHMYORCH_DOC_PRD=$configured ;;
+        2) OHMYORCH_DOC_SPECS=$configured ;;
+        3) OHMYORCH_DOC_CODEBASE=$configured ;;
+        4) OHMYORCH_PAGES=$configured ;;
+        5) OHMYORCH_EPIC_LOGS=$configured ;;
+        6) OHMYORCH_MAX_STALLS=$configured ;;
+        7) OHMYORCH_FAST_VALIDATION=$configured ;;
+      esac
+      index=$((index + 1))
+    done <<EOF
+$values
+EOF
+    # A valid document yields exactly fifteen lines; anything else yields none.
+    [ "$index" -eq 15 ] || {
+      OHMYORCH_ENABLED=false; OHMYORCH_FAST_VALIDATION=false
       ohmyorch_error 'invalid/unsupported project config (schema 1, local spec-driven only)'; return 2;
     }
-    OHMYORCH_ENABLED=$(jq -r .enabled "$OHMYORCH_CONFIG")
-    OHMYORCH_DOC_PRD=$(jq -r .documents.prd "$OHMYORCH_CONFIG")
-    OHMYORCH_DOC_SPECS=$(jq -r .documents.specs "$OHMYORCH_CONFIG")
-    OHMYORCH_DOC_CODEBASE=$(jq -r .documents.codebase "$OHMYORCH_CONFIG")
-    OHMYORCH_PAGES=$(jq -r .output.pages "$OHMYORCH_CONFIG")
-    OHMYORCH_EPIC_LOGS=$(jq -r .output.epicLogs "$OHMYORCH_CONFIG")
-    OHMYORCH_MAX_STALLS=$(jq -r .delivery.maxStalls "$OHMYORCH_CONFIG")
-    local configured
+    index=0
     while IFS= read -r configured; do
+      index=$((index + 1))
+      [ "$index" -gt 9 ] || continue
       [ "$(ohmyorch_relative "$configured")" = "$configured" ] || { ohmyorch_error "config paths must use canonical relative spelling"; return 2; };
-    done < <(
-      jq -r '.documents[],.output[],.fastValidation.script' "$OHMYORCH_CONFIG")
+    done <<EOF
+$values
+EOF
     [ "$OHMYORCH_DOC_PRD" != "$OHMYORCH_DOC_SPECS" ] &&
       [ "$OHMYORCH_DOC_PRD" != "$OHMYORCH_DOC_CODEBASE" ] &&
       [ "$OHMYORCH_DOC_SPECS" != "$OHMYORCH_DOC_CODEBASE" ] || {
@@ -109,49 +143,56 @@ ohmyorch_load_config() {
   fi
   export OHMYORCH_ENABLED OHMYORCH_DOC_PRD OHMYORCH_DOC_SPECS OHMYORCH_DOC_CODEBASE
   export OHMYORCH_PAGES OHMYORCH_EPIC_LOGS OHMYORCH_MAX_STALLS OHMYORCH_CONFIG
+  export OHMYORCH_FAST_VALIDATION
 }
 
-ohmyorch_init() {
-  command -v jq >/dev/null 2>&1 || ohmyorch_die 'jq >=1.6 is required; install it explicitly'
+# The initialization itself. It reports a failure on stderr and returns 2, so the
+# hook dispatcher can keep its repair route without initializing twice. Scripts
+# call ohmyorch_init, which exits instead.
+ohmyorch_try_init() {
+  command -v jq >/dev/null 2>&1 || { ohmyorch_error 'jq >=1.6 is required; install it explicitly'; return 2; }
   OHMYORCH_ARGS=()
   local root="${OHMYORCH_PROJECT_ROOT:-}" session="${OHMYORCH_SESSION_ID:-}" arg
   OHMYORCH_TAKEOVER=0
   while [ "$#" -gt 0 ]; do
     case "$1" in
-      --project-root) [ "$#" -gt 1 ] || ohmyorch_die '--project-root needs a value'; root="$2"; shift 2 ;;
-      --session-id) [ "$#" -gt 1 ] || ohmyorch_die '--session-id needs a value'; session="$2"; shift 2 ;;
+      --project-root) [ "$#" -gt 1 ] || { ohmyorch_error '--project-root needs a value'; return 2; }; root="$2"; shift 2 ;;
+      --session-id) [ "$#" -gt 1 ] || { ohmyorch_error '--session-id needs a value'; return 2; }; session="$2"; shift 2 ;;
       --takeover) OHMYORCH_TAKEOVER=1; shift ;;
       *) OHMYORCH_ARGS+=("$1"); shift ;;
     esac
   done
-  case "$root" in /*) ;; *) ohmyorch_die '--project-root must be an explicit absolute directory' ;; esac
-  [ ! -L "$root" ] || ohmyorch_die 'symlinked project root refused'
+  case "$root" in /*) ;; *) ohmyorch_error '--project-root must be an explicit absolute directory'; return 2 ;; esac
+  [ ! -L "$root" ] || { ohmyorch_error 'symlinked project root refused'; return 2; }
   OHMYORCH_INPUT_ROOT=${root%/}
   export OHMYORCH_INPUT_ROOT
-  root=$(cd -- "$root" 2>/dev/null && pwd -P) || ohmyorch_die 'project root does not exist'
+  root=$(cd -- "$root" 2>/dev/null && pwd -P) || { ohmyorch_error 'project root does not exist'; return 2; }
   case "$root" in /|"$HOME"|"$OHMYORCH_CODE_ROOT"|"$OHMYORCH_CODE_ROOT"/*)
-    ohmyorch_die 'refusing filesystem/home/plugin root as consumer project' ;;
+    ohmyorch_error 'refusing filesystem/home/plugin root as consumer project'; return 2 ;;
   esac
   OHMYORCH_PROJECT_ROOT="$root"; OHMYORCH_SESSION_ID="$session"
   if [ -n "$session" ]; then
-    case "$session" in *[!a-zA-Z0-9_-]*) ohmyorch_die 'invalid session id' ;; esac
+    case "$session" in *[!a-zA-Z0-9_-]*) ohmyorch_error 'invalid session id'; return 2 ;; esac
   fi
   export OHMYORCH_PROJECT_ROOT OHMYORCH_SESSION_ID
-  cd -- "$root" || exit 2
+  cd -- "$root" || return 2
   OHMYORCH_CONFIG_VALID=1
   if ! ohmyorch_load_config; then
-    [ "${OHMYORCH_ALLOW_UNCONFIGURED:-0}" = 1 ] || exit 2
+    [ "${OHMYORCH_ALLOW_UNCONFIGURED:-0}" = 1 ] || return 2
     OHMYORCH_CONFIG_VALID=0; OHMYORCH_ENABLED=false
     OHMYORCH_DOC_PRD=PRD.md; OHMYORCH_DOC_SPECS=SPECS.md; OHMYORCH_DOC_CODEBASE=CODEBASE.md
     OHMYORCH_PAGES=docs/pages; OHMYORCH_EPIC_LOGS=SPEC-LOGS; OHMYORCH_MAX_STALLS=3
+    OHMYORCH_FAST_VALIDATION=false
   fi
-  export OHMYORCH_CONFIG_VALID OHMYORCH_ENABLED
+  export OHMYORCH_CONFIG_VALID OHMYORCH_ENABLED OHMYORCH_FAST_VALIDATION
   if [ "$OHMYORCH_ENABLED" = true ] && [ "${OHMYORCH_ALLOW_UNCONFIGURED:-0}" != 1 ]; then
-    for arg in workflow-status completion-gate validate-product-artifacts validate-implementation-plan validate-review validate-test-report validate-status validate-verification; do
-      [ -x "$OHMYORCH_CODE_ROOT/scripts/$arg.sh" ] || ohmyorch_die "missing bundled validator: $arg"
+    for arg in delivery validate-product-artifacts; do
+      [ -x "$OHMYORCH_CODE_ROOT/scripts/$arg.sh" ] || { ohmyorch_error "missing bundled validator: $arg"; return 2; }
     done
   fi
 }
+
+ohmyorch_init() { ohmyorch_try_init "$@" || exit 2; }
 
 ohmyorch_doc_path() {
   case "$1" in
@@ -166,15 +207,24 @@ ohmyorch_require_active() {
   [ "$OHMYORCH_ENABLED" = true ] || ohmyorch_die 'project inactive; run /ohmyorch:bootstrap explicitly'
 }
 
-ohmyorch_selected_change() {
-  local changes count
-  if [ -n "${OHMYORCH_SELECTED_CHANGE:-}" ]; then
-    printf '%s\n' "$OHMYORCH_SELECTED_CHANGE"; return
+# Print "<done> <total>" task checkboxes of one tasks.md; "0 0" when it is absent.
+# tasks.md is the only tracking file of a change: delivery derivation and the
+# archive guard both read progress through this one function.
+# The two patterns mirror OpenSpec's own counter (TASK_LINE_PATTERN in
+# dist/utils/task-progress.js, OpenSpec 1.13.2): any list marker (-, *, +, 1.,
+# 1)), a box holding at most one character, and only x/X counts as done. So
+# `- [~]`, `- [-]`, `- []`, `* [ ]` and `1. [ ]` are unfinished tasks, and a
+# link bullet such as `- [x](url)` is not a task. Recheck them on an OpenSpec bump.
+# The match is exact for ASCII. Two non-ASCII cases differ from OpenSpec and are
+# not counted here: a task line right after a byte-order mark, and, in a locale
+# without UTF-8, a box that holds one multi-byte character (`- [✓]`).
+ohmyorch_tasks_progress() {
+  local file="$1" total=0 complete=0
+  if [ -f "$file" ]; then
+    total=$(grep -cE '^[[:space:]]*([-*+]|[0-9]{1,9}[.)])[[:space:]]*\[([[:space:]]*[^][:space:]]?[[:space:]]*\]([^([]|$)|[[:space:]]+\])' "$file" 2>/dev/null || true)
+    complete=$(grep -cE '^[[:space:]]*([-*+]|[0-9]{1,9}[.)])[[:space:]]*\[[[:space:]]*[xX][[:space:]]*\]([^([]|$)' "$file" 2>/dev/null || true)
   fi
-  changes=$(find openspec/changes -mindepth 1 -maxdepth 1 -type d ! -name archive 2>/dev/null | sort)
-  count=$(printf '%s\n' "$changes" | awk 'NF {n++} END {print n+0}')
-  [ "$count" -eq 1 ] || { ohmyorch_error 'exactly one selected active change is required'; return 2; }
-  basename -- "$changes"
+  printf '%s %s\n' "${complete:-0}" "${total:-0}"
 }
 
 ohmyorch_change_id() {
