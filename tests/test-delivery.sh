@@ -1313,6 +1313,22 @@ rm openspec/changes/archive/plain-undated
 mkdir -p openspec/changes/archive/plain-undated
 expect_contains "an undated archive entry is an archived change" '"action": "mark-done"' \
   scripts/delivery.sh next US-9.1 --json
+# Row 4: a Change: line that names an archived change does not close a story
+# whose own change directory is still active. The guard blocks DONE there too.
+mkdir -p openspec/changes/us-9-10-another-story
+expect_contains "row 4: us-9-10-* is not US-9.1's directory" '"action": "mark-done"' \
+  scripts/delivery.sh next US-9.1 --json
+rmdir openspec/changes/us-9-10-another-story
+mkdir -p openspec/changes/us-9-1-still-open
+expect_contains "row 4: an active us-n-m directory wins over an archived Change: id" '"action": "escalate"' \
+  scripts/delivery.sh next US-9.1 --json
+expect_contains "row 4: the reason names both changes" \
+  "US-9.1 names the archived change plain-undated, but its own change us-9-1-still-open is still active" \
+  scripts/delivery.sh next US-9.1 --json
+expect_contains "row 4: the command says how to continue" \
+  "point US-9.1's Change: line at us-9-1-still-open in SPECS.md to continue it" \
+  scripts/delivery.sh next US-9.1
+rmdir openspec/changes/us-9-1-still-open
 rmdir openspec/changes/archive/plain-undated
 # An archived id that only starts or ends with the Change: id is another change.
 NEAR="openspec/changes/archive/2026-09-24-plain-undated-two openspec/changes/archive/plain-undated-two

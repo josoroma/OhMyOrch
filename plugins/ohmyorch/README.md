@@ -2,7 +2,7 @@
 
 OhMyOrch delivers a SPECS backlog with OpenSpec: each READY story is one change that moves through propose, apply, verify and archive. Its installed code stays in Claude's plugin cache; documents and workflow state stay in your project.
 
-Version `0.1.0` is the plugin source in this repository; it is not tagged, and the last tagged release is `0.0.1`. Marketplace installation, cache updates and uninstall were exercised on Claude Code 2.1.292 with the previous version. Live delegated-agent identity and full story lifecycle tests remain gates for public packaged artifacts and support claims. The owner has not selected the distribution license. See the repository's implementation evidence for the scope of validation.
+Version `0.1.0` is the plugin source in this repository; it is not tagged, and the last tagged release is `0.0.1`. Marketplace installation, cache updates and uninstall were exercised on Claude Code 2.1.314 for this version, and on 2.1.285 and 2.1.292 with the previous one. Live delegated-agent identity and full story lifecycle tests remain gates for public packaged artifacts and support claims. The owner has not selected the distribution license. See the repository's implementation evidence for the scope of validation.
 
 ## Install
 
@@ -24,7 +24,7 @@ For local development, add a checkout's absolute path as the marketplace, or lau
 
 ## Initialize a project explicitly
 
-Prerequisites: Bash 3.2 or later, jq 1.6 or later, Git, shasum and standard Unix utilities. OpenSpec 1.13.2 is the current validation target and must be installed separately. Claude Code 2.1.292 is the preferred CLI target; 2.1.285 passed format/cache tests with the previous version, and versions before 2.1.139 cannot use the exec-form hooks. Native Windows and custom OpenSpec schemas are not supported by this implementation; WSL/Linux requires the same Unix prerequisites.
+Prerequisites: Bash 3.2 or later, jq 1.6 or later, Git, shasum and standard Unix utilities. OpenSpec 1.13.2 is the current validation target and must be installed separately. For this version the format and cache checks ran on Claude Code 2.1.314; 2.1.285 and 2.1.292 passed them with the previous version, and versions before 2.1.139 cannot use the exec-form hooks. Native Windows and custom OpenSpec schemas are not supported by this implementation; WSL/Linux requires the same Unix prerequisites.
 
 ```text
 /ohmyorch:doctor --json
@@ -97,7 +97,7 @@ Each applied operation reports its recovery ID. Inspect with `upgrade-project --
 
 ## Security and limitations
 
-Hook stdout contains protocol JSON only; diagnostics use stderr. Role checks trust Claude's top-level identity fields, not prompt text. A file-tool write from any `ohmyorch:*` agent is refused, because those agents are read-only authors. Other subagents cannot write the mapped SPECS or `openspec/delivery/`. Paths outside the project, traversal, symlinks and malformed payloads are refused. Inactive projects are no-ops. Activated projects with invalid configuration or missing validators block protected writes; project.json retains a repair route.
+Hook stdout contains protocol JSON only; diagnostics use stderr. Role checks trust Claude's top-level identity fields, not prompt text. A file-tool write from any `ohmyorch:*` agent is refused, because those agents are read-only authors. Other subagents cannot write the mapped SPECS or `openspec/delivery/`. A file-tool target that is physically outside the project and Claude's plugin directory is not judged, so Claude's own plan, memory and scratch files can be written; an `ohmyorch:*` agent is refused there too. No other route to a file inside the project skips a guard: a symbolic link, a traversal, another letter case of the project root and an inode path are refused, and a doubled slash is judged as the path it names. A target that is itself a symbolic link, a path that contains `..` or is longer than 4,096 characters, a path into the installed plugin or, for a cache installation, into Claude's plugin directory (its `data` directory excepted), and a malformed payload are refused. Inactive projects are no-ops. Activated projects with invalid configuration or missing validators block every file-tool write, outside targets included; project.json retains a repair route.
 
 These are workflow guardrails, not process confinement. Arbitrary Bash/MCP writes, renamed archive executables and other extensions can bypass file-tool checks. Archive interception supports a standalone literal `openspec archive <id> -y` invocation; dynamic/chained forms are refused when detected. For stronger isolation, use Claude permissions and OS isolation separately.
 

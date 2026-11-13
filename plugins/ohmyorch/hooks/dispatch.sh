@@ -48,6 +48,62 @@ fi
 for executable in validate-product-artifacts delivery guard-archive guard-story-done guard-context-preflight guard-delivery-loop; do
   [ -x "$OHMYORCH_CODE_ROOT/scripts/$executable.sh" ] || { ohmyorch_error "missing bundled validator: $executable"; exit 2; }
 done
+# The directory that holds every installed plugin, when this one runs from
+# Claude's plugin cache (<plugins>/cache/<marketplace>/<plugin>/<version>). Other
+# versions, marketplace clones and the install records are plugin territory
+# too; the per-plugin data directories under <plugins>/data are not. It stays
+# empty for a --plugin-dir checkout.
+plugins_home=""
+case "$OHMYORCH_CODE_ROOT" in */plugins/cache/*/*/*) plugins_home="${OHMYORCH_CODE_ROOT%/cache/*/*/*}" ;; esac
+case "$plugins_home" in */plugins) ;; *) plugins_home="" ;; esac
+# outside_project <target>: true when a file-tool target is physically outside
+# the project, the installed plugin and Claude's plugin directory. Containment
+# is judged on the physical path of the nearest existing directory, compared by
+# identity, so no other route to a file inside them counts as outside: a
+# symbolic link, a doubled slash, `/./`, another letter case on a
+# case-insensitive volume, an inode path. `..` is refused as text, because a
+# tool may fold it before the directory in front of it exists. Whatever is "not
+# outside" goes to the strict check below, which judges it as the in-project
+# path it names or refuses it. A target that is itself a symbolic link is never
+# outside, and neither is a path too long to be opened.
+outside_project() {
+  local candidate="$1" physical data=0
+  case "$candidate" in /*) ;; *) return 1 ;; esac
+  [ "${#candidate}" -le 4096 ] || return 1
+  case "$candidate/" in */../*) return 1 ;; esac
+  # macOS spellings that open a file by inode or by resolver flag, also behind
+  # the leading slashes and `/./` that a tool may fold away before it opens.
+  physical=$candidate
+  while :; do case "$physical" in //*) physical=${physical#/} ;; /./*) physical=${physical#/.} ;; *) break ;; esac; done
+  case "$physical" in /.vol/*|/.nofollow/*|/.resolve/*) return 1 ;; esac
+  [ ! -L "$candidate" ] || return 1
+  candidate=${candidate%/*}
+  # An entry that exists although its parent is not a directory, and any
+  # existing entry or link below the nearest directory, is some other route to
+  # a file: not outside.
+  [ ! -e "$1" ] || [ -d "${candidate:-/}" ] || return 1
+  while [ -n "$candidate" ] && [ ! -d "$candidate" ]; do
+    [ ! -e "$candidate" ] && [ ! -L "$candidate" ] || return 1
+    candidate=${candidate%/*}
+  done
+  physical=$(cd -- "${candidate:-/}" 2>/dev/null && pwd -P) || return 1
+  # The plugins' data directory may not exist yet: its name is then the first
+  # missing component below the plugin directory.
+  if [ -n "$plugins_home" ] && [ "$physical" -ef "$plugins_home" ]; then
+    case "${1#"$candidate"/}" in data/?*) data=1 ;; esac
+  fi
+  while [ -n "$physical" ]; do
+    [ ! "$physical" -ef "$OHMYORCH_PROJECT_ROOT" ] || return 1
+    [ ! "$physical" -ef "$OHMYORCH_CODE_ROOT" ] || return 1
+    if [ -n "$plugins_home" ]; then
+      # A real directory only: a `data` that is a link leads somewhere else.
+      [ -L "$plugins_home/data" ] || [ ! "$physical" -ef "$plugins_home/data" ] || data=1
+      [ "$data" -eq 1 ] || [ ! "$physical" -ef "$plugins_home" ] || return 1
+    fi
+    physical=${physical%/*}
+  done
+  return 0
+}
 case "$mode" in
   session-context)
     jq -n --arg prd "$OHMYORCH_DOC_PRD" --arg specs "$OHMYORCH_DOC_SPECS" --arg cb "$OHMYORCH_DOC_CODEBASE" \
@@ -69,6 +125,22 @@ case "$mode" in
       agent_id=$(jq -r '.agent_id // ""' <<< "$payload")
     fi
     while IFS= read -r raw_path; do
+      # A target physically outside the project and Claude's plugin directory
+      # is not this plugin's to judge: Claude's own plan, memory and scratch
+      # files live there. The ordinary in-project spelling needs no check at all.
+      case "$raw_path" in
+        "$OHMYORCH_PROJECT_ROOT"/*) ;;
+        *)
+          if outside_project "$raw_path"; then
+            if [ "$mode" = pre-write ]; then
+              case "$agent" in ohmyorch:*)
+                printf 'BLOCKED [%s] %s — read-only role returns authored content to the coordinator\n' "${agent#ohmyorch:}" "$raw_path" >&2
+                exit 2 ;;
+              esac
+            fi
+            continue
+          fi ;;
+      esac
       file=$(ohmyorch_relative "$raw_path") || exit 2
       if [ "$mode" = post-write ]; then
         case "$file" in "$OHMYORCH_DOC_PRD"|"$OHMYORCH_DOC_SPECS"|"$OHMYORCH_DOC_CODEBASE")

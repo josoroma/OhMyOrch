@@ -45,7 +45,7 @@ These IDs and task text are examples; use targets that actually exist in your ma
 
 Actual delivery needs an authenticated Claude Code session. Prerequisites are OpenSpec **1.13.2**, Bash **3.2+**, jq **1.6+**, Git, shasum, and standard Unix utilities. OpenSpec is installed separately and has its own Node requirements; the bundled plugin runtime uses Bash and jq.
 
-Claude Code **2.1.292** is the recorded preferred validation target. For 0.0.1, format and isolated marketplace/cache checks passed on it and on **2.1.285**. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.
+Claude Code **2.1.292** is the recorded preferred validation target. For 0.0.1, format and isolated marketplace/cache checks passed on it and on **2.1.285**; for 0.1.0 they passed locally on **2.1.314**. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.
 
 With a checkout of this version, run from your consuming project:
 
@@ -137,8 +137,8 @@ After every step, the session derives the next action again from SPECS and the c
 | `propose` | The story has no change yet, or the change's planning artifacts are incomplete. | Creates the change, or authors only what is missing. |
 | `apply` | `tasks.md` has an unticked task. | Implements the pending tasks and ticks each one. |
 | `verify` | Every task is ticked. | Verifies the change; with no CRITICAL issue, archives it. |
-| `mark-done` | The change is archived, no active directory has its id, and the story is not DONE. | Sets the story to DONE and points its `Change:` line at the archived change. |
-| `escalate` | The story is not READY or IN PROGRESS, a dependency is unfinished, or another change is still active. | Stops and reports the decision a human must make. |
+| `mark-done` | The change is archived, no active directory has its id or is named for the story, and the story is not DONE. | Sets the story to DONE and points its `Change:` line at the archived change. |
+| `escalate` | The story is not READY or IN PROGRESS, a dependency is unfinished, another change is still active, or the story's `Change:` line names an archived change while a directory named for the story is still active. | Stops and reports the decision a human must make. |
 | `complete` | Every story in the goal is DONE. | Reports the result. |
 
 Planning is complete when the change has `proposal.md`, at least one `.md` file under `specs/`, and a `tasks.md` with task checkboxes. `design.md` is never required, and a change whose `.openspec.yaml` declares `skip_specs: true` needs no `specs/`. Tasks are counted the way OpenSpec counts them: a checkbox with any marker other than `x` is unfinished. Only one change is active at a time. Stored goal text is a human record; current files govern the next step.
@@ -306,7 +306,7 @@ Applied lifecycle operations report recovery IDs. Rollback verifies affected-fil
 
 Root hooks use Claude's scoped identity fields for supported Write/Edit/MultiEdit payloads, intercept supported standalone archive commands, and evaluate only the owner's Stop events. They are workflow guardrails. Arbitrary Bash/MCP writes and renamed executables can bypass file-tool checks. The archive guard sees only the `openspec archive` command; a change archived any other way is not checked. PostToolUse reports findings after a write; it cannot undo it.
 
-In an activated project the hooks refuse a Write, Edit, or MultiEdit whose target is outside the project. That includes Claude's own plan, memory, and scratch files when they are written with those tools.
+In an activated project the hooks do not judge a Write, Edit, or MultiEdit whose target is physically outside the project and Claude's plugin directory, so Claude's own plan, memory, and scratch files can be written. A path that reaches the project or the installed plugin by another route, such as a symbolic link or `..`, is refused, and so is a target that is itself a symbolic link.
 
 Verify is advisory and is not independent evidence: the session that wrote the code also checks it. The two guards confirm only that every task is ticked before archive and that the change is archived before DONE. They do not show that a task was done well or that every scenario was exercised. A human reviews the diff before relying on a delivered story.
 

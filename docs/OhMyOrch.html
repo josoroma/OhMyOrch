@@ -103,7 +103,7 @@
 <p><img src="images/delivery-loop.svg" alt="One READY story moves through propose, apply, verify, and archive, then is marked DONE" class="diagram" decoding="async" loading="lazy" width="1080" height="626"></p>
 <h2 id="start-in-a-real-project">Start in a real project</h2>
 <p>Actual delivery needs an authenticated Claude Code session. Prerequisites are OpenSpec <strong>1.13.2</strong>, Bash <strong>3.2+</strong>, jq <strong>1.6+</strong>, Git, shasum, and standard Unix utilities. OpenSpec is installed separately and has its own Node requirements; the bundled plugin runtime uses Bash and jq.</p>
-<p>Claude Code <strong>2.1.292</strong> is the recorded preferred validation target. For 0.0.1, format and isolated marketplace/cache checks passed on it and on <strong>2.1.285</strong>. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.</p>
+<p>Claude Code <strong>2.1.292</strong> is the recorded preferred validation target. For 0.0.1, format and isolated marketplace/cache checks passed on it and on <strong>2.1.285</strong>; for 0.1.0 they passed locally on <strong>2.1.314</strong>. Full live-agent validation is pending; these are recorded targets, not a claim about the newest available CLI.</p>
 <p>With a checkout of this version, run from your consuming project:</p>
 <pre><code class="language-bash">claude --plugin-dir /absolute/checkout/plugins/ohmyorch
 </code></pre>
@@ -203,12 +203,12 @@ claude plugin install ohmyorch@ohmyorch-marketplace --scope local
 </tr>
 <tr>
 <td><code>mark-done</code></td>
-<td>The change is archived, no active directory has its id, and the story is not DONE.</td>
+<td>The change is archived, no active directory has its id or is named for the story, and the story is not DONE.</td>
 <td>Sets the story to DONE and points its <code>Change:</code> line at the archived change.</td>
 </tr>
 <tr>
 <td><code>escalate</code></td>
-<td>The story is not READY or IN PROGRESS, a dependency is unfinished, or another change is still active.</td>
+<td>The story is not READY or IN PROGRESS, a dependency is unfinished, another change is still active, or the story's <code>Change:</code> line names an archived change while a directory named for the story is still active.</td>
 <td>Stops and reports the decision a human must make.</td>
 </tr>
 <tr>
@@ -519,7 +519,7 @@ openspec list --json
 <p>Applied lifecycle operations report recovery IDs. Rollback verifies affected-file backups and current hashes, preserving subsequent edits. Recovery requires the retained backup directory; an ID alone cannot restore files. Read the <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/README.md">handbook</a> and <a href="https://github.com/josoroma/OhMyOrch/blob/main/docs/distribution.md">distribution guide</a> for scope-specific commands.</p>
 <h2 id="know-the-current-boundaries">Know the current boundaries</h2>
 <p>Root hooks use Claude's scoped identity fields for supported Write/Edit/MultiEdit payloads, intercept supported standalone archive commands, and evaluate only the owner's Stop events. They are workflow guardrails. Arbitrary Bash/MCP writes and renamed executables can bypass file-tool checks. The archive guard sees only the <code>openspec archive</code> command; a change archived any other way is not checked. PostToolUse reports findings after a write; it cannot undo it.</p>
-<p>In an activated project the hooks refuse a Write, Edit, or MultiEdit whose target is outside the project. That includes Claude's own plan, memory, and scratch files when they are written with those tools.</p>
+<p>In an activated project the hooks do not judge a Write, Edit, or MultiEdit whose target is physically outside the project and Claude's plugin directory, so Claude's own plan, memory, and scratch files can be written. A path that reaches the project or the installed plugin by another route, such as a symbolic link or <code>..</code>, is refused, and so is a target that is itself a symbolic link.</p>
 <p>Verify is advisory and is not independent evidence: the session that wrote the code also checks it. The two guards confirm only that every task is ticked before archive and that the change is archived before DONE. They do not show that a task was done well or that every scenario was exercised. A human reviews the diff before relying on a delivered story.</p>
 <p>Native Windows, custom OpenSpec schemas, registered/global stores, and unsupported prospective file-tool payloads are outside this implementation's supported scope. Linux/macOS CI is configured; recorded local execution was macOS. Authenticated role identity/denials and the complete live lifecycle remain public release gates.</p>
 <h2 id="build-and-inspect-the-source">Build and inspect the source</h2>

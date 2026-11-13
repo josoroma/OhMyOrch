@@ -23,8 +23,9 @@
 # Every change that could stand behind the story is judged, so a write cannot
 # detach a story from its active change by rewording or deleting its `Change:`
 # line: the `Change:` id in the prospective content, the `Change:` id in the
-# file on disk, and every active `us-<n>-<m>-*` directory unless the `Change:`
-# id on disk names an archived change.
+# file on disk, and every active `us-<n>-<m>-*` directory. delivery.sh derives
+# mark-done only when none of them is active, so the two always agree. A
+# directory name that holds a newline is not a change for either of them.
 #
 # Allows when the harness is not in use or the story cannot be determined.
 #
@@ -282,40 +283,22 @@ fi
 #   - the story's `Change:` id in the prospective content, when the content
 #     carries that story's heading;
 #   - the story's `Change:` id in the file on disk;
-#   - every active change directory named for the story (us-<n>-<m>-*), unless
-#     the `Change:` id on disk names an archived change. That is the one state
-#     in which delivery.sh derives mark-done from the `Change:` line, so a stray
-#     directory must not block it there.
+#   - every active change directory named for the story (us-<n>-<m>-*).
 # A write cannot detach a story from its active change by rewording or deleting
 # the `Change:` line in the same write. After an earlier write the directories
-# still stand in, unless the reworded line names an archived change or the
-# change is not named us-<n>-<m>-*.
+# still stand in; only a change that is not named us-<n>-<m>-* can then no
+# longer be told apart.
 change_candidates() {
-  local story="$1" disk="" nm nl=$'\n' archive
+  local story="$1" nm
   if grep -qE "^###[[:space:]]+${story//./\\.}:" <<< "$CONTENT"; then
     printf '%s\n' "$CONTENT" | story_changes | awk -F'\t' -v s="$story" '$1 == s { v = $2 } END { print v }'
   fi
   if [ -f "$FILE" ]; then
-    disk=$(story_changes < "$FILE" | awk -F'\t' -v s="$story" '$1 == s { v = $2 } END { print v }')
-    printf '%s\n' "$disk"
+    story_changes < "$FILE" | awk -F'\t' -v s="$story" '$1 == s { v = $2 } END { print v }'
   fi
-  # Archived as change_archived in delivery.sh reads it: a real directory with
-  # that name under the archive, with or without the date prefix. The value is
-  # compared with the listing as text: literally, never as a pattern, and
-  # without any pathname expansion. An empty value, `-` (no change at all for
-  # delivery.sh) and a dot name never name an archived change.
-  case "$disk" in
-    ''|-|.*) ;;
-    *)
-      archive=$(find openspec/changes/archive -maxdepth 1 -mindepth 1 -type d \
-        -not -name $'*\n*' 2>/dev/null) || true
-      case "$nl$archive$nl" in
-        *"${nl}openspec/changes/archive/$disk$nl"*) return 0 ;;
-        *"${nl}openspec/changes/archive/"[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-"$disk$nl"*) return 0 ;;
-      esac ;;
-  esac
   nm=${story#US-}; nm=${nm/./-}
-  find openspec/changes -maxdepth 1 -mindepth 1 -type d -name "us-$nm-*" 2>/dev/null \
+  find openspec/changes -maxdepth 1 -mindepth 1 -type d -name "us-$nm-*" \
+    -not -name $'*\n*' 2>/dev/null \
     | sed 's|.*/||' | sort
 }
 

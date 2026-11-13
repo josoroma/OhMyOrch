@@ -6,7 +6,7 @@ Breaking simplification: delivery now follows the upstream OpenSpec 1.13.2 flow 
 
 - A change's only artifacts are OpenSpec's own: `proposal.md`, delta `specs/`, optional `design.md` and `tasks.md`. `tasks.md` is the only progress tracker.
 - `delivery next` derives one of six actions: `propose`, `apply`, `verify`, `mark-done`, `escalate`, `complete`. Its output no longer has an owner field. `delivery refresh --json` prints the derived action.
-- `mark-done` is derived only when the story's change is archived and no active directory has its id, so an active change wins over an archive of the same id. To redo a DONE story, set it back to READY with a new `Change:` id.
+- `mark-done` is derived only when the story's change is archived, no active directory has its id and none is named for the story (`us-<n>-<m>-*`). An active change wins over an archive of the same id, and a `Change:` line that names an archived change does not close a story whose own change directory is still active: that state derives `escalate`. To redo a DONE story, set it back to READY with a new `Change:` id.
 - Planning is complete when the change has `proposal.md`, a `tasks.md` with at least one checkbox and at least one `.md` file under `specs/`. `specs/` is not required when the change's `.openspec.yaml` sets `skip_specs` to `true`, `True` or `TRUE`; a trailing comment is allowed. `design.md` is never required.
 - Tasks are counted the way OpenSpec 1.13.2 counts them. A `-`, `*`, `+` or numbered list item with a checkbox is a task, and any marker other than `x` or `X` is unfinished: `- [ ]`, `- [~]`, `- [-]`, `- []`, `* [ ]` and `1. [ ]` all keep the change in apply.
 - Verify is advisory and writes no file. A CRITICAL finding is recorded as a new unticked task in `tasks.md`, which returns the change to apply.
@@ -17,8 +17,9 @@ Breaking simplification: delivery now follows the upstream OpenSpec 1.13.2 flow 
 Guards that remain, with their new predicates:
 
 - Archive: `openspec archive <id> -y` is refused while the change's `tasks.md` has an unfinished task. A change with every task ticked, or with no task checklist, is allowed. The id may be bare or in one pair of quotes. OpenSpec itself validates and merges the delta specs.
-- DONE: a SPECS write that newly sets a story to `Status: DONE` is refused while that story's change is still an active directory under `openspec/changes/`. The guard judges the `Change:` id in the write and the one already on disk. It also judges every active `us-<n>-<m>-*` directory, unless the `Change:` id on disk names an archived change. This is stricter than 0.0.1, which allowed DONE for an unarchived change that only looked eligible. Archive first.
+- DONE: a SPECS write that newly sets a story to `Status: DONE` is refused while that story's change is still an active directory under `openspec/changes/`. The guard judges the `Change:` id in the write and the one already on disk. It also judges every active `us-<n>-<m>-*` directory. This is stricter than 0.0.1, which allowed DONE for an unarchived change that only looked eligible. Archive first.
 - Any `ohmyorch:*` agent is read-only: its file-tool writes are refused. Other subagents cannot write the mapped SPECS or `openspec/delivery/`.
+- Outside targets: a Write, Edit or MultiEdit whose target is physically outside the project and Claude's plugin directory (its `data` directory excepted) is no longer refused, so Claude's own plan, memory and scratch files can be written in an activated project. An `ohmyorch:*` agent is still refused there. No other route to a file inside the project or the installed plugin skips a guard, and a target that is itself a symbolic link or contains `..` is still refused. In 0.0.1 every target outside the project was refused.
 
 Faster hooks:
 
@@ -40,10 +41,11 @@ Fixed:
 - A SPECS document with CRLF line endings is parsed. In 0.0.1 every story in it escalated as not READY.
 - A story title with no ASCII letter or digit, or made only of stop words, derives the change id `us-<n>-<m>-story`. In 0.0.1 the derived id ended in a hyphen, which OpenSpec refuses.
 - A derived change id is the same in every locale: a byte outside ASCII separates words. In 0.0.1 the id depended on the locale of the process that derived it. On macOS under a UTF-8 locale, `İ` and the Kelvin sign became the letters `i` and `k`; under a legacy charset locale, other bytes could stay in the id.
-- An archived change is recognised by its literal id, in the derivation and in the DONE guard alike. A `Change:` value with pattern characters, such as `us-1-1-*`, no longer counts as archived because some archive entry matches it.
+- An archived change is recognised by its literal id. A `Change:` value with pattern characters, such as `us-1-1-*`, no longer counts as archived because some archive entry matches it.
 - Every hook refusal names its reason on stderr. In 0.0.1 a malformed write payload, or a Bash payload whose command is not a string, was refused with no message.
 - In an enabled project a missing or non-executable bundled `delivery.sh` or `validate-product-artifacts.sh` is reported as `missing bundled validator: <name>` and refused in every hook mode.
 - With no `CODEBASE.md`, the product-artifact validator reports a `CODEBASE Context: skipped (<reason>)` line as a recorded skip decision. In 0.0.1 it advised removing the line.
+- The CODEBASE check recognises a repository without a package manifest as a codebase whatever its listing of source files looks like. In 0.0.1 a listing longer than about 16 KiB, or one that `find` could not finish because of an unreadable directory, read as no source at all, and the check passed as for an empty project.
 
 Removed:
 

@@ -105,6 +105,22 @@ PRE="$SCRIPTS/guard-context-preflight.sh"
 commit() { git add -A && git -c user.email=t@t -c user.name=t commit -qm "$1"; }
 
 check "brownfield, no CODEBASE.md"       2 "$PRE" --file PRD.md --quiet
+# A large repository without a manifest is a codebase too: its long listing of
+# source files must not read as "no source file".
+S2L="$WORK/s2-large"
+mkdir -p "$S2L/src"
+( cd "$S2L" && git init -q . && i=0 && while [ "$i" -lt 4000 ]; do : > "src/module-with-a-rather-long-name-$i.ts"; i=$((i + 1)); done )
+in_large() { ( cd "$S2L" && "$@" ); }
+check "a large manifest-less repository is a codebase" 2 in_large "$PRE" --file PRD.md --quiet
+expect_contains "and it is asked for its analysis" "A meaningful codebase is present but CODEBASE.md does not exist." \
+  in_large "$PRE" --file PRD.md
+# A listing that find could not finish is still a listing.
+S2U="$WORK/s2-unreadable"
+mkdir -p "$S2U/src" "$S2U/locked"
+( cd "$S2U" && git init -q . && : > src/app.ts && chmod 000 locked )
+in_unreadable() { ( cd "$S2U" && "$@" ); }
+check "a repository with an unreadable directory is still a codebase" 2 in_unreadable "$PRE" --file PRD.md --quiet
+chmod 755 "$S2U/locked"
 expect_contains "the block prints the skip line to record" \
   "    b) record a deliberate skip by adding this line to PRD.md:
        CODEBASE Context: skipped (<reason>)" "$PRE" --file PRD.md
@@ -570,25 +586,22 @@ while IFS='|' read -r spelling line; do
 done <<EOF
 $DETACHED
 EOF
-# The story's Change: line on disk names the archived change, so a stray active
-# us-2-1-* directory is not its change: delivery derives mark-done here, and the
-# guard agrees. Directories are left out only here: the id on disk names an
-# archived change.
-mkdir -p openspec/changes/us-2-1-stray
-check "a stray us-n-m directory does not block an archived Change:" 0 "$GD" --file SPECS.md --content "$EARLY" --quiet
-check "nor the same story's plain DONE edit"      0 "$GD" --file SPECS.md --content "$(done_content US-2.1)" --quiet
-# An archive entry without the date prefix is an archived change too.
-mv openspec/changes/archive/2026-11-12-widget-work openspec/changes/archive/widget-work
-check "an undated archive entry is an archived change" 0 "$GD" --file SPECS.md --content "$(done_content US-2.1)" --quiet
-mv openspec/changes/archive/widget-work openspec/changes/archive/2026-11-12-widget-work
-# A symbolic link under the archive is not an archived change: the stray
-# directory then stands in again.
-mv openspec/changes/archive/2026-11-12-widget-work "$WORK/widget-work.kept"
-ln -s "$WORK/widget-work.kept" openspec/changes/archive/2026-11-12-widget-work
-check "a symbolic link under the archive is not an archived change" 2 "$GD" --file SPECS.md --content "$(done_content US-2.1)" --quiet
-rm openspec/changes/archive/2026-11-12-widget-work
-mv "$WORK/widget-work.kept" openspec/changes/archive/2026-11-12-widget-work
-rmdir openspec/changes/us-2-1-stray
+# The story's Change: line names the archived change, yet a directory named for
+# the story is still active. delivery.sh escalates in this state instead of
+# deriving mark-done, and the guard refuses DONE until it is resolved: an
+# earlier write that pointed the line at an archived change detaches nothing.
+mkdir -p openspec/changes/us-2-1-still-open
+check "an active us-n-m directory blocks beside an archived Change:" 2 "$GD" --file SPECS.md --content "$EARLY" --quiet
+check "and blocks the same story's plain DONE edit" 2 "$GD" --file SPECS.md --content "$(done_content US-2.1)" --quiet
+expect_contains "the active directory is the change named" "Change us-2-1-still-open is still active" \
+  "$GD" --file SPECS.md --content "$(done_content US-2.1)"
+rmdir openspec/changes/us-2-1-still-open
+check "DONE is allowed again once that directory is gone" 0 "$GD" --file SPECS.md --content "$(done_content US-2.1)" --quiet
+# A directory name that holds a newline names no change, as in delivery.sh: its
+# second line must not be read as the id of another active change.
+mkdir -p openspec/changes/other-active "openspec/changes/"$'us-2-1-x\nother-active'
+check "a directory name that holds a newline names no change" 0 "$GD" --file SPECS.md --content "$(done_content US-2.1)" --quiet
+rmdir "openspec/changes/"$'us-2-1-x\nother-active' openspec/changes/other-active
 mv openspec/changes/archive/2026-11-12-widget-work openspec/changes/widget-work
 
 section "guard-story-done.sh — blocked while the change is active (us-n-m- directory)"
@@ -617,7 +630,7 @@ awk '{ print } /^### US-2.2:/ { print ""; print "Change: -" }' "$WORK/specs.s5" 
 check "Change: - on disk leaves the directory in charge" 2 "$GD" --file SPECS.md --content "$(done_content US-2.2)" --quiet
 # The same end state in two writes: an earlier write reworded the Change: line,
 # so by the DONE write only the directory still names the active change. The
-# directories are left out only for an id that names an archived change.
+# story's directories always stand in, whatever the line says.
 REWORDED_EARLIER='annotated|Change: `openspec/changes/archive/2026-11-12-us-2-2-found-by-directory/` (archived)
 a Markdown link|Change: [us-2-2-found-by-directory](openspec/changes/us-2-2-found-by-directory/)
 a mistyped id|Change: `openspec/changes/us-2-2-found-by-directry/`

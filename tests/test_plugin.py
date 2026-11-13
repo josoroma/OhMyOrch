@@ -451,8 +451,140 @@ class Integration(unittest.TestCase):
             allowed=self.hook('pre-write',{'file_path':target,'content':content})
             self.assertEqual('',allowed.stdout+allowed.stderr,target)
         self.hook('pre-write',{'file_path':'a\nb.md','content':'text'},code=2)
-        self.hook('pre-write',{'file_path':str(Path(self.work.name)/'outside.md'),'content':'text'},code=2)
         self.hook('pre-write',{'content':'text'},code=2)
+
+    def test_targets_outside_the_project_are_not_judged(self):
+        self.activate()
+        self.change()
+        (self.root/'openspec/delivery').mkdir()
+        work=Path(self.work.name)
+        # Claude's own plan, memory and scratch files live outside the project. A
+        # target physically outside the project and the installed plugin passes
+        # silently before and after the write, existing directory or not.
+        # A doubled slash, as a path built from macOS's $TMPDIR has, is the same place.
+        for outside in [work/'outside.md',work/'no-such-dir/deeper/notes.md',Path('/no-such-root-dir/notes.md'),
+                        f'{work}//outside.md',f'{work}/./outside.md',f'{work}/no-such-dir//notes.md']:
+            for mode in ['pre-write','post-write']:
+                allowed=self.hook(mode,{'file_path':str(outside),'content':'text'})
+                self.assertEqual('',allowed.stdout+allowed.stderr,outside)
+        for writer in [{'agent':'general-purpose'},{'agent_id':'anonymous-subagent'}]:
+            allowed=self.hook('pre-write',{'file_path':str(work/'outside.md'),'content':'text'},**writer)
+            self.assertEqual('',allowed.stdout+allowed.stderr)
+        mixed=self.hook('pre-write',{'files':[{'file_path':str(work/'outside.md')},{'file_path':'src/app.ts'}]})
+        self.assertEqual('',mixed.stdout+mixed.stderr)
+        # The read-only authoring agents write nowhere.
+        denied=self.hook('pre-write',{'file_path':str(work/'outside.md'),'content':'text'},agent='ohmyorch:spec-ingestor',code=2)
+        self.assertEqual(READ_ONLY.format(role='spec-ingestor',file=str(work/'outside.md')),denied.stderr)
+        # An outside target never carries an inside one past its guards.
+        specs=(self.root/'SPECS.md').read_text()
+        done={'file_path':'SPECS.md','content':specs.replace('Status: READY','Status: DONE',1)}
+        refused=self.hook('pre-write',{'files':[{'file_path':str(work/'outside.md')},done]},code=2)
+        self.assertNotEqual('',refused.stderr)
+        blocked=self.hook('pre-write',done,code=2)
+        self.assertEqual(DONE_BLOCK.format(specs='SPECS.md',story='US-1.1',id='selected'),blocked.stderr)
+        # No other route to a file inside the project counts as outside: a
+        # symbolic link to the project, to a mapped document or into the delivery
+        # directory, a traversal, a doubled or trailing slash. Each is refused or
+        # judged as the in-project path it names; here that is a DONE edit.
+        alias=work/'alias';alias.symlink_to(self.root,target_is_directory=True)
+        document=work/'specs-link.md';document.symlink_to(self.root/'SPECS.md')
+        delivery=work/'delivery-link';delivery.symlink_to(self.root/'openspec/delivery',target_is_directory=True)
+        spellings=[alias/'SPECS.md',alias/'src/app.ts',document,f'{document}/',f'{document}/.',delivery/'goal.md',
+                   f'{work}/no-such-dir/../{self.root.name}/SPECS.md',f'{work}/./{self.root.name}/SPECS.md',
+                   f'/{self.root}/SPECS.md',f'{self.root}//SPECS.md']
+        # On a case-insensitive volume another letter case is the same directory.
+        shouted=Path(str(self.root).upper())
+        if shouted.exists() and shouted.samefile(self.root): spellings.append(shouted/'SPECS.md')
+        # macOS opens a file by device and inode number; that is a route too.
+        if Path('/.vol').exists():
+            status=(self.root/'SPECS.md').stat()
+            spellings.append(f'/.vol/{status.st_dev}/{status.st_ino}')
+            spellings.append(f'//.vol/{status.st_dev}/{status.st_ino}')
+            spellings.append(f'/./.vol/{status.st_dev}/{status.st_ino}')
+        # A link that dangles today may point into the project tomorrow.
+        later=work/'later';later.symlink_to(self.root/'openspec/delivery/created-later',target_is_directory=True)
+        spellings.append(later/'goal.md')
+        for spelling in spellings:
+            for writer in [{},{'agent':'general-purpose'}]:
+                refused=self.hook('pre-write',{'file_path':str(spelling),'content':specs.replace('Status: READY','Status: DONE',1)},code=2,**writer)
+                self.assertNotEqual('',refused.stderr,spelling)
+        # Installed plugin code is never a target: directly, through a link, in
+        # another letter case or by inode.
+        plugin_link=work/'plugin-link';plugin_link.symlink_to(PLUGIN,target_is_directory=True)
+        targets=[PLUGIN/'scripts/guard-archive.sh',PLUGIN/'hooks/new-file.sh',plugin_link/'scripts/guard-archive.sh']
+        shouted=Path(str(PLUGIN).upper())
+        if shouted.exists() and shouted.samefile(PLUGIN): targets.append(shouted/'scripts/guard-archive.sh')
+        if Path('/.vol').exists():
+            status=(PLUGIN/'scripts/guard-archive.sh').stat()
+            targets.append(f'/.vol/{status.st_dev}/{status.st_ino}')
+        for target in targets:
+            for mode in ['pre-write','post-write']:
+                self.hook(mode,{'file_path':str(target),'content':'text'},code=2)
+
+    def test_claude_plugin_directory_is_not_a_file_tool_target(self):
+        self.activate()
+        # The plugin as Claude installs it: <config>/plugins/cache/<marketplace>/<plugin>/<version>.
+        config=Path(self.work.name)/'config'
+        installed=config/'plugins/cache/market/ohmyorch/0.1.0'
+        shutil.copytree(PLUGIN,installed)
+        (config/'plugins/cache/market/ohmyorch/0.0.9/hooks').mkdir(parents=True)
+        (config/'plugins/marketplaces/market/plugins/ohmyorch/hooks').mkdir(parents=True)
+        # Every installed plugin, other versions, marketplace clones and the install
+        # records stay out of reach of the file tools...
+        for target in ['plugins/cache/market/ohmyorch/0.1.0/hooks/dispatch.sh',
+                       'plugins/cache/market/ohmyorch/0.0.9/hooks/dispatch.sh',
+                       'plugins/cache/market/another-plugin/1.0.0/skills/x/SKILL.md',
+                       'plugins/marketplaces/market/plugins/ohmyorch/hooks/dispatch.sh',
+                       'plugins/installed_plugins.json']:
+            for mode in ['pre-write','post-write']:
+                for writer in [{},{'agent':'general-purpose'}]:
+                    if mode=='post-write' and writer: continue
+                    refused=self.hook(mode,{'file_path':str(config/target),'content':'text'},code=2,plugin=installed,**writer)
+                    self.assertNotEqual('',refused.stderr,target)
+        # ...while Claude's own plan and memory files beside them are writable.
+        for target in ['plans/steady-plan.md','projects/-some-project/memory/MEMORY.md','CLAUDE.md']:
+            for mode in ['pre-write','post-write']:
+                allowed=self.hook(mode,{'file_path':str(config/target),'content':'text'},plugin=installed)
+                self.assertEqual('',allowed.stdout+allowed.stderr,target)
+        # Another plugin's own data directory is not plugin code, before the
+        # directory exists and after. Only the directory named `data`, directly
+        # under the plugin directory, is meant.
+        state=str(config/'plugins/data/another-plugin-market/state.json')
+        near=['plugins/data.json','plugins/data-old/x.json','plugins/cache/market/ohmyorch/0.0.9/data/x.json']
+        for mode in ['pre-write','post-write']:
+            allowed=self.hook(mode,{'file_path':state,'content':'text'},plugin=installed)
+            self.assertEqual('',allowed.stdout+allowed.stderr)
+        for target in near:
+            self.hook('pre-write',{'file_path':str(config/target),'content':'text'},code=2,plugin=installed)
+        (config/'plugins/data').mkdir()
+        (config/'plugins/cache/data').mkdir()
+        for mode in ['pre-write','post-write']:
+            allowed=self.hook(mode,{'file_path':state,'content':'text'},plugin=installed)
+            self.assertEqual('',allowed.stdout+allowed.stderr)
+        for target in near+['plugins/cache/data/x.json']:
+            self.hook('pre-write',{'file_path':str(config/target),'content':'text'},code=2,plugin=installed)
+        # A link inside `data`, or `data` itself as a link, leads back into plugin code.
+        (config/'plugins/data/into-cache').symlink_to(config/'plugins/cache',target_is_directory=True)
+        self.hook('pre-write',{'file_path':str(config/'plugins/data/into-cache/market/ohmyorch/0.1.0/hooks/dispatch.sh'),'content':'text'},code=2,plugin=installed)
+        (config/'plugins/data/into-cache').unlink();(config/'plugins/data').rmdir()
+        (config/'plugins/data').symlink_to(config/'plugins/cache',target_is_directory=True)
+        self.hook('pre-write',{'file_path':str(config/'plugins/data/market/ohmyorch/0.0.9/hooks/dispatch.sh'),'content':'text'},code=2,plugin=installed)
+        # A plugin loaded from a plain directory protects itself only...
+        allowed=self.hook('pre-write',{'file_path':str(config/'plugins/installed_plugins.json'),'content':'text'})
+        self.assertEqual('',allowed.stdout+allowed.stderr)
+        # ...and a directory that merely has `cache` in its path is not Claude's.
+        elsewhere=Path(self.work.name)/'x/cache/a/b/c'
+        shutil.copytree(PLUGIN,elsewhere)
+        allowed=self.hook('pre-write',{'file_path':str(Path(self.work.name)/'x/notes.md'),'content':'text'},plugin=elsewhere)
+        self.assertEqual('',allowed.stdout+allowed.stderr)
+        # A path too long to be opened is not walked component by component.
+        endless=str(Path(self.work.name)/'deep')+'/a'*6000+'/x.md'
+        self.hook('pre-write',{'file_path':endless,'content':'text'},code=2)
+        # The limit is 4,096 characters.
+        base=str(Path(self.work.name)/'long')+'/'
+        allowed=self.hook('pre-write',{'file_path':base+'x'*(4096-len(base)),'content':'text'})
+        self.assertEqual('',allowed.stdout+allowed.stderr)
+        self.hook('pre-write',{'file_path':base+'x'*(4097-len(base)),'content':'text'},code=2)
 
     def test_ordinary_writes_spawn_no_guard(self):
         self.activate()

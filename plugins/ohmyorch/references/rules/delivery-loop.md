@@ -39,6 +39,9 @@ of the target that is not `DONE`; the first match decides:
    re-scope the dependency first.
 4. The story's change is archived and no active directory has its id: `mark-done`.
    Set `Status: DONE` and point the story's `Change:` line at the archived change.
+   When a directory named for the story (`us-<n>-<m>-*`) is still active, the
+   action is `escalate` instead: point the `Change:` line at that change, or remove
+   the directory if it is not the story's.
 5. The story has no change and another change is active: `escalate`. Finish or
    archive the active change first.
 6. The story has no change: `propose`. Run `/ohmyorch:opsx-propose <change>` with the

@@ -283,8 +283,7 @@ change_set() {
 # change_archived <id>: a directory with that name exists under the archive,
 # with or without the date prefix. The id is compared with the listing as
 # text: literally, never as a pattern, and without any pathname expansion.
-# `-` and a dot name are not changes. guard-story-done.sh reads "archived" the
-# same way.
+# `-` and a dot name are not changes.
 change_archived() {
   local nl=$'\n' a="$CHANGES_DIR/archive/"
   case "$1" in ''|-|.*) return 1 ;; esac
@@ -379,7 +378,7 @@ has_file_under() {
 # Derive the next action for the stories in R_STORIES. Sets A_* variables.
 # First match wins; the order below is the contract.
 derive_next() {
-  local sid status deps dep dstatus change others cdir missing progress tdone ttotal blocked=""
+  local sid status deps dep dstatus change own others cdir missing progress tdone ttotal blocked=""
   load_specs
 
   # The first story of the goal that is not DONE, in one pass over the rows.
@@ -435,7 +434,18 @@ derive_next() {
 
   # 4. Archived, no longer active, and not yet DONE: the only remaining step is
   # the DONE edit. An active directory with the same id wins over the archive.
+  # So does an active directory named for the story: a `Change:` line that names
+  # an archived change must not close a story whose own change is still open.
+  # guard-story-done.sh judges the same directories, so the two always agree.
   if [ ! -d "$CHANGES_DIR/$change" ] && change_archived "$change"; then
+    own="${sid#US-}"; own="us-${own/./-}-"
+    load_active_dirs
+    if first_with_prefix "$ACTIVE_DIRS" "$own"; then
+      set_action escalate "$sid" "$change" \
+        "point $sid's Change: line at $CHANGE_ID in $SPECS to continue it, or remove that directory if it is not this story's change" \
+        "$sid names the archived change $change, but its own change $CHANGE_ID is still active"
+      return
+    fi
     set_action mark-done "$sid" "$change" \
       "set 'Status: DONE' for $sid in $SPECS and point its Change: line at the archived change" \
       "change $change is archived but $sid is $status"

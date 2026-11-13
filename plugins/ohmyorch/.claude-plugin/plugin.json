@@ -20,12 +20,10 @@
     ],
     "projectSchemaVersion": 1,
     "formatValidatedClaudeCode": [
-      "2.1.285",
-      "2.1.292"
+      "2.1.314"
     ],
     "cacheLifecycleValidatedClaudeCode": [
-      "2.1.285",
-      "2.1.292"
+      "2.1.314"
     ],
     "liveAgentValidation": "pending-release-gate"
   }

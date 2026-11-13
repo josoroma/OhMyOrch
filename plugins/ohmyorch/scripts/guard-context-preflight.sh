@@ -151,8 +151,11 @@ detect_codebase() {
            Gemfile composer.json CMakeLists.txt Makefile; do
     [ -f "$m" ] && return 0
   done
-  # Otherwise, any source file outside the harness's own directories.
-  find . -maxdepth 3 -type f \
+  # Otherwise, any source file outside the harness's own directories. The
+  # listing is tested as text: under `pipefail` a `head` that stops at the first
+  # line breaks a long listing's writer, and the failed pipeline would read as
+  # "no source file" in exactly the repositories that have the most of them.
+  [ -n "$(find . -maxdepth 3 -type f \
     \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \
     -o -name '*.py' -o -name '*.go' -o -name '*.rs' -o -name '*.java' \
     -o -name '*.rb' -o -name '*.cs' -o -name '*.php' -o -name '*.ex' \
@@ -160,7 +163,7 @@ detect_codebase() {
     -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' -o -name '*.sh' \) \
     -not -path './.git/*' -not -path './.claude/*' -not -path './openspec/*' \
     -not -path '*/node_modules/*' \
-    2>/dev/null | head -1 | grep -q .
+    2>/dev/null | head -1)" ]
 }
 
 # A recorded skip: in either mapped document on disk, in the document as this
