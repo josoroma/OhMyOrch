@@ -847,7 +847,7 @@ for retired in guard-planning-handoff check-write-scope check-scope completion-g
                validate-implementation-plan validate-review validate-test-report validate-status validate-verification; do
   check "$retired.sh is gone"            1 test -e "$OHMYORCH_TEST_PLUGIN_ROOT/scripts/$retired.sh"
 done
-expect_eq "the payload ships exactly fourteen scripts" "14" "$(find "$OHMYORCH_TEST_PLUGIN_ROOT/scripts" -maxdepth 1 -type f -name '*.sh' | wc -l | tr -d ' ')"
+expect_eq "the payload ships exactly thirteen scripts" "13" "$(find "$OHMYORCH_TEST_PLUGIN_ROOT/scripts" -maxdepth 1 -type f -name '*.sh' | wc -l | tr -d ' ')"
 
 # ---------------------------------------------------------------------------
 # Skill/agent contracts are checked by tools/check-plugin.mjs.

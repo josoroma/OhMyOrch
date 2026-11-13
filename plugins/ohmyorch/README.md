@@ -72,7 +72,7 @@ The public CLI requires an explicit root:
 
 Inside skills, `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PROJECT_DIR}` and `${CLAUDE_SESSION_ID}` are supported substitutions. They are not automatically Bash environment variables in ordinary tool calls. Use the concrete substituted paths, escape literal arguments, and never evaluate user arguments as shell code. Bin PATH exposure is a convenience, not the source of project identity.
 
-## Update, migration and recovery
+## Update and recovery
 
 ```text
 /plugin marketplace update ohmyorch-marketplace
@@ -82,16 +82,14 @@ Inside skills, `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PROJECT_DIR}` and `${CLAUDE_SE
 /ohmyorch:adapt-project --apply
 ```
 
-Plugin updates do not rewrite project state. Project upgrade is explicit, schema-aware and backed up. This release supports schema 1 and preserves the durable goal when moving old loop counters to ignored runtime state. A change created by an earlier plugin version can hold extra per-change files that this version no longer produces; they stay in place as project history and are ignored. Managed guidance text changes only when you run `/ohmyorch:adapt-project` again. After updating from 0.0.1, run it with `--dry-run`, then `--apply`: until then the project's `CLAUDE.md` block and `.claude/rules/ohmyorch-*-standards.md` still describe the removed flow, and `/ohmyorch:upgrade-project` does not change them. Adaptation also refreshes an `openspec/config.yaml` that is unchanged since bootstrap scaffolded it; an edited one is left alone and its old `context:` line must be changed by hand. The [changelog](CHANGELOG.md) lists what changed and, under "Upgrading from 0.0.1", gives that line, the `delivery stop` step for a goal that is still owned, and the step for an in-flight change with open review findings. Uninstall keeps project documents and state; select the same scope used to install. Recovery is separate from plugin uninstall.
+Plugin updates do not rewrite project state. Project upgrade is explicit, schema-aware and backed up. This release supports schema 1, the current schema, so a project upgrade has nothing to change yet. A change created by an earlier plugin version can hold extra per-change files that this version no longer produces; they stay in place as project history and are ignored. Managed guidance text changes only when you run `/ohmyorch:adapt-project` again. After updating from 0.0.1, run it with `--dry-run`, then `--apply`: until then the project's `CLAUDE.md` block and `.claude/rules/ohmyorch-*-standards.md` still describe the removed flow, and `/ohmyorch:upgrade-project` does not change them. Adaptation also refreshes an `openspec/config.yaml` that is unchanged since bootstrap scaffolded it; an edited one is left alone and its old `context:` line must be changed by hand. The [changelog](CHANGELOG.md) lists what changed and, under "Upgrading from 0.0.1", gives that line, the `delivery stop` step for a goal that is still owned, and the step for an in-flight change with open review findings. Uninstall keeps project documents and state; select the same scope used to install. Recovery is separate from plugin uninstall.
 
 ```text
-/ohmyorch:migrate-legacy --dry-run
-/ohmyorch:migrate-legacy --apply --plan-id <reviewed hash>
 /ohmyorch:harness-reset --scope managed --dry-run
 /ohmyorch:harness-reset --scope workflow --dry-run
 ```
 
-Migration deletes only fingerprinted legacy files and exact owned hook registrations. Unknown customizations remain. Edited legacy files require `--include-edited` in a separately reviewed plan. Never run both legacy and plugin hooks in the same project. Workflow reset requires the exact reviewed plan hash and resets only mapped PRD/SPECS and the enumerated OpenSpec files; it preserves CODEBASE, host scripts, nested human guidance and unrelated docs.
+Applying a workflow reset requires the exact hash of the reviewed plan, passed as `--plan-id <reviewed hash>`. It resets only mapped PRD/SPECS and the enumerated OpenSpec files; it preserves CODEBASE, host scripts, nested human guidance and unrelated docs.
 
 Each applied operation reports its recovery ID. Inspect with `upgrade-project --dry-run --rollback <id>`, then apply with `--apply --rollback <id>`. Recovery verifies backups and current hashes; it refuses to overwrite edits made since apply. A failed transaction rolls back its own writes. Empty directories and private recovery records may remain. A process killed during apply leaves a journal and operation lock: inspect the journal, confirm the original process is gone, remove only that empty lock directory, and run hash-guarded rollback. Never wipe runtime/backups wholesale.
 

@@ -1,18 +1,18 @@
 # OhMyOrch
 
+![OhMyOrch](docs/images/OhMyOrch.png)
+
+OhMyOrch is a Claude Code plugin that delivers a `SPECS.md` backlog with OpenSpec, one story at a time.
+
+<https://josoroma.github.io/OhMyOrch/docs/OhMyOrch.html>
+
+[Plugin handbook](plugins/ohmyorch/README.md) · [Installation & updates](docs/distribution.md)
+
 Watch the walkthrough, From Spec to Delivery. It was recorded for 0.0.1, before the flow became the four steps shown below.
 
 [![Watch From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained on YouTube](https://img.youtube.com/vi/vLKeNAXPPd8/maxresdefault.jpg)](https://www.youtube.com/watch?v=vLKeNAXPPd8)
 
 [**Watch the walkthrough: From Spec to Delivery**](https://www.youtube.com/watch?v=vLKeNAXPPd8)
-
-OhMyOrch is a Claude Code plugin that delivers a `SPECS.md` backlog with OpenSpec, one story at a time.
-
-![OhMyOrch](https://josoroma.github.io/OhMyOrch/docs/images/OhMyOrch.png)
-
-<https://josoroma.github.io/OhMyOrch/docs/OhMyOrch.html>
-
-[Plugin handbook](plugins/ohmyorch/README.md) · [Installation & updates](docs/distribution.md)
 
 Give Claude a READY story. The main session proposes, applies, verifies and archives one OpenSpec change, then marks the story DONE.
 
@@ -69,11 +69,11 @@ The prerequisites, the marketplace commands, and the release gates that are stil
 
 ## What's included
 
-The plugin has 20 skills (19 public commands and one internal contract), three read-only authoring agents for the PRD, SPECS and CODEBASE documents, root hooks and a Bash/jq runtime.
+The plugin has 18 skills (17 public commands and one internal contract), three read-only authoring agents for the PRD, SPECS and CODEBASE documents, root hooks and a Bash/jq runtime.
 
-![Plugin contents: 20 skills, 3 authoring agents, 6 rule references, root hooks, and what stays in your project](docs/images/slide-07-plugin-contents.svg)
+![Plugin contents: 18 skills, 3 authoring agents, 6 rule references, root hooks, and what stays in your project](docs/images/slide-07-plugin-contents.svg)
 
-The 19 public skills, grouped by the job you need to do. The [guide](docs/OhMyOrch.md) describes each one.
+The 17 public skills, grouped by the job you need to do. The [guide](docs/OhMyOrch.md) describes each one.
 
 ![Skill map: the public skills grouped by job](docs/images/slide-08-skill-map.svg)
 

@@ -5,12 +5,12 @@ source "$OHMYORCH_CODE_ROOT/lib/managed-files.sh"
 
 ohmyorch_lifecycle_parse() {
   APPLY=0; DRY_RUN=0; WITH_OPENSPEC=0; NESTED=0; MODE=create-only; SCOPE=managed
-  DOCS_DIR=''; MAP_PRD=''; MAP_SPECS=''; MAP_CODEBASE=''; REVIEWED_PLAN=''; ROLLBACK=''; INCLUDE_EDITED=0
+  DOCS_DIR=''; MAP_PRD=''; MAP_SPECS=''; MAP_CODEBASE=''; REVIEWED_PLAN=''; ROLLBACK=''
   while [ "$#" -gt 0 ]; do
     case "$1" in
       --apply) APPLY=1; shift ;; --dry-run) DRY_RUN=1; shift ;;
       --with-openspec) WITH_OPENSPEC=1; shift ;; --nested) NESTED=1; shift ;;
-      --include-edited) INCLUDE_EDITED=1; shift ;; --json) shift ;;
+      --json) shift ;;
       --docs-dir|--prd|--specs|--codebase|--mode|--scope|--plan-id|--rollback)
         [ "$#" -gt 1 ] || ohmyorch_die "$1 needs a value"
         case "$1" in --docs-dir) DOCS_DIR="$2" ;; --prd) MAP_PRD="$2" ;; --specs) MAP_SPECS="$2" ;;
@@ -218,42 +218,6 @@ ohmyorch_upgrade_plan() {
   [ "$OHMYORCH_CONFIG_VALID" = 1 ] || ohmyorch_die 'unsupported schema; no guessed upgrade exists'
   ohmyorch_require_active
   # Initial schema is 1; code updates have no implicit project rewrite.
-  if [ -f openspec/delivery/loop.state ]; then
-    ohmyorch_plan_file .claude/ohmyorch/runtime/legacy-loop.state openspec/delivery/loop.state create-only || exit 2
-    ohmyorch_plan_file openspec/delivery/loop.state DELETE raw-update || exit 2
-  fi
-}
-
-ohmyorch_legacy_plan() {
-  local row path expected actual
-  while IFS= read -r row; do
-    path=$(jq -r .path <<< "$row"); expected=$(jq -r .sha256 <<< "$row")
-    ohmyorch_path "$path" >/dev/null || exit 2
-    [ -f "$path" ] || continue
-    actual=$(ohmyorch_hash "$path")
-    if [ "$actual" != "$expected" ] && [ "$INCLUDE_EDITED" -ne 1 ]; then
-      ohmyorch_die "edited legacy component: $path; review an --include-edited plan explicitly"
-    fi
-    ohmyorch_plan_file "$path" DELETE raw-update || exit 2
-  done < <(jq -c '.files[]' "$OHMYORCH_CODE_ROOT/references/legacy-files.json")
-  if [ -f .claude/settings.json ]; then
-    ohmyorch_path .claude/settings.json >/dev/null || exit 2
-    jq --slurpfile known "$OHMYORCH_CODE_ROOT/references/legacy-hooks.json" '
-      if .hooks then .hooks |= with_entries(
-        .key as $event | .value |= map(
-          .matcher as $matcher | .hooks |= map(
-            . as $handler | select(any($known[0][];
-              .event==$event and .matcher==$matcher and .command==$handler.command) | not)
-          ) | select(.hooks|length>0)
-        ) | select(.value|length>0)
-      ) | if .hooks=={} then del(.hooks) else . end else . end
-    ' .claude/settings.json > "$OHMYORCH_STAGE/settings.json" || exit 2
-    # Avoid formatting-only edits when no owned registration was removed.
-    if ! jq -e --slurpfile new "$OHMYORCH_STAGE/settings.json" '.==$new[0]' .claude/settings.json >/dev/null; then
-      ohmyorch_plan_file .claude/settings.json "$OHMYORCH_STAGE/settings.json" raw-update || exit 2
-    fi
-  fi
-  ohmyorch_bootstrap_plan
 }
 
 ohmyorch_lifecycle_main() {
@@ -265,13 +229,11 @@ ohmyorch_lifecycle_main() {
     adapt-project) ohmyorch_adapt_plan ;;
     upgrade-project) ohmyorch_upgrade_plan ;;
     harness-reset) ohmyorch_reset_plan ;;
-    migrate-legacy) ohmyorch_legacy_plan ;;
     *) ohmyorch_die "unknown lifecycle operation: $OHMYORCH_OPERATION" ;;
   esac
   ohmyorch_plan_finish || exit 2
   if [ "$APPLY" -eq 0 ]; then ohmyorch_print_plan; return; fi
-  if [ "$OHMYORCH_OPERATION" = migrate-legacy ] ||
-     { [ "$OHMYORCH_OPERATION" = harness-reset ] && [ "$SCOPE" = workflow ]; }; then
+  if [ "$OHMYORCH_OPERATION" = harness-reset ] && [ "$SCOPE" = workflow ]; then
     [ -n "$REVIEWED_PLAN" ] && [ "$REVIEWED_PLAN" = "$OHMYORCH_PLAN_ID" ] || ohmyorch_die "review --dry-run first, then --apply --plan-id $OHMYORCH_PLAN_ID"
   elif [ -n "$REVIEWED_PLAN" ]; then
     [ "$REVIEWED_PLAN" = "$OHMYORCH_PLAN_ID" ] || ohmyorch_die 'reviewed plan is stale'

@@ -12,7 +12,7 @@ Breaking simplification: delivery now follows the upstream OpenSpec 1.13.2 flow 
 - Verify is advisory and writes no file. A CRITICAL finding is recorded as a new unticked task in `tasks.md`, which returns the change to apply.
 - When a human decision is missing in the middle of a change, the session records it with `delivery block --reason '<story id: the decision needed>'` and stops. The goal becomes BLOCKED with that reason, and `/ohmyorch:deliver <same target>` resumes it once the decision is made.
 - The seven `opsx-*` skills match the prompts OpenSpec 1.13.2 generates, apart from the plugin namespace and one boundary paragraph. They no longer run `doctor`, re-read the contract or delegate to a role agent on every invocation.
-- The plugin now has 20 skills (19 public commands and the internal `contract`), three read-only authoring agents (`codebase-analyst`, `product-specifier`, `spec-ingestor`), six rule references and 14 CLI operations.
+- The plugin now has 18 skills (17 public commands and the internal `contract`), three read-only authoring agents (`codebase-analyst`, `product-specifier`, `spec-ingestor`), six rule references and 13 CLI operations.
 
 Guards that remain, with their new predicates:
 
@@ -49,13 +49,14 @@ Fixed:
 
 Removed:
 
-- Skills: `plan-feature`, `review-feature`, `test-feature`, `product-iteration`.
+- Skills: `plan-feature`, `review-feature`, `test-feature`, `product-iteration`, and `post-install`, which was only an alias: use `/ohmyorch:adapt-project`.
 - Agents: `planner`, `implementer`, `reviewer`, `tester`, `product-manager`.
 - CLI operations and their scripts (11): `workflow-status`, `status`, `completion-gate`, `validate-implementation-plan`, `validate-review`, `validate-test-report`, `validate-status`, `validate-verification`, `check-write-scope`, `check-scope`, `guard-planning-handoff`.
+- The `migrate-legacy` skill and CLI operation, the `legacy` check of `doctor`, and the relocation of an old `openspec/delivery/loop.state` counter by `upgrade-project`. A setup from before OhMyOrch was a plugin is no longer detected or converted.
 - `delivery reopen` and the `--change` option of `delivery`.
 - Per-change artifacts: `implementation-plan.md`, `review.md`, `test-report.md`, `status.md`, `completion.md` and `history/`, together with their templates under `templates/artifacts/`.
 - Rule reference `testing.md`.
-- Scaffold `SPEC-LOGS/README.md`: `bootstrap --with-openspec` no longer creates it, because nothing writes epic logs. The `output.epicLogs` key stays in `project.json`, so existing configurations remain valid.
+- Scaffold `SPEC-LOGS/README.md`: `bootstrap --with-openspec` no longer creates it, because nothing writes epic logs.
 - `templates/project/project.schema.json`, which no code read.
 - Concepts: the seven gates, the four completion conditions, verdict history, reopen and remediation rounds, the predicted-files scope contract, change states and per-stage owners. The partial/UNVERIFIED acceptance exceptions that 0.0.1 retained are gone because the evaluators that had them were removed.
 

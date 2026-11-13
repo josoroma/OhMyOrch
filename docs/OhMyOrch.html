@@ -341,7 +341,7 @@ openspec list --json
 </table></div>
 <p>Update and uninstall preserve project documents/state. Initialization, adaptation, project upgrades, and reset are separate explicit operations. This publisher repository keeps consumer scaffolding in bundled templates for bootstrap into your project.</p>
 <h2 id="choose-the-right-skill">Choose the right skill</h2>
-<p>There are <strong>20 skills: 19 public commands and one internal contract</strong>. Invoke public skills as <code>/ohmyorch:&lt;name&gt;</code>. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.</p>
+<p>There are <strong>18 skills: 17 public commands and one internal contract</strong>. Invoke public skills as <code>/ohmyorch:&lt;name&gt;</code>. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.</p>
 <h3 id="initialize-and-maintain-a-project">Initialize and maintain a project</h3>
 <p>Lifecycle changes are manually invoked. Preview first, inspect the proposed files, and apply the reviewed operation explicitly.</p>
 <div class="table-scroll" role="region" aria-label="Reference table" tabindex="0"><table>
@@ -369,19 +369,9 @@ openspec list --json
 <td><code>/ohmyorch:adapt-project --dry-run --mode merge</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/post-install/SKILL.md"><code>post-install</code></a></td>
-<td>Invoke the explicit adaptation alias.</td>
-<td><code>/ohmyorch:post-install --dry-run</code></td>
-</tr>
-<tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/upgrade-project/SKILL.md"><code>upgrade-project</code></a></td>
 <td>Preview a project-state upgrade or recover a retained lifecycle transaction.</td>
 <td><code>/ohmyorch:upgrade-project --dry-run</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/migrate-legacy/SKILL.md"><code>migrate-legacy</code></a></td>
-<td>Preview adoption and retirement of fingerprinted copied components.</td>
-<td><code>/ohmyorch:migrate-legacy --dry-run</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/skills/harness-reset/SKILL.md"><code>harness-reset</code></a></td>
@@ -493,7 +483,7 @@ openspec list --json
 </tbody>
 </table></div>
 <p><code>generate-html-page</code> produces a self-contained themed page with evidence sources, light/dark modes, accessible SVGs, and a bundled validator. This public guide is a separate website with repository-hosted images and SVG assets.</p>
-<p>The bundled CLI has 14 operations: <code>doctor</code>, <code>bootstrap</code>, <code>adapt-project</code>, <code>upgrade-project</code>, <code>migrate-legacy</code>, <code>harness-reset</code>, <code>delivery</code>, <code>validate-product-artifacts</code>, <code>validate-html-page</code>, <code>guard-context-preflight</code>, <code>guard-story-done</code>, <code>guard-archive</code>, <code>guard-delivery-loop</code>, and <code>run-project-validation</code>. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.</p>
+<p>The bundled CLI has 13 operations: <code>doctor</code>, <code>bootstrap</code>, <code>adapt-project</code>, <code>upgrade-project</code>, <code>harness-reset</code>, <code>delivery</code>, <code>validate-product-artifacts</code>, <code>validate-html-page</code>, <code>guard-context-preflight</code>, <code>guard-story-done</code>, <code>guard-archive</code>, <code>guard-delivery-loop</code>, and <code>run-project-validation</code>. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.</p>
 <h2 id="walk-through-one-feature">Walk through one feature</h2>
 <p>Suppose your approved product brief describes password reset, and ingestion produces a READY story <code>US-1.1</code> in <code>EPIC-1</code>. In your initialized consumer project:</p>
 <ol>
@@ -511,7 +501,6 @@ openspec list --json
 /ohmyorch:adapt-project --apply
 </code></pre>
 <p>Code update and project-state upgrade are separate. Review the latter before applying. Managed guidance changes only when you review and apply <code>/ohmyorch:adapt-project</code>. After updating from 0.0.1, the project's <code>CLAUDE.md</code> block and <code>.claude/rules/ohmyorch-*-standards.md</code> still describe the removed flow until you do, and <code>/ohmyorch:upgrade-project</code> does not change them. Adaptation also refreshes an <code>openspec/config.yaml</code> that is unchanged since bootstrap scaffolded it; an edited one is left alone and its old <code>context:</code> line must be changed by hand. The <a href="https://github.com/josoroma/OhMyOrch/blob/main/plugins/ohmyorch/CHANGELOG.md">changelog</a> gives that line under &quot;Upgrading from 0.0.1&quot;, with the <code>delivery stop</code> step for a goal that is still owned and the step for an in-flight change with open review findings.</p>
-<p>Copied setups use <code>/ohmyorch:migrate-legacy --dry-run</code>, then apply the exact reviewed plan ID. Do not enable old and plugin hooks together.</p>
 <p>Reset defaults to owned managed guidance; full workflow reset is a separately reviewed scope:</p>
 <pre><code class="language-text">/ohmyorch:harness-reset --scope managed --dry-run
 /ohmyorch:harness-reset --scope workflow --dry-run

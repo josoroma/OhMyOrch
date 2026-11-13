@@ -27,9 +27,9 @@ claude plugin marketplace add josoroma/OhMyOrch
 claude plugin install ohmyorch@ohmyorch-marketplace --scope project
 ```
 
-The interactive equivalents are `/plugin marketplace add josoroma/OhMyOrch` and `/plugin install ohmyorch@ohmyorch-marketplace`, followed by scope selection. User scope applies across projects; project scope is shared in project settings; local scope is personal to the project. A project's enabled declaration is distinct from initialized OhMyOrch data. Configure provider credentials through your own settings, never through bundled plugin files. No manual `.claude` copying is needed. Installation/update/SessionStart do not bootstrap.
+The interactive equivalents are `/plugin marketplace add josoroma/OhMyOrch` and `/plugin install ohmyorch@ohmyorch-marketplace`, followed by scope selection. User scope applies across projects; project scope is shared in project settings; local scope is personal to the project. A project's enabled declaration is distinct from initialized OhMyOrch data. Configure provider credentials through your own settings, never through bundled plugin files. Installation/update/SessionStart do not bootstrap.
 
-Initialize through `/ohmyorch:bootstrap --dry-run --with-openspec`, review, then `--apply`. Existing documents are adopted unchanged. Analyze the actual codebase before generating project-specific guidance. Migration of an old copied setup uses the explicit reviewed-hash `/ohmyorch:migrate-legacy` flow, not install-time deletion.
+Initialize through `/ohmyorch:bootstrap --dry-run --with-openspec`, review, then `--apply`. Existing documents are adopted unchanged. Analyze the actual codebase before generating project-specific guidance.
 
 ## Update and rollback
 
@@ -51,7 +51,7 @@ A plugin rollback must select an immutable prior catalog/plugin Git ref and rein
 4. The owner reviews the concrete diff, evidence and artifacts, then creates an immutable `<plugin-version>` tag without a `v` prefix and release. The release workflow prepares gated artifacts; it does not publish automatically. While recorded evidence is pending, it reports that status and skips packaging/upload. Repository/tag/Pages publication does not mark those gates passed. Promote support claims only with actual validation, and communicate breaking command/reset behavior, the commands the changelog lists as removed, and that verify is advisory.
 5. Recheck Anthropic's current [publication guidance](https://code.claude.com/docs/en/plugins/publish) before requesting an official listing. Official marketplace admission is separate from this self-hosted catalog and is not required for consumers to install it.
 
-`npm run package:plugin -- --development` builds a clearly named unreleased zip for local testing while public release gates are unresolved. The reproducible zip is an optional artifact; marketplace/Git installation remains primary. The allowlist excludes local `.claude` configuration, project state, tests, tools, snapshots, caches and generated pages. The old curl installer/uninstaller and copier packaging were removed; use Claude's plugin commands.
+`npm run package:plugin -- --development` builds a clearly named unreleased zip for local testing while public release gates are unresolved. The reproducible zip is an optional artifact; marketplace/Git installation remains primary. The allowlist excludes local `.claude` configuration, project state, tests, tools, snapshots, caches and generated pages.
 
 On 2026-10-07 the owner explicitly directed consolidation of published history into one root commit and replacement of the previous `v1.0.0` release with **0.0.1**, using the sole literal tag `0.0.1`. The prior history and release metadata were retained in an external recovery copy. This authorized reset is separate from normal updates and rollback; future release tags remain immutable.
 
@@ -61,4 +61,4 @@ The publisher guide is maintained in `docs/OhMyOrch.md`. `npm run docs:build` us
 
 ## Support and compatibility
 
-The first preferred CLI is 2.1.292. Local 2.1.285 and 2.1.292 passed metadata/cache lifecycle tests for 0.0.1; the 0.1.0 results are in the [implementation evidence](plan/PLUGIN-IMPLEMENTATION.md#openspec-flow-simplification-and-version-010--2026-11-12). Live agent identity/lifecycle validation is still pending by user direction. OpenSpec 1.13.2 is the dependency target; jq >=1.6 and Bash >=3.2 are required. Linux and macOS are CI targets; local results in this migration are macOS only. Native Windows and custom OpenSpec schemas are unsupported. Versions before Claude Code 2.1.139 lack the required exec-form hook arguments. No weaker legacy mode is advertised as equivalent enforcement.
+The first preferred CLI is 2.1.292. Local 2.1.285 and 2.1.292 passed metadata/cache lifecycle tests for 0.0.1; the 0.1.0 results are in the [implementation evidence](plan/PLUGIN-IMPLEMENTATION.md#openspec-flow-simplification-and-version-010--2026-11-12). Live agent identity/lifecycle validation is still pending by user direction. OpenSpec 1.13.2 is the dependency target; jq >=1.6 and Bash >=3.2 are required. Linux and macOS are CI targets; local results are macOS only. Native Windows and custom OpenSpec schemas are unsupported. Versions before Claude Code 2.1.139 lack the required exec-form hook arguments. No weaker legacy mode is advertised as equivalent enforcement.

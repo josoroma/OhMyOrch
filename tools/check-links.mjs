@@ -106,5 +106,5 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exitCode = 1;
 } else {
-  console.log(`PASS: ${references} local links/assets/fragments in ${files.length} documentation files; historical inventories and invalid fixtures remain separate`);
+  console.log(`PASS: ${references} local links/assets/fragments in ${files.length} documentation files; invalid fixtures remain separate`);
 }

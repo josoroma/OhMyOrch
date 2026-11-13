@@ -13,7 +13,7 @@ check(manifest.name==='ohmyorch','Plugin ID must remain ohmyorch');
 check(/^\d+\.\d+\.\d+(?:-[\w.]+)?$/.test(manifest.version),'Invalid SemVer');
 check(catalog.plugins.length===1 && catalog.plugins[0].source==='./plugins/ohmyorch','Catalog source boundary');
 check(JSON.parse(read(path.join(root,'package.json'))).version===manifest.version,'Maintainer/plugin version drift');
-const groups=[['skills',20],['agents',3]];
+const groups=[['skills',18],['agents',3]];
 const seen=new Set();
 for(const [group,count] of groups){
  const files=fs.readdirSync(path.join(plugin,group)).map(n=>path.join(plugin,group,n,group==='skills'?'SKILL.md':'')).filter(p=>fs.statSync(p).isFile());
@@ -59,4 +59,4 @@ for(const [event,groups] of Object.entries(hooks))for(const group of groups)for(
 check(!fs.existsSync(path.join(plugin,'settings.json')),'No global agent/default permissions');
 check(!fs.existsSync(path.join(plugin,'.mcp.json')),'No runtime MCP dependency is declared');
 if(errors.length){console.error(errors.join('\n'));process.exit(1);}
-console.log(`PASS: ${manifest.name} ${manifest.version}; 20 skills, 3 agents; paths, hook registration, Bash syntax and payload boundaries`);
+console.log(`PASS: ${manifest.name} ${manifest.version}; 18 skills, 3 agents; paths, hook registration, Bash syntax and payload boundaries`);

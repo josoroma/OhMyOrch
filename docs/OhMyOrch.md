@@ -218,7 +218,7 @@ Update and uninstall preserve project documents/state. Initialization, adaptatio
 
 ## Choose the right skill
 
-There are **20 skills: 19 public commands and one internal contract**. Invoke public skills as `/ohmyorch:<name>`. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.
+There are **18 skills: 17 public commands and one internal contract**. Invoke public skills as `/ohmyorch:<name>`. The inventory below covers every installed skill and gives an example for each public command. IDs, change names, task descriptions, and source paths are illustrative; substitute actual approved project inputs.
 
 ### Initialize and maintain a project
 
@@ -229,9 +229,7 @@ Lifecycle changes are manually invoked. Preview first, inspect the proposed file
 | [`doctor`](../plugins/ohmyorch/skills/doctor/SKILL.md) | Report prerequisite, project, mapping, and interrupted-operation diagnostics. | `/ohmyorch:doctor --json` |
 | [`bootstrap`](../plugins/ohmyorch/skills/bootstrap/SKILL.md) | Adopt existing documents and create missing neutral scaffolding. | `/ohmyorch:bootstrap --dry-run --with-openspec` |
 | [`adapt-project`](../plugins/ohmyorch/skills/adapt-project/SKILL.md) | Create evidence-backed project guidance and owned blocks. | `/ohmyorch:adapt-project --dry-run --mode merge` |
-| [`post-install`](../plugins/ohmyorch/skills/post-install/SKILL.md) | Invoke the explicit adaptation alias. | `/ohmyorch:post-install --dry-run` |
 | [`upgrade-project`](../plugins/ohmyorch/skills/upgrade-project/SKILL.md) | Preview a project-state upgrade or recover a retained lifecycle transaction. | `/ohmyorch:upgrade-project --dry-run` |
-| [`migrate-legacy`](../plugins/ohmyorch/skills/migrate-legacy/SKILL.md) | Preview adoption and retirement of fingerprinted copied components. | `/ohmyorch:migrate-legacy --dry-run` |
 | [`harness-reset`](../plugins/ohmyorch/skills/harness-reset/SKILL.md) | Preview the ownership-based managed-guidance reset. | `/ohmyorch:harness-reset --scope managed --dry-run` |
 
 ### Understand intent and drive delivery
@@ -266,7 +264,7 @@ These seven commands are the OpenSpec workflows under the plugin's namespace. Ea
 
 `generate-html-page` produces a self-contained themed page with evidence sources, light/dark modes, accessible SVGs, and a bundled validator. This public guide is a separate website with repository-hosted images and SVG assets.
 
-The bundled CLI has 14 operations: `doctor`, `bootstrap`, `adapt-project`, `upgrade-project`, `migrate-legacy`, `harness-reset`, `delivery`, `validate-product-artifacts`, `validate-html-page`, `guard-context-preflight`, `guard-story-done`, `guard-archive`, `guard-delivery-loop`, and `run-project-validation`. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.
+The bundled CLI has 13 operations: `doctor`, `bootstrap`, `adapt-project`, `upgrade-project`, `harness-reset`, `delivery`, `validate-product-artifacts`, `validate-html-page`, `guard-context-preflight`, `guard-story-done`, `guard-archive`, `guard-delivery-loop`, and `run-project-validation`. Host fast validation is disabled by default; enable it explicitly and approve the reviewed script's current SHA-256. Changed/unapproved scripts are skipped.
 
 ## Walk through one feature
 
@@ -290,8 +288,6 @@ For every story in that epic, choose `/ohmyorch:deliver EPIC-1`. To prioritize i
 ```
 
 Code update and project-state upgrade are separate. Review the latter before applying. Managed guidance changes only when you review and apply `/ohmyorch:adapt-project`. After updating from 0.0.1, the project's `CLAUDE.md` block and `.claude/rules/ohmyorch-*-standards.md` still describe the removed flow until you do, and `/ohmyorch:upgrade-project` does not change them. Adaptation also refreshes an `openspec/config.yaml` that is unchanged since bootstrap scaffolded it; an edited one is left alone and its old `context:` line must be changed by hand. The [changelog](../plugins/ohmyorch/CHANGELOG.md) gives that line under "Upgrading from 0.0.1", with the `delivery stop` step for a goal that is still owned and the step for an in-flight change with open review findings.
-
-Copied setups use `/ohmyorch:migrate-legacy --dry-run`, then apply the exact reviewed plan ID. Do not enable old and plugin hooks together.
 
 Reset defaults to owned managed guidance; full workflow reset is a separately reviewed scope:
 

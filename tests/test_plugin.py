@@ -21,7 +21,7 @@ CONFIG = {'schemaVersion': 1, 'enabled': True,
           'delivery': {'maxStalls': 3},
           'fastValidation': {'enabled': False, 'script': 'scripts/fast-validate.sh'}}
 # The whole CLI surface: one script per operation, nothing else.
-OPERATIONS = ['doctor', 'bootstrap', 'adapt-project', 'upgrade-project', 'migrate-legacy', 'harness-reset',
+OPERATIONS = ['doctor', 'bootstrap', 'adapt-project', 'upgrade-project', 'harness-reset',
               'delivery', 'validate-product-artifacts', 'validate-html-page', 'guard-context-preflight',
               'guard-story-done', 'guard-archive', 'guard-delivery-loop', 'run-project-validation']
 RETIRED = ['workflow-status', 'status', 'completion-gate', 'validate-implementation-plan', 'validate-review',
@@ -386,8 +386,8 @@ class Integration(unittest.TestCase):
         for mode,tool_input,who in refusals:
             self.hook(mode,tool_input,code=2,**who)
 
-    def test_cli_surface_is_the_fourteen_operations(self):
-        self.assertEqual(14,len(OPERATIONS))
+    def test_cli_surface_is_the_thirteen_operations(self):
+        self.assertEqual(13,len(OPERATIONS))
         self.assertEqual(sorted(op+'.sh' for op in OPERATIONS),sorted(p.name for p in (PLUGIN/'scripts').iterdir()))
         self.activate()
         self.change()
@@ -1449,18 +1449,44 @@ class Integration(unittest.TestCase):
         self.assertTrue(rule.read_text().endswith('Human edit\n'))
         self.assertEqual(before['PRD.md'],self.snapshot()['PRD.md'])
 
-    def test_reset_is_bounded_and_requires_reviewed_hash(self):
+    def test_reset_is_bounded_requires_reviewed_hash_and_can_roll_back(self):
         self.run_cli('bootstrap','--apply')
         (self.root/'scripts').mkdir()
         host=self.root/'scripts/host.sh';host.write_text('echo human-owned\n')
         (self.root/'src').mkdir();(self.root/'src/CLAUDE.md').write_text('nested human-owned')
+        prd=self.root/'PRD.md';prd.write_text('Human intent\n')
+        settings=self.root/'.claude/settings.json';settings.write_text('{"env":{"PREFERENCE":"fixture"}}')
         self.change()
+        tasks=self.root/'openspec/changes/selected/tasks.md'
         self.run_cli('harness-reset','--scope','workflow','--apply',code=2)
+        # A plan reviewed before a later edit is refused, names the current plan and writes nothing.
+        stale=json.loads(self.run_cli('harness-reset','--scope','workflow','--dry-run').stdout)
+        tasks.write_text('- [ ] edited after the preview\n')
+        before=self.snapshot()
+        refused=self.run_cli('harness-reset','--scope','workflow','--apply','--plan-id',stale['planId'],code=2)
+        self.assertEqual(before,self.snapshot())
         preview=json.loads(self.run_cli('harness-reset','--scope','workflow','--dry-run').stdout)
+        self.assertNotEqual(stale['planId'],preview['planId'])
+        self.assertEqual(f"OhMyOrch: review --dry-run first, then --apply --plan-id {preview['planId']}\n",refused.stderr)
         self.run_cli('harness-reset','--scope','workflow','--apply','--plan-id',preview['planId'])
         self.assertEqual('echo human-owned\n',host.read_text())
         self.assertEqual('nested human-owned',(self.root/'src/CLAUDE.md').read_text())
-        self.assertFalse((self.root/'openspec/changes/selected/tasks.md').exists())
+        self.assertFalse(tasks.exists())
+        self.assertEqual((PLUGIN/'templates/project/PRD.md').read_text(),prd.read_text())
+        # The recovery preview writes nothing. Applying it restores each file the reset deleted
+        # or replaced, byte for byte, and leaves a file outside its journal alone.
+        journal=next(j for j in (self.root/'.claude/ohmyorch/backups').glob('*/journal.json')
+                     if json.loads(j.read_text())['operation']=='harness-reset')
+        reset=self.snapshot()
+        self.run_cli('upgrade-project','--dry-run','--rollback',journal.parent.name)
+        self.assertEqual(reset,self.snapshot())
+        self.run_cli('upgrade-project','--apply','--rollback',journal.parent.name)
+        restored=self.snapshot()
+        for path,value in before.items(): self.assertEqual(value,restored[path],path)
+        self.assertEqual('- [ ] edited after the preview\n',tasks.read_text())
+        self.assertEqual('Human intent\n',prd.read_text())
+        self.assertEqual('{"env":{"PREFERENCE":"fixture"}}',settings.read_text())
+        self.assertEqual('rolled-back',json.loads(journal.read_text())['status'])
 
     def test_host_script_requires_current_ignored_approval(self):
         self.run_cli('bootstrap','--apply')
@@ -1536,44 +1562,6 @@ class Integration(unittest.TestCase):
         project.unlink()
         self.assertEqual('false',exported())
 
-    def test_legacy_cutover_preserves_custom_settings_and_can_roll_back(self):
-        legacy=self.root/'.claude/agents/ohmyorch-reviewer.md'
-        legacy.parent.mkdir(parents=True)
-        legacy.write_bytes((REPO/'tests/fixtures/legacy/reviewer.md').read_bytes())
-        custom=legacy.parent/'custom.md';custom.write_text('Human customization')
-        handlers=json.loads((PLUGIN/'references/legacy-hooks.json').read_text())
-        handler=next(h for h in handlers if h['event']=='PreToolUse' and h['matcher']=='Write|Edit|MultiEdit')
-        settings={'env':{'PREFERENCE':'fixture'}, 'hooks':{'PreToolUse':[{'matcher':handler['matcher'], 'hooks':[{'type':'command','command':handler['command']},{'type':'command','command':'echo user-owned'}]}]}}
-        settings_file=self.root/'.claude/settings.json';settings_file.write_text(json.dumps(settings))
-        before=self.snapshot()
-        plan=json.loads(self.run_cli('migrate-legacy','--dry-run').stdout)
-        self.assertEqual(before,self.snapshot())
-        self.run_cli('migrate-legacy','--apply',code=2)
-        self.run_cli('migrate-legacy','--apply','--plan-id',plan['planId'])
-        self.assertFalse(legacy.exists())
-        self.assertEqual('Human customization',custom.read_text())
-        after=json.loads(settings_file.read_text())
-        self.assertEqual(settings['env'],after['env'])
-        self.assertEqual(['echo user-owned'],[h['command'] for h in after['hooks']['PreToolUse'][0]['hooks']])
-        journal=next((self.root/'.claude/ohmyorch/backups').glob('*/journal.json'))
-        op=journal.parent.name
-        state_before=self.snapshot()
-        self.run_cli('upgrade-project','--dry-run','--rollback',op)
-        self.assertEqual(state_before,self.snapshot())
-        self.run_cli('upgrade-project','--apply','--rollback',op)
-        for path,value in before.items(): self.assertEqual(value,self.snapshot()[path])
-        self.assertFalse((self.root/'.claude/ohmyorch/project.json').exists())
-
-    def test_edited_legacy_components_and_stale_plan(self):
-        legacy=self.root/'.claude/agents/ohmyorch-reviewer.md'
-        legacy.parent.mkdir(parents=True)
-        legacy.write_text('Locally edited specialist')
-        self.run_cli('migrate-legacy','--dry-run',code=2)
-        plan=json.loads(self.run_cli('migrate-legacy','--include-edited','--dry-run').stdout)
-        legacy.write_text('Another edit after preview')
-        self.run_cli('migrate-legacy','--include-edited','--apply','--plan-id',plan['planId'],code=2)
-        self.assertEqual('Another edit after preview',legacy.read_text())
-
     def test_post_hook_has_protocol_clean_stdout(self):
         self.activate()
         for target in ['SPECS.md','PRD.md','CODEBASE.md']:
@@ -1589,7 +1577,7 @@ class Integration(unittest.TestCase):
         self.assertEqual('',broken.stdout)
         self.assertNotEqual('',broken.stderr)
 
-    def test_openspec_initialization_and_old_counter_upgrade(self):
+    def test_openspec_initialization_is_idempotent_and_upgrade_writes_nothing(self):
         if not shutil.which('openspec'): self.skipTest('OpenSpec initialization prerequisite missing')
         self.run_cli('bootstrap','--apply','--with-openspec')
         config=(self.root/'openspec/config.yaml').read_text()
@@ -1599,11 +1587,11 @@ class Integration(unittest.TestCase):
         first=self.snapshot()
         self.run_cli('bootstrap','--apply','--with-openspec')
         self.assertEqual(first,self.snapshot())
-        old=self.root/'openspec/delivery/loop.state';old.write_text('count=2\n')
         goal=self.root/'openspec/delivery/goal.md';goal.write_text('Durable goal unchanged')
+        before=self.snapshot()
+        self.assertEqual([],json.loads(self.run_cli('upgrade-project','--dry-run').stdout)['files'])
         self.run_cli('upgrade-project','--apply')
-        self.assertFalse(old.exists())
-        self.assertEqual('count=2\n',(self.root/'.claude/ohmyorch/runtime/legacy-loop.state').read_text())
+        self.assertEqual(before,self.snapshot())
         self.assertEqual('Durable goal unchanged',goal.read_text())
 
     def test_real_openspec_change_from_verify_through_archive_to_done(self):

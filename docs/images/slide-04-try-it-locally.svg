@@ -41,7 +41,7 @@
 
     <!-- headline -->
     <text x="72" y="204" font-size="72" font-weight="800" letter-spacing="-2" fill="#fafafa">Load <tspan fill="url(#hl)">0.1.0</tspan> from a checkout.</text>
-    <text x="72" y="252" font-size="25" fill="#a1a1a1">Test the plugin in a consumer project without copying .claude/ components.</text>
+    <text x="72" y="252" font-size="25" fill="#a1a1a1">Test the plugin in a consumer project without installing it.</text>
 
     <!-- version chips -->
     <g font-size="15" font-weight="600" letter-spacing="2" text-anchor="middle" fill="#a1a1a1">

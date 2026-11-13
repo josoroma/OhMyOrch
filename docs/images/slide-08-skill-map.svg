@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
   <title id="t">OhMyOrch skill map: start with the job you need to do</title>
-  <desc id="d">The 19 public OhMyOrch skills grouped by job: understand code and intent (analyze-codebase, generate-prd, ingest-spec), deliver or resume (deliver), work on one change (opsx-explore, opsx-propose, opsx-apply, opsx-verify, opsx-update, opsx-sync, opsx-archive), set up and maintain (doctor, bootstrap, adapt-project, post-install, upgrade-project), reset or migrate (harness-reset, migrate-legacy) and present (generate-html-page), each invoked as /ohmyorch:name.</desc>
+  <desc id="d">The 17 public OhMyOrch skills grouped by job: understand code and intent (analyze-codebase, generate-prd, ingest-spec), deliver or resume (deliver), work on one change (opsx-explore, opsx-propose, opsx-apply, opsx-verify, opsx-update, opsx-sync, opsx-archive), set up and maintain (doctor, bootstrap, adapt-project, upgrade-project), reset (harness-reset) and present (generate-html-page), each invoked as /ohmyorch:name.</desc>
   <defs>
     <linearGradient id="hl" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#2b7fff"/>
@@ -41,7 +41,7 @@
 
     <!-- headline -->
     <text x="72" y="210" font-size="64" font-weight="800" letter-spacing="-2" fill="#fafafa">Start with the job <tspan fill="url(#hl)">you need to do</tspan>.</text>
-    <text x="72" y="260" font-size="25" fill="#a1a1a1">19 public skills, grouped by job.</text>
+    <text x="72" y="260" font-size="25" fill="#a1a1a1">17 public skills, grouped by job.</text>
 
     <!-- how a chip is invoked -->
     <text x="1300" y="259" font-size="15" letter-spacing="2" text-anchor="end" fill="#a1a1a1">INVOKE AS</text>
@@ -78,7 +78,7 @@
       <text x="156" y="416">Deliver or resume</text>
       <text x="156" y="513">Work on one change</text>
       <text x="156" y="610">Set up and maintain</text>
-      <text x="156" y="682">Reset or migrate</text>
+      <text x="156" y="682">Reset</text>
       <text x="156" y="754">Present</text>
     </g>
 
@@ -87,8 +87,8 @@
       <text x="1504" y="341">3 SKILLS</text>
       <text x="1504" y="413">1 SKILL</text>
       <text x="1504" y="510">7 SKILLS</text>
-      <text x="1504" y="607">5 SKILLS</text>
-      <text x="1504" y="679">2 SKILLS</text>
+      <text x="1504" y="607">4 SKILLS</text>
+      <text x="1504" y="679">1 SKILL</text>
       <text x="1504" y="751">1 SKILL</text>
     </g>
 
@@ -137,25 +137,21 @@
       <rect x="540" y="582" width="98" height="40" rx="10"/>
       <rect x="650" y="582" width="132" height="40" rx="10"/>
       <rect x="794" y="582" width="176" height="40" rx="10"/>
-      <rect x="982" y="582" width="164" height="40" rx="10"/>
-      <rect x="1158" y="582" width="198" height="40" rx="10"/>
+      <rect x="982" y="582" width="198" height="40" rx="10"/>
     </g>
     <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" text-anchor="middle" fill="#fafafa">
       <text x="589" y="608">doctor</text>
       <text x="716" y="608">bootstrap</text>
       <text x="882" y="608">adapt-project</text>
-      <text x="1064" y="608">post-install</text>
-      <text x="1257" y="608">upgrade-project</text>
+      <text x="1081" y="608">upgrade-project</text>
     </g>
 
-    <!-- row 5: reset or migrate (neutral, recessed) -->
+    <!-- row 5: reset (neutral, recessed) -->
     <g fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.14">
       <rect x="540" y="654" width="176" height="40" rx="10"/>
-      <rect x="728" y="654" width="186" height="40" rx="10"/>
     </g>
     <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" text-anchor="middle" fill="#fafafa">
       <text x="628" y="680">harness-reset</text>
-      <text x="821" y="680">migrate-legacy</text>
     </g>
 
     <!-- row 6: present (deep emerald) -->

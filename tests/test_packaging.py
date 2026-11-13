@@ -21,7 +21,7 @@ class Packaging(unittest.TestCase):
                 names=zip.namelist()
                 self.assertIn('ohmyorch/.claude-plugin/plugin.json',names)
                 self.assertIn('ohmyorch/third-party/openspec-LICENSE',names)
-                self.assertEqual(20,sum(n.endswith('/SKILL.md') for n in names))
+                self.assertEqual(18,sum(n.endswith('/SKILL.md') for n in names))
                 self.assertEqual(3,sum(n.startswith('ohmyorch/agents/') for n in names))
                 for name in names:
                     self.assertFalse(any(word in name for word in ['settings.local','fixtures/','tests/','node_modules','canonical/','backups/','runtime/','docs/resets']))

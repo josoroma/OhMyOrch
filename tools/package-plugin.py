@@ -14,7 +14,7 @@ EXACT={'.claude-plugin/plugin.json','bin/ohmyorch','hooks/hooks.json','hooks/dis
        'README.md','CHANGELOG.md','THIRD-PARTY-NOTICES.md','LICENSE',
        'third-party/openspec-LICENSE'}
 PATTERNS=[r'skills/[a-z-]+/SKILL\.md',r'agents/[a-z-]+\.md',
-          r'references/[a-z-]+\.(md|json)',r'references/rules/[a-z-]+\.md',
+          r'references/[a-z-]+\.md',r'references/rules/[a-z-]+\.md',
           r'lib/[a-z-]+\.(sh|jq)',r'scripts/[a-z-]+\.sh',
           r'templates/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_.-]+\.(md|html|yaml|json)']
 

@@ -36,18 +36,6 @@ fi
 if [ "$OHMYORCH_CONFIG_VALID" != 1 ]; then check project-config FAIL 'invalid or unsupported; repair explicitly'
 elif [ "$OHMYORCH_ENABLED" = true ]; then check project-config PASS 'schema 1 activated'
 else check project-config SKIP 'inactive; explicit /ohmyorch:bootstrap required'; fi
-legacy=0
-for f in .claude/agents/ohmyorch-*.md .claude/skills/ohmyorch-*/SKILL.md .claude/commands/ohmyorch/opsx/*.md; do
-  [ ! -f "$f" ] || legacy=$((legacy+1))
-done
-hook_count=0
-if [ -f .claude/settings.json ] && [ ! -L .claude/settings.json ]; then
-  hook_count=$(jq '[.hooks // {} | .. | objects | .command? // empty | select(test("scripts/(guard-|validate-product-artifacts|run-project-validation)"))] | length' .claude/settings.json 2>/dev/null) || hook_count=0
-fi
-if [ "$legacy" -gt 0 ] || [ "$hook_count" -gt 0 ]; then
-  if [ "$OHMYORCH_ENABLED" = true ]; then check legacy FAIL "$legacy legacy components, $hook_count hook registrations; explicit migration required"
-  else check legacy SKIP "$legacy legacy components, $hook_count hooks; migrate before activation"; fi
-else check legacy PASS 'no known standalone components/hooks'; fi
 if [ -f openspec/config.yaml ]; then
   if grep -qE '^schema:[[:space:]]*spec-driven[[:space:]]*$' openspec/config.yaml; then check openspec-schema PASS 'local spec-driven'
   else check openspec-schema UNSUPPORTED 'custom/ambiguous schema needs an adapter'; fi

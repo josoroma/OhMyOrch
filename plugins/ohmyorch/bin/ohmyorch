@@ -12,14 +12,14 @@ for cli_arg in "$@"; do
     *) requested_operation="$cli_arg"; break ;;
   esac
 done
-case "$requested_operation" in doctor|bootstrap|upgrade-project|migrate-legacy)
+case "$requested_operation" in doctor|bootstrap|upgrade-project)
   export OHMYORCH_ALLOW_UNCONFIGURED=1 ;; esac
 ohmyorch_init "$@"
 set -- "${OHMYORCH_ARGS[@]+"${OHMYORCH_ARGS[@]}"}"
 [ "$#" -gt 0 ] || ohmyorch_die 'usage: ohmyorch --project-root /absolute/project <operation> [arguments]'
 operation="$1"; shift
 case "$operation" in
-  doctor|bootstrap|adapt-project|upgrade-project|migrate-legacy|harness-reset|delivery|validate-product-artifacts|validate-html-page|guard-context-preflight|guard-story-done|guard-archive|guard-delivery-loop|run-project-validation) ;;
+  doctor|bootstrap|adapt-project|upgrade-project|harness-reset|delivery|validate-product-artifacts|validate-html-page|guard-context-preflight|guard-story-done|guard-archive|guard-delivery-loop|run-project-validation) ;;
   *) ohmyorch_die "unknown operation: $operation" ;;
 esac
 script="$OHMYORCH_CODE_ROOT/scripts/$operation.sh"

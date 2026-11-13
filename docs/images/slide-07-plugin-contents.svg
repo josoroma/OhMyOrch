@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
   <title id="t">OhMyOrch: what the plugin includes</title>
-  <desc id="d">The plugin ships 20 skills (19 public and 1 internal), 3 read-only authoring agents, 6 rule references, root hooks with 5 routes and a Bash and jq runtime, and it keeps that installed code apart from the project's own documents, OpenSpec changes, delivery goal record and configuration.</desc>
+  <desc id="d">The plugin ships 18 skills (17 public and 1 internal), 3 read-only authoring agents, 6 rule references, root hooks with 5 routes and a Bash and jq runtime, and it keeps that installed code apart from the project's own documents, OpenSpec changes, delivery goal record and configuration.</desc>
   <defs>
     <linearGradient id="hl" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#2b7fff"/>
@@ -45,7 +45,7 @@
     <text x="72" y="282" font-size="72" font-weight="800" letter-spacing="-2" fill="#fafafa"><tspan fill="url(#hl)">not a single command</tspan>.</text>
     <text x="72" y="332" font-size="25" fill="#a1a1a1">Public skills are invoked as <tspan font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="23" fill="#2b7fff">/ohmyorch:</tspan><tspan font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="23" fill="#fafafa">&lt;name&gt;</tspan>.</text>
 
-    <!-- three of the 19 public skills -->
+    <!-- three of the 17 public skills -->
     <g>
       <rect x="1071" y="226" width="217" height="44" rx="10" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
       <text x="1179.5" y="254" font-size="17" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#fafafa"><tspan fill="#2b7fff">/ohmyorch:</tspan>doctor</text>
@@ -54,7 +54,7 @@
       <rect x="1120" y="282" width="276" height="44" rx="10" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
       <text x="1258" y="310" font-size="17" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#fafafa"><tspan fill="#2b7fff">/ohmyorch:</tspan>opsx-verify</text>
       <rect x="1408" y="282" width="120" height="44" rx="10" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
-      <text x="1468" y="310" font-size="16" text-anchor="middle" fill="#a1a1a1">+ 16 more</text>
+      <text x="1468" y="310" font-size="16" text-anchor="middle" fill="#a1a1a1">+ 14 more</text>
     </g>
 
     <!-- stat tiles -->
@@ -62,9 +62,9 @@
       <rect x="72" y="368" width="275.2" height="146" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
       <rect x="92" y="388" width="48" height="48" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
       <use href="#i-slash" x="104" y="400" width="24" height="24" color="#2b7fff"/>
-      <text x="154" y="425" font-size="36" font-weight="800" letter-spacing="-1" fill="#fafafa">20</text>
+      <text x="154" y="425" font-size="36" font-weight="800" letter-spacing="-1" fill="#fafafa">18</text>
       <text x="92" y="468" font-size="20" font-weight="600" fill="#fafafa">skills</text>
-      <text x="92" y="493" font-size="16" fill="#a1a1a1">19 public + 1 internal</text>
+      <text x="92" y="493" font-size="16" fill="#a1a1a1">17 public + 1 internal</text>
 
       <rect x="367.2" y="368" width="275.2" height="146" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
       <rect x="387.2" y="388" width="48" height="48" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
