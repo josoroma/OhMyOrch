@@ -8,7 +8,7 @@ The reusable plugin, consumer lifecycle, root hook dispatcher, maintainer valida
 
 ```text
 .claude-plugin/marketplace.json          # catalog; source ./plugins/ohmyorch
-plugins/ohmyorch/                        # current consumer payload: 69 files
+plugins/ohmyorch/                        # current consumer payload: 67 files
   .claude-plugin/plugin.json             # sole plugin version/identity
   README.md, CHANGELOG.md
   THIRD-PARTY-NOTICES.md
@@ -227,7 +227,7 @@ The owner asked for a faster process that keeps only what is part of OpenSpec, a
 - **Prompts.** The seven `opsx-*` skills equal the prompts OpenSpec 1.13.2 generates apart from the plugin namespace and one boundary paragraph; `references/openspec-provenance.md` records this.
 - **Preserved-ambiguity language retired.** The partial/UNVERIFIED acceptance and verification-text exceptions belonged to evaluators that no longer exist. They were removed, not strengthened.
 - **Version.** Manifest, root package/lockfile, readiness `pluginVersion`, changelog and guides use **0.1.0**. No tag was created; `0.0.1` remains the last tagged release. Project schema 1 is unchanged, so no project upgrade path is required. No release-readiness boolean changed.
-- **Documentation.** `CLAUDE.md`, the README, the plugin handbook, the changelog, `docs/OhMyOrch.md` and its generated HTML, `docs/distribution.md` and both guide SVGs describe the new flow. The README no longer embeds the six slides that depict the retired flow; the image files remain in `docs/images/`. The linked walkthrough video was recorded for 0.0.1.
+- **Documentation.** `CLAUDE.md`, the README, the plugin handbook, the changelog, `docs/OhMyOrch.md` and its generated HTML, `docs/distribution.md` and both guide SVGs describe the new flow. The README slides that depicted the retired flow were redrawn on 2026-11-13 (see below). The linked walkthrough video was recorded for 0.0.1.
 
 ### Review fixes
 
@@ -255,20 +255,26 @@ The owner agreed to four changes the review had left open. They follow the first
 - **DONE after a misdirected `Change:` line.** When a story's `Change:` line names an archived change while a directory named for the story is still active, the derivation escalates instead of deriving `mark-done`, and the DONE guard judges those directories without exception. A directory name that holds a newline is not a change for either of them. The guard no longer needs its own archived test.
 - **Validated versions.** The manifest's `formatValidatedClaudeCode` and `cacheLifecycleValidatedClaudeCode` name 2.1.314, the version on which those checks ran for 0.1.0.
 
+### Slides and unused files — 2026-11-13
+
+- **README slides.** The ten README slides are redrawn as hand-written SVG, `docs/images/slide-01-overview.svg` to `slide-10-change-record.svg`, in the Luma dark palette of `docs/Design-Common.md` with the Josoroma wordmark in the footer. Each statement on a slide was checked against the repository by a reviewer that did not draw it, and each slide was inspected in a 1600x900 headless Chrome render. The README shows them in order, with a short line of text before every image. The ten PNG slides they replace are deleted.
+- **Unused files removed.** An inventory looked for every tracked file that nothing current loads, runs, reads or links, and a second pass deleted each candidate in a scratch copy and ran the checks and suites. Removed: `templates/project/project.schema.json` (no code read it; the loader validates with its own jq predicate); `templates/project/SPEC-LOGS/README.md` and its bootstrap entry (nothing writes epic logs any more); `tests/fixtures/invalid/` (no test read it); `tests/fixtures/html-pages/make-fixtures.py` (it pointed at a retired path and no longer produced the committed fixtures); the staging steps of `tests/support/legacy-view.sh` that no suite used; the retired `docs/resets` and `docs/pre-install-backup` entries in `tools/check-links.mjs` and `.gitignore`, with the retired `openspec/delivery/loop.state` ignore rule. The payload is now 67 files.
+- **Left in place, by the owner's decision or pending it.** `docs/videos/` is untracked local work. The architecture plan and the dated history in this record describe how the plugin got here. The `post-install` skill is a compatibility alias. The `output.epicLogs` configuration key is still required by the project schema, so existing `project.json` files stay valid, although nothing writes to that directory. The direct `--hook` modes of the guard scripts are exercised by the suites but not by the dispatcher.
+
 ### Validation
 
-Recorded on 2026-11-13, after the review fixes, the four verification passes and the owner decisions above, on macOS 27.2 (arm64) with `/bin/bash` 3.2.57, jq 1.7.1-apple, OpenSpec 1.13.2, Python 3.15.2 (the `python3` that `sh` and the npm scripts start), Node 26.13.0 and Claude Code 2.1.314. Every row was observed after the last payload and test edit. `npm run check` was run once more after this section was written. No authenticated model session was run, and no CI run is claimed.
+Recorded on 2026-11-13, after the review fixes, the four verification passes, the owner decisions and the removal of unused files above, on macOS 27.2 (arm64) with `/bin/bash` 3.2.57, jq 1.7.1-apple, OpenSpec 1.13.2, Python 3.15.2 (the `python3` that `sh` and the npm scripts start), Node 26.13.0 and Claude Code 2.1.314. Every row was observed after the last payload and test edit. `npm run check` was run once more after this section was written. No authenticated model session was run, and no CI run is claimed.
 
 | Check | Observed result |
 |---|---|
 | `npm run docs:build` | Exit 0: rendered `docs/OhMyOrch.html` from `docs/OhMyOrch.md`, with the manifest at 0.1.0. |
-| `npm run check` | Exit 0. Plugin check: `ohmyorch 0.1.0; 20 skills, 3 agents`. Link check: 183 local links, assets and fragments in 57 documentation files. The generated guide matches its Markdown source. |
-| `npm test` | Exit 0. `guards` 274 passed, 0 failed; `delivery` 425 passed, 0 failed; `html-page` 153 passed, 0 failed; `plugin` 38 tests OK in 189 s; `packaging` 4 tests OK; `specs-app` 15 passed, 0 failed. No test was skipped. |
+| `npm run check` | Exit 0. Plugin check: `ohmyorch 0.1.0; 20 skills, 3 agents`. Link check: 276 local links, assets and fragments in 66 documentation files, the ten slide SVGs and their internal references among them. The generated guide matches its Markdown source. |
+| `npm test` | Exit 0. `guards` 274 passed, 0 failed; `delivery` 425 passed, 0 failed; `html-page` 153 passed, 0 failed; `plugin` 38 tests OK in 177 s; `packaging` 4 tests OK; `specs-app` 15 passed, 0 failed. No test was skipped. |
 | `npm run test:marketplace` | Exit 0 on Claude Code 2.1.314: isolated marketplace add, cached install, next-patch update, uninstall and project preservation. The test uses a temporary configuration directory and no authenticated session. |
 | `claude plugin validate --strict --json plugins/ohmyorch` | Exit 0 with `"success": true`, no manifest error or warning. The directory findings are `LICENSE_MISSING` (blocking for a directory listing) and `ICON_MISSING` (warning). The license is the owner's open decision. Run with an empty, isolated configuration directory. |
 | `claude plugin validate --strict --json .claude-plugin/marketplace.json` | Exit 0 with `"success": true`, no error or warning. Run with the same isolated configuration directory. |
-| `npm run package:plugin -- --development` | Exit 0: `ohmyorch-0.1.0-development.zip` with 69 allowlisted files. The listing equals the payload tree: 20 skills, 3 agents, 14 scripts and 6 rule references, with no removed file and nothing from `tests/`, `tools/` or `docs/`. |
-| Payload count | `find plugins/ohmyorch -type f \| wc -l` printed 69. |
+| `npm run package:plugin -- --development` | Exit 0: `ohmyorch-0.1.0-development.zip` with 67 allowlisted files. The listing equals the payload tree: 20 skills, 3 agents, 14 scripts and 6 rule references, with no removed file and nothing from `tests/`, `tools/` or `docs/`. |
+| Payload count | `find plugins/ohmyorch -type f \| wc -l` printed 67. |
 | Upstream prompts | Each `opsx-*` skill is byte-identical to the prompt OpenSpec 1.13.2 generates once the `name:` line, the boundary block and the namespace renames are undone. The boundary block is the same in all seven. |
 | Prompt rules against the runtime | 36 statements from the delivery skill and the rule references were checked in scratch projects against the final payload, and all 36 held: 25 on derivation, guards and the CODEBASE preflight, and 11 on the two SPECS bookkeeping edits. |
 | Guide images | Both guide SVGs parse with `xmllint --noout`. The review fixes did not change them. |

@@ -1,10 +1,12 @@
 # OhMyOrch
 
+Watch the walkthrough, From Spec to Delivery. It was recorded for 0.0.1, before the flow became the four steps shown below.
+
 [![Watch From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained on YouTube](https://img.youtube.com/vi/vLKeNAXPPd8/maxresdefault.jpg)](https://www.youtube.com/watch?v=vLKeNAXPPd8)
 
 [**Watch the walkthrough: From Spec to Delivery**](https://www.youtube.com/watch?v=vLKeNAXPPd8)
 
-The walkthrough was recorded for 0.0.1 and predates the simplified propose, apply, verify, archive flow described below.
+OhMyOrch is a Claude Code plugin that delivers a `SPECS.md` backlog with OpenSpec, one story at a time.
 
 ![OhMyOrch](https://josoroma.github.io/OhMyOrch/docs/images/OhMyOrch.png)
 
@@ -12,9 +14,13 @@ The walkthrough was recorded for 0.0.1 and predates the simplified propose, appl
 
 [Plugin handbook](plugins/ohmyorch/README.md) · [Installation & updates](docs/distribution.md)
 
+Give Claude a READY story. The main session proposes, applies, verifies and archives one OpenSpec change, then marks the story DONE.
+
+![OhMyOrch overview: one OpenSpec change per READY story, delivered by the main session](docs/images/slide-01-overview.svg)
+
 ## How delivery works
 
-OhMyOrch is a Claude Code plugin that delivers a `SPECS.md` backlog with OpenSpec. Each READY story becomes one OpenSpec change, and the main session takes it through four steps:
+Each READY story becomes one OpenSpec change, and the main session takes it through four steps:
 
 ```text
 SPECS.md READY story
@@ -25,14 +31,19 @@ SPECS.md READY story
    -> story marked DONE in SPECS.md
 ```
 
-Run the whole loop with `/ohmyorch:deliver <target>`, where the target is an epic (`EPIC-1`), a story (`US-1.1`) or a task (`US-1.1#2`). The next action is derived from `SPECS.md` and the change directory on every call, so a new session resumes from the files, not from chat memory.
+Run the whole loop with `/ohmyorch:deliver <target>`, where the target is an epic (`EPIC-1`), a story (`US-1.1`) or a task (`US-1.1#2`). The slide shows the command behind each step and the six actions the loop can derive.
+
+![The four delivery steps: propose, apply, verify, archive, then the story is DONE](docs/images/slide-02-four-steps.svg)
 
 - A change's record is OpenSpec's own artifacts. `tasks.md` is the only progress tracker.
 - Verify writes no file. A CRITICAL finding becomes a new unticked task, which returns the change to apply.
 - Two guards are mechanical: `openspec archive` is refused while `tasks.md` has unticked tasks, and a story cannot become DONE while its change is still active.
-- The plugin has 20 skills (19 public commands and one internal contract), three read-only authoring agents for the PRD, SPECS and CODEBASE documents, root hooks and a Bash/jq runtime. The [guide](docs/OhMyOrch.md) lists every skill.
 
-![Local plugin workflow](docs/images/ohmyorch-local-plugin-workflow.png)
+The next action is derived from `SPECS.md` and the change directory on every call, so a new session resumes from the files, not from chat memory.
+
+![Files, not chat memory: five properties that let a new session resume](docs/images/slide-03-files-not-chat-memory.svg)
+
+## Try it locally
 
 **0.1.0 is the current source version; it is not tagged. The last tagged release is 0.0.1.** For a local preview, run from this repository:
 
@@ -40,11 +51,43 @@ Run the whole loop with `/ohmyorch:deliver <target>`, where the target is an epi
 claude --plugin-dir ./plugins/ohmyorch
 ```
 
-![Preparing and delivering approved work](docs/images/ready-intent-to-execution.png)
+Load the plugin from a checkout, check the project, and preview the bootstrap before you apply it.
 
-![Installation, prerequisites and release checks](docs/images/validate-first-publish-second.png)
+![Try it locally: load the plugin from a checkout, then bootstrap with a dry run first](docs/images/slide-04-try-it-locally.svg)
 
-![Contributing and project ownership](docs/images/publisher-repo-and-consumer-project.png)
+## Prepare, then deliver
+
+Analyze the code, write or ingest the intent, deliver a READY story, and resume the goal when a session ends.
+
+![Prepare, then deliver: analyze the codebase, generate or ingest intent, deliver, resume](docs/images/slide-05-prepare-then-deliver.svg)
+
+## Install and release status
+
+The prerequisites, the marketplace commands, and the release gates that are still open. [Installation & updates](docs/distribution.md) has the details.
+
+![Distribution: prerequisites, marketplace install and the open release gates](docs/images/slide-06-validate-then-publish.svg)
+
+## What's included
+
+The plugin has 20 skills (19 public commands and one internal contract), three read-only authoring agents for the PRD, SPECS and CODEBASE documents, root hooks and a Bash/jq runtime.
+
+![Plugin contents: 20 skills, 3 authoring agents, 6 rule references, root hooks, and what stays in your project](docs/images/slide-07-plugin-contents.svg)
+
+The 19 public skills, grouped by the job you need to do. The [guide](docs/OhMyOrch.md) describes each one.
+
+![Skill map: the public skills grouped by job](docs/images/slide-08-skill-map.svg)
+
+## Work on the plugin
+
+The checks a maintainer runs in this repository, and what never reaches a packaged plugin.
+
+![Publisher repository and consumer project: maintainer checks, tools and packaging exclusions](docs/images/slide-09-publisher-and-consumer.svg)
+
+## What a delivered story leaves behind
+
+A change leaves only OpenSpec's own artifacts: no plan, review, test-report or status files.
+
+![The change is the record: story, proposal, delta specs, optional design, tasks, archive, DONE](docs/images/slide-10-change-record.svg)
 
 ## See your specification as a workspace
 

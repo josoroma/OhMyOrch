@@ -55,6 +55,8 @@ Removed:
 - `delivery reopen` and the `--change` option of `delivery`.
 - Per-change artifacts: `implementation-plan.md`, `review.md`, `test-report.md`, `status.md`, `completion.md` and `history/`, together with their templates under `templates/artifacts/`.
 - Rule reference `testing.md`.
+- Scaffold `SPEC-LOGS/README.md`: `bootstrap --with-openspec` no longer creates it, because nothing writes epic logs. The `output.epicLogs` key stays in `project.json`, so existing configurations remain valid.
+- `templates/project/project.schema.json`, which no code read.
 - Concepts: the seven gates, the four completion conditions, verdict history, reopen and remediation rounds, the predicted-files scope contract, change states and per-stage owners. The partial/UNVERIFIED acceptance exceptions that 0.0.1 retained are gone because the evaluators that had them were removed.
 
 Upgrading from 0.0.1:

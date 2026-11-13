@@ -13,7 +13,7 @@ const ignoredDirectories = new Set([
 ]);
 // docs/videos holds video production workspaces (sources, renders, QA logs) that
 // cite plugin sources of the release they explain; it is not published documentation.
-const ignoredPaths = new Set(['tests/fixtures', 'docs/resets', 'docs/pre-install-backup', 'docs/videos']);
+const ignoredPaths = new Set(['tests/fixtures', 'docs/videos']);
 function documentationFiles(directory = '') {
   const result = [];
   for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes: true })) {

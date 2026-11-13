@@ -115,7 +115,7 @@ EOF
       ohmyorch_plan_file openspec/config.yaml "$OHMYORCH_CODE_ROOT/templates/project/openspec/config.yaml" create-only || exit 2
       ohmyorch_record openspec/config.yaml "$OHMYORCH_CODE_ROOT/templates/project/openspec/config.yaml" scaffold || exit 2
     fi
-    for path in openspec/specs/README.md openspec/changes/archive/README.md openspec/delivery/README.md SPEC-LOGS/README.md; do
+    for path in openspec/specs/README.md openspec/changes/archive/README.md openspec/delivery/README.md; do
       if [ ! -e "$path" ]; then
         ohmyorch_plan_file "$path" "$OHMYORCH_CODE_ROOT/templates/project/$path" create-only || exit 2
         ohmyorch_record "$path" "$OHMYORCH_CODE_ROOT/templates/project/$path" scaffold || exit 2

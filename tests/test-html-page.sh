@@ -17,7 +17,7 @@
 #      each valid fixture passes, including the false-positive guards.
 #
 # Each invalid fixture is the valid page with exactly one mutation, named after the
-# rule it breaks (scripts/fixtures/html-pages/make-fixtures.py).
+# rule it breaks. The fixtures are maintained by hand.
 #
 # Usage: scripts/test-html-page.sh
 #

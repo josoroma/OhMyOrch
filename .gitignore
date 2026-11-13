@@ -14,21 +14,6 @@
 .claude/logs/
 .claude/.cache/
 
-# --- Harness runtime state ---
-# Per-machine goal-loop counters written by the delivery Stop hook (US-12.2).
-# openspec/delivery/goal.md IS tracked: it is the durable goal record.
-openspec/delivery/loop.state
-
-# Timestamped backups written by /harness-reset. NEVER commit these: a backup of
-# .claude/ is a byte copy of the live directory, so it contains the machine-local
-# .claude/settings.local.json and whatever secrets that holds. A committed backup
-# would leak them, and rotate-by-history is the worst way to find out.
-docs/resets/
-
-# Timestamped backups written by /ohmyorch:post-install. They may contain
-# .claude/settings.local.json and project-local guidance that should stay local.
-docs/pre-install-backup/
-
 # --- Secrets & environment ---
 .env
 .env.*

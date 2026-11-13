@@ -3,13 +3,8 @@
 set -euo pipefail
 repository=$(cd -- "$(dirname -- "$0")/../.." && pwd -P)
 target="$1"
-mkdir -p "$target/scripts/templates" "$target/.claude/rules"
+mkdir -p "$target/scripts"
 cp -R "$repository/tests/fixtures" "$target/scripts/fixtures"
-cp "$repository/plugins/ohmyorch/templates/html-page.html" "$target/scripts/templates/"
-cp "$repository/plugins/ohmyorch/README.md" "$target/README.md"
-cp "$repository/plugins/ohmyorch/README.md" "$target/scripts/README.md"
-cp "$repository/plugins/ohmyorch/references/rules/delivery-loop.md" "$target/.claude/rules/ohmyorch:delivery-loop.md"
-cp "$repository/tests/fixtures/valid/SPECS.md" "$target/SPECS.md"
 for script in "$repository/plugins/ohmyorch/scripts/"*.sh; do
   name=${script##*/}
   cat > "$target/scripts/$name" <<'EOF'

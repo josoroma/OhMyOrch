@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <title id="t">OhMyOrch distribution: validate first, publish second</title>
+  <desc id="d">Version 0.1.0 is the plugin source and 0.0.1 is the last tagged release; the slide lists the prerequisites, the two marketplace install commands and the four release gates that are still open.</desc>
+  <defs>
+    <linearGradient id="hl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2b7fff"/>
+      <stop offset="1" stop-color="#5ee9b5"/>
+    </linearGradient>
+    <linearGradient id="hl2" x1="0.5" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2b7fff"/>
+      <stop offset="1" stop-color="#5ee9b5"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0.82" cy="0.18" r="0.55">
+      <stop offset="0" stop-color="#2b7fff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2b7fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0.1" cy="0.95" r="0.5">
+      <stop offset="0" stop-color="#00bc7d" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#00bc7d" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#ffffff" fill-opacity="0.10"/>
+    </pattern>
+    <clipPath id="frame"><rect width="1600" height="900" rx="28"/></clipPath>
+    <symbol id="i-box" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></g></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></g></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></g></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-6-6-6"/><path d="M12 19h8"/></g></symbol>
+    <symbol id="i-braces" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></g></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></g></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></g></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></symbol>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1600" height="900" fill="#0a0a0a"/>
+    <rect width="1600" height="900" fill="url(#glowA)"/>
+    <rect width="1600" height="900" fill="url(#glowB)"/>
+    <rect x="1380" y="148" width="148" height="84" fill="url(#dots)"/>
+
+    <!-- kicker -->
+    <rect x="72" y="64" width="214" height="46" rx="23" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+    <use href="#i-box" x="92" y="76" width="22" height="22" color="#2b7fff"/>
+    <text x="128" y="94" font-size="15" font-weight="600" letter-spacing="3" fill="#a1a1a1">DISTRIBUTION</text>
+    <text x="1528" y="96" font-size="18" font-weight="500" letter-spacing="2" text-anchor="end" fill="#737373" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">06</text>
+
+    <!-- headline -->
+    <text x="72" y="206" font-size="72" font-weight="800" letter-spacing="-2" fill="#fafafa">Validate first. <tspan fill="url(#hl2)">Publish second.</tspan></text>
+    <text x="72" y="254" font-size="25" fill="#a1a1a1"><tspan fill="#fafafa">0.1.0</tspan> is the source version; the last tagged release is <tspan fill="#fafafa">0.0.1</tspan>.</text>
+
+    <!-- prerequisites -->
+    <g>
+      <rect x="72" y="290" width="718" height="500" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="96" y="312" width="48" height="48" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-list" x="108" y="324" width="24" height="24" color="#2b7fff"/>
+      <text x="160" y="344" font-size="22" font-weight="700" fill="#fafafa">Prerequisites</text>
+
+      <rect x="96" y="380" width="670" height="52" rx="10" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.10"/>
+      <use href="#i-file" x="114" y="396" width="20" height="20" color="#2b7fff"/>
+      <text x="150" y="412" font-size="18" fill="#a1a1a1"><tspan font-weight="600" fill="#fafafa">OpenSpec</tspan><tspan dx="12" font-size="16">validation target, separate install</tspan></text>
+      <rect x="650" y="391" width="104" height="30" rx="15" fill="#262626"/>
+      <text x="702" y="412" font-size="16" text-anchor="middle" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1.13.2</text>
+
+      <rect x="96" y="440" width="670" height="52" rx="10" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.10"/>
+      <use href="#i-terminal" x="114" y="456" width="20" height="20" color="#2b7fff"/>
+      <text x="150" y="472" font-size="18" font-weight="600" fill="#fafafa">Bash</text>
+      <rect x="650" y="451" width="104" height="30" rx="15" fill="#262626"/>
+      <text x="702" y="472" font-size="16" text-anchor="middle" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">3.2+</text>
+
+      <rect x="96" y="500" width="670" height="52" rx="10" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.10"/>
+      <use href="#i-braces" x="114" y="516" width="20" height="20" color="#2b7fff"/>
+      <text x="150" y="532" font-size="18" font-weight="600" fill="#fafafa">jq</text>
+      <rect x="650" y="511" width="104" height="30" rx="15" fill="#262626"/>
+      <text x="702" y="532" font-size="16" text-anchor="middle" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1.6+</text>
+
+      <rect x="96" y="560" width="670" height="52" rx="10" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.10"/>
+      <use href="#i-wrench" x="114" y="576" width="20" height="20" color="#2b7fff"/>
+      <text x="150" y="592" font-size="18" font-weight="600" fill="#fafafa">Git, shasum, Unix utilities</text>
+      <rect x="650" y="571" width="104" height="30" rx="15" fill="#262626"/>
+      <text x="702" y="592" font-size="16" text-anchor="middle" fill="#a1a1a1" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">required</text>
+
+      <rect x="96" y="636" width="670" height="130" rx="10" fill="#00bc7d" fill-opacity="0.08" stroke="#5ee9b5" stroke-opacity="0.30"/>
+      <rect x="116" y="677" width="48" height="48" rx="12" fill="#5ee9b5" fill-opacity="0.12"/>
+      <use href="#i-check" x="128" y="689" width="24" height="24" color="#5ee9b5"/>
+      <text x="184" y="682" font-size="22" font-weight="700" fill="#fafafa">Claude Code <tspan fill="#5ee9b5">2.1.314</tspan></text>
+      <text x="184" y="710" font-size="18" fill="#a1a1a1">Format and cache checks for 0.1.0 ran on it</text>
+      <text x="184" y="736" font-size="18" fill="#a1a1a1">Versions before 2.1.139 lack exec-form hooks</text>
+    </g>
+
+    <!-- install -->
+    <g>
+      <rect x="810" y="290" width="718" height="256" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="834" y="312" width="48" height="48" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-download" x="846" y="324" width="24" height="24" color="#2b7fff"/>
+      <text x="898" y="344" font-size="22" font-weight="700" fill="#fafafa">Install from the marketplace</text>
+
+      <rect x="834" y="380" width="670" height="114" rx="10" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.10"/>
+      <circle cx="858" cy="396" r="5" fill="#ffffff" fill-opacity="0.18"/>
+      <circle cx="876" cy="396" r="5" fill="#ffffff" fill-opacity="0.18"/>
+      <circle cx="894" cy="396" r="5" fill="#ffffff" fill-opacity="0.18"/>
+      <text x="1484" y="401" font-size="15" text-anchor="end" fill="#737373">Claude Code</text>
+      <rect x="834" y="412" width="670" height="1" fill="#ffffff" fill-opacity="0.10"/>
+      <text x="858" y="445" font-size="18" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan fill="#2b7fff">/plugin</tspan> marketplace add josoroma/OhMyOrch</text>
+      <text x="858" y="475" font-size="18" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan fill="#2b7fff">/plugin</tspan> install ohmyorch@ohmyorch-marketplace</text>
+
+      <text x="834" y="526" font-size="18" fill="#a1a1a1">Then choose user, project or local scope.</text>
+    </g>
+
+    <!-- release gates -->
+    <g>
+      <rect x="810" y="566" width="718" height="224" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="834" y="588" width="48" height="48" rx="12" fill="#ff6467" fill-opacity="0.13"/>
+      <use href="#i-lock" x="846" y="600" width="24" height="24" color="#ff6467"/>
+      <text x="898" y="620" font-size="22" font-weight="700" fill="#fafafa">Release gates still open</text>
+      <rect x="1368" y="596" width="136" height="32" rx="16" fill="#262626"/>
+      <text x="1436" y="617" font-size="15" font-weight="600" letter-spacing="2" text-anchor="middle" fill="#a1a1a1">4 PENDING</text>
+
+      <g fill="none" stroke="#737373" stroke-width="2">
+        <circle cx="858" cy="666" r="6"/>
+        <circle cx="858" cy="696" r="6"/>
+        <circle cx="858" cy="726" r="6"/>
+        <circle cx="858" cy="756" r="6"/>
+      </g>
+      <text x="898" y="672" font-size="18" fill="#fafafa">Authenticated agent identity and denial tests</text>
+      <text x="898" y="702" font-size="18" fill="#fafafa">Authenticated full story lifecycle test</text>
+      <text x="898" y="732" font-size="18" fill="#fafafa">Validation on the latest stable Claude Code</text>
+      <text x="898" y="762" font-size="18" fill="#fafafa">Distribution license chosen by the owner</text>
+    </g>
+
+    <!-- footer -->
+    <rect x="72" y="822" width="1456" height="1" fill="#ffffff" fill-opacity="0.10"/>
+    <text x="72" y="864" font-size="22" font-weight="800" letter-spacing="-0.5" fill="#fafafa">Oh<tspan fill="url(#hl)">My</tspan>Orch</text>
+    <text x="800" y="862" font-size="15" letter-spacing="3" text-anchor="middle" fill="#737373">CLAUDE CODE + OPENSPEC</text>
+    <g transform="translate(1408 844) scale(0.6)" fill-rule="evenodd">
+      <g fill="#c92b60">
+        <path d="M26.8 5.8C26.8 5.3 26.4 5.1 25.9 5.3C22.3 6.5 20.8 9.1 20.8 12.8V21.2C20.8 26.3 17.8 29.1 12.8 29.1H9.1C6.2 29.1 4.3 31.0 4.1 33.7C4.1 34.0 4.3 34.2 4.7 34.2H12.9C21.6 34.2 26.8 29.2 26.8 21.1Z"/>
+        <path d="M40.4 12.5C33.9 12.5 29.3 17.2 29.3 23.5C29.3 29.8 33.9 34.5 40.4 34.5C46.9 34.5 51.5 29.8 51.5 23.5C51.5 17.2 46.9 12.5 40.4 12.5ZM40.4 18.0C43.6 18.0 45.9 20.3 45.9 23.5C45.9 26.7 43.6 29.0 40.4 29.0C37.2 29.0 34.9 26.7 34.9 23.5C34.9 20.3 37.2 18.0 40.4 18.0Z"/>
+        <path d="M68.0 14.4C65.8 13.1 63.6 12.5 61.0 12.5C55.9 12.5 52.4 15.2 52.4 19.3C52.4 23.2 55.3 24.7 59.4 25.7L61.4 26.2C63.1 26.6 63.8 27.1 63.8 27.9C63.8 28.9 62.8 29.5 61.1 29.5C58.5 29.5 56.0 28.5 53.8 26.9C53.5 26.7 53.2 26.8 53.0 27.1L51.1 30.4C50.9 30.7 51.0 31.0 51.3 31.2C54.0 33.4 57.5 34.5 61.0 34.5C66.3 34.5 69.7 31.8 69.7 27.5C69.7 23.7 67.0 22.1 62.8 21.1L60.6 20.6C58.9 20.2 58.2 19.7 58.2 18.9C58.2 18.0 59.2 17.5 60.8 17.5C62.7 17.5 64.4 18.0 66.2 19.0C66.5 19.2 66.8 19.1 67.0 18.8L68.2 15.1C68.4 14.8 68.3 14.6 68.0 14.4Z"/>
+        <path d="M81.8 12.5C75.3 12.5 70.7 17.2 70.7 23.5C70.7 29.8 75.3 34.5 81.8 34.5C88.3 34.5 92.9 29.8 92.9 23.5C92.9 17.2 88.3 12.5 81.8 12.5ZM81.8 18.0C85.0 18.0 87.3 20.3 87.3 23.5C87.3 26.7 85.0 29.0 81.8 29.0C78.6 29.0 76.3 26.7 76.3 23.5C76.3 20.3 78.6 18.0 81.8 18.0Z"/>
+        <path d="M100.2 33.4V23.5C100.2 20.3 102.1 18.4 105.4 18.4H107.4C107.7 18.4 107.9 18.2 107.9 17.9V13.4C107.9 13.1 107.7 12.9 107.4 12.9H105.1C98.5 12.9 94.5 16.9 94.5 23.4V33.4C94.5 33.8 94.7 34.0 95.1 34.0H99.6C100.0 34.0 100.2 33.8 100.2 33.4Z"/>
+        <path d="M119.4 12.5C112.9 12.5 108.3 17.2 108.3 23.5C108.3 29.8 112.9 34.5 119.4 34.5C125.9 34.5 130.5 29.8 130.5 23.5C130.5 17.2 125.9 12.5 119.4 12.5ZM119.4 18.0C122.6 18.0 124.9 20.3 124.9 23.5C124.9 26.7 122.6 29.0 119.4 29.0C116.2 29.0 113.9 26.7 113.9 23.5C113.9 20.3 116.2 18.0 119.4 18.0Z"/>
+        <path d="M133.0 33.4V22.9C133.0 16.7 137.0 12.5 142.8 12.5C146.1 12.5 148.6 13.8 150.4 15.9C152.2 13.8 154.7 12.5 158.0 12.5C163.8 12.5 167.8 16.7 167.8 22.9V33.4C167.8 33.8 167.6 34.0 167.2 34.0H162.7C162.3 34.0 162.1 33.8 162.1 33.4V23.0C162.1 19.8 160.6 18.0 158.0 18.0C155.4 18.0 153.3 19.8 153.3 23.0V33.4C153.3 33.8 153.1 34.0 152.7 34.0H148.2C147.8 34.0 147.6 33.8 147.6 33.4V23.0C147.6 19.8 145.4 18.0 142.8 18.0C140.2 18.0 138.7 19.8 138.7 23.0V33.4C138.7 33.8 138.5 34.0 138.1 34.0H133.6C133.2 34.0 133.0 33.8 133.0 33.4Z"/>
+      </g>
+      <path fill="#087fa9" d="M183.6 11.7C176.8 11.7 171.9 16.5 171.9 23.1C171.9 29.6 176.8 34.0 183.6 34.0H194.6C195.0 34.0 195.2 33.8 195.2 33.4V23.1C195.2 16.5 190.3 11.7 183.6 11.7ZM183.6 17.3C187.1 17.3 189.5 19.7 189.5 23.1V28.5H183.6C180.1 28.5 177.6 26.3 177.6 23.1C177.6 19.7 180.1 17.3 183.6 17.3Z"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <title id="t">OhMyOrch: the change is the record</title>
+  <desc id="d">A READY story in SPECS.md becomes one OpenSpec change made of proposal.md, delta specs, an optional design.md and tasks.md; archiving merges the specs into openspec/specs/ and moves the change to changes/archive/, then the story is marked DONE in SPECS.md.</desc>
+  <defs>
+    <linearGradient id="hl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2b7fff"/>
+      <stop offset="1" stop-color="#5ee9b5"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0.82" cy="0.18" r="0.55">
+      <stop offset="0" stop-color="#2b7fff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2b7fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0.1" cy="0.95" r="0.5">
+      <stop offset="0" stop-color="#00bc7d" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#00bc7d" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#ffffff" fill-opacity="0.10"/>
+    </pattern>
+    <clipPath id="frame"><rect width="1600" height="900" rx="28"/></clipPath>
+    <symbol id="i-file" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/></g></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></g></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></g></symbol>
+    <symbol id="i-diff" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v14"/><path d="M5 10h14"/><path d="M5 21h14"/></g></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></g></symbol>
+    <symbol id="i-tasks" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></g></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></g></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></g></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></g></symbol>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1600" height="900" fill="#0a0a0a"/>
+    <rect width="1600" height="900" fill="url(#glowA)"/>
+    <rect width="1600" height="900" fill="url(#glowB)"/>
+    <rect x="1328" y="168" width="200" height="110" fill="url(#dots)"/>
+
+    <!-- kicker -->
+    <rect x="72" y="64" width="198" height="46" rx="23" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+    <use href="#i-file" x="92" y="76" width="22" height="22" color="#2b7fff"/>
+    <text x="128" y="94" font-size="15" font-weight="600" letter-spacing="3" fill="#a1a1a1">THE RECORD</text>
+    <text x="1528" y="96" font-size="18" font-weight="500" letter-spacing="2" text-anchor="end" fill="#737373" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">10</text>
+
+    <!-- headline -->
+    <text x="72" y="212" font-size="72" font-weight="800" letter-spacing="-2" fill="#fafafa">The change is <tspan fill="url(#hl)">the record</tspan>.</text>
+    <text x="72" y="264" font-size="25" fill="#a1a1a1">Only OpenSpec's own artifacts. No plan, review, test-report or status files.</text>
+
+    <!-- the change directory groups the four artifacts -->
+    <g fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5" stroke-linecap="round">
+      <path d="M320 350V342Q320 334 328 334H652"/>
+      <path d="M948 334H1272Q1280 334 1280 342V350"/>
+    </g>
+    <text x="800" y="339" font-size="16" text-anchor="middle" fill="#a1a1a1" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">openspec/changes/&lt;change&gt;/</text>
+
+    <!-- trail -->
+    <g>
+      <!-- 1 READY STORY -->
+      <rect x="72" y="358" width="216" height="240" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="88" y="376" width="52" height="52" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-flag" x="101" y="389" width="26" height="26" color="#2b7fff"/>
+      <text x="88" y="464" font-size="18" font-weight="700" letter-spacing="2" fill="#fafafa">READY STORY</text>
+      <text x="88" y="499" font-size="17" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">SPECS.md</text>
+      <text x="88" y="532" font-size="18" fill="#a1a1a1">one story,</text>
+      <text x="88" y="556" font-size="18" fill="#a1a1a1">one change</text>
+
+      <!-- 2 PROPOSAL -->
+      <rect x="320" y="358" width="216" height="240" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="336" y="376" width="52" height="52" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-bulb" x="349" y="389" width="26" height="26" color="#2b7fff"/>
+      <text x="336" y="464" font-size="18" font-weight="700" letter-spacing="2" fill="#fafafa">PROPOSAL</text>
+      <text x="336" y="499" font-size="17" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">proposal.md</text>
+      <text x="336" y="532" font-size="18" fill="#a1a1a1">why, and what</text>
+      <text x="336" y="556" font-size="18" fill="#a1a1a1">is in scope</text>
+
+      <!-- 3 DELTA SPECS -->
+      <rect x="568" y="358" width="216" height="240" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="584" y="376" width="52" height="52" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-diff" x="597" y="389" width="26" height="26" color="#2b7fff"/>
+      <text x="584" y="464" font-size="18" font-weight="700" letter-spacing="2" fill="#fafafa">DELTA SPECS</text>
+      <text x="584" y="499" font-size="17" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">specs/</text>
+      <text x="584" y="532" font-size="18" fill="#a1a1a1">each acceptance</text>
+      <text x="584" y="556" font-size="18" fill="#a1a1a1">scenario</text>
+
+      <!-- 4 DESIGN, optional -->
+      <rect x="816" y="358" width="216" height="240" rx="14" fill="#171717" fill-opacity="0.45" stroke="#ffffff" stroke-opacity="0.30" stroke-dasharray="7 7"/>
+      <rect x="832" y="376" width="52" height="52" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-layers" x="845" y="389" width="26" height="26" color="#2b7fff"/>
+      <rect x="904" y="388" width="112" height="28" rx="14" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-dasharray="4 4"/>
+      <text x="961" y="407" font-size="15" font-weight="600" letter-spacing="2" text-anchor="middle" fill="#a1a1a1">OPTIONAL</text>
+      <text x="832" y="464" font-size="18" font-weight="700" letter-spacing="2" fill="#fafafa">DESIGN</text>
+      <text x="832" y="499" font-size="17" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">design.md</text>
+      <text x="832" y="532" font-size="18" fill="#a1a1a1">how, only when</text>
+      <text x="832" y="556" font-size="18" fill="#a1a1a1">needed</text>
+
+      <!-- 5 TASKS -->
+      <rect x="1064" y="358" width="216" height="240" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="1080" y="376" width="52" height="52" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-tasks" x="1093" y="389" width="26" height="26" color="#2b7fff"/>
+      <text x="1080" y="464" font-size="18" font-weight="700" letter-spacing="2" fill="#fafafa">TASKS</text>
+      <text x="1080" y="499" font-size="17" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">tasks.md</text>
+      <text x="1080" y="532" font-size="18" fill="#a1a1a1">the only</text>
+      <text x="1080" y="556" font-size="18" fill="#a1a1a1">progress tracker</text>
+
+      <!-- 6 ARCHIVE -->
+      <rect x="1312" y="358" width="216" height="240" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.14"/>
+      <rect x="1328" y="376" width="52" height="52" rx="12" fill="#5ee9b5" fill-opacity="0.12"/>
+      <use href="#i-archive" x="1341" y="389" width="26" height="26" color="#5ee9b5"/>
+      <text x="1328" y="464" font-size="18" font-weight="700" letter-spacing="2" fill="#fafafa">ARCHIVE</text>
+      <text x="1328" y="497" font-size="18" fill="#a1a1a1">merged into</text>
+      <text x="1328" y="521" font-size="16" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">openspec/specs/</text>
+      <text x="1328" y="551" font-size="18" fill="#a1a1a1">moved to</text>
+      <text x="1328" y="575" font-size="16" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">changes/archive/</text>
+
+      <!-- arrows -->
+      <g fill="#5ee9b5">
+        <path d="M-7 -8 8 0 -7 8Z" transform="translate(304 478)"/>
+        <path d="M-7 -8 8 0 -7 8Z" transform="translate(552 478)"/>
+        <path d="M-7 -8 8 0 -7 8Z" transform="translate(800 478)"/>
+        <path d="M-7 -8 8 0 -7 8Z" transform="translate(1048 478)"/>
+        <path d="M-7 -8 8 0 -7 8Z" transform="translate(1296 478)"/>
+        <path d="M-7 -8 8 0 -7 8Z" transform="translate(1420 620) rotate(90)"/>
+      </g>
+    </g>
+
+    <!-- resume strip -->
+    <g>
+      <rect x="72" y="642" width="1208" height="132" rx="14" fill="#171717" stroke="#ffffff" stroke-opacity="0.10"/>
+      <rect x="96" y="680" width="56" height="56" rx="12" fill="#5ee9b5" fill-opacity="0.12"/>
+      <use href="#i-db" x="110" y="694" width="28" height="28" color="#5ee9b5"/>
+      <text x="172" y="687" font-size="22" font-weight="700" fill="#fafafa">New sessions resume from files</text>
+      <text x="172" y="718" font-size="18" fill="#a1a1a1">SPECS.md and the change directory hold</text>
+      <text x="172" y="742" font-size="18" fill="#a1a1a1">the state. A chat transcript does not.</text>
+
+      <rect x="676" y="666" width="1" height="84" fill="#ffffff" fill-opacity="0.10"/>
+
+      <rect x="700" y="680" width="56" height="56" rx="12" fill="#2b7fff" fill-opacity="0.14"/>
+      <use href="#i-refresh" x="714" y="694" width="28" height="28" color="#2b7fff"/>
+      <text x="776" y="687" font-size="22" font-weight="700" fill="#fafafa">goal.md is a record for readers</text>
+      <text x="776" y="718" font-size="18" fill="#a1a1a1">The next action is recomputed on every</text>
+      <text x="776" y="742" font-size="18" fill="#a1a1a1">call, never remembered.</text>
+    </g>
+
+    <!-- DONE -->
+    <g>
+      <rect x="1312" y="642" width="216" height="132" rx="14" fill="#00bc7d" fill-opacity="0.14" stroke="#5ee9b5" stroke-opacity="0.45"/>
+      <use href="#i-check" x="1330" y="665" width="26" height="26" color="#5ee9b5"/>
+      <text x="1368" y="687" font-size="24" font-weight="700" letter-spacing="3" fill="#5ee9b5">DONE</text>
+      <text x="1330" y="722" font-size="18" fill="#a1a1a1">story marked in</text>
+      <text x="1330" y="746" font-size="18" fill="#a1a1a1">SPECS.md</text>
+    </g>
+
+    <!-- footer -->
+    <rect x="72" y="822" width="1456" height="1" fill="#ffffff" fill-opacity="0.10"/>
+    <text x="72" y="864" font-size="22" font-weight="800" letter-spacing="-0.5" fill="#fafafa">Oh<tspan fill="url(#hl)">My</tspan>Orch</text>
+    <text x="800" y="862" font-size="15" letter-spacing="3" text-anchor="middle" fill="#737373">CLAUDE CODE + OPENSPEC</text>
+    <g transform="translate(1408 844) scale(0.6)" fill-rule="evenodd">
+      <g fill="#c92b60">
+        <path d="M26.8 5.8C26.8 5.3 26.4 5.1 25.9 5.3C22.3 6.5 20.8 9.1 20.8 12.8V21.2C20.8 26.3 17.8 29.1 12.8 29.1H9.1C6.2 29.1 4.3 31.0 4.1 33.7C4.1 34.0 4.3 34.2 4.7 34.2H12.9C21.6 34.2 26.8 29.2 26.8 21.1Z"/>
+        <path d="M40.4 12.5C33.9 12.5 29.3 17.2 29.3 23.5C29.3 29.8 33.9 34.5 40.4 34.5C46.9 34.5 51.5 29.8 51.5 23.5C51.5 17.2 46.9 12.5 40.4 12.5ZM40.4 18.0C43.6 18.0 45.9 20.3 45.9 23.5C45.9 26.7 43.6 29.0 40.4 29.0C37.2 29.0 34.9 26.7 34.9 23.5C34.9 20.3 37.2 18.0 40.4 18.0Z"/>
+        <path d="M68.0 14.4C65.8 13.1 63.6 12.5 61.0 12.5C55.9 12.5 52.4 15.2 52.4 19.3C52.4 23.2 55.3 24.7 59.4 25.7L61.4 26.2C63.1 26.6 63.8 27.1 63.8 27.9C63.8 28.9 62.8 29.5 61.1 29.5C58.5 29.5 56.0 28.5 53.8 26.9C53.5 26.7 53.2 26.8 53.0 27.1L51.1 30.4C50.9 30.7 51.0 31.0 51.3 31.2C54.0 33.4 57.5 34.5 61.0 34.5C66.3 34.5 69.7 31.8 69.7 27.5C69.7 23.7 67.0 22.1 62.8 21.1L60.6 20.6C58.9 20.2 58.2 19.7 58.2 18.9C58.2 18.0 59.2 17.5 60.8 17.5C62.7 17.5 64.4 18.0 66.2 19.0C66.5 19.2 66.8 19.1 67.0 18.8L68.2 15.1C68.4 14.8 68.3 14.6 68.0 14.4Z"/>
+        <path d="M81.8 12.5C75.3 12.5 70.7 17.2 70.7 23.5C70.7 29.8 75.3 34.5 81.8 34.5C88.3 34.5 92.9 29.8 92.9 23.5C92.9 17.2 88.3 12.5 81.8 12.5ZM81.8 18.0C85.0 18.0 87.3 20.3 87.3 23.5C87.3 26.7 85.0 29.0 81.8 29.0C78.6 29.0 76.3 26.7 76.3 23.5C76.3 20.3 78.6 18.0 81.8 18.0Z"/>
+        <path d="M100.2 33.4V23.5C100.2 20.3 102.1 18.4 105.4 18.4H107.4C107.7 18.4 107.9 18.2 107.9 17.9V13.4C107.9 13.1 107.7 12.9 107.4 12.9H105.1C98.5 12.9 94.5 16.9 94.5 23.4V33.4C94.5 33.8 94.7 34.0 95.1 34.0H99.6C100.0 34.0 100.2 33.8 100.2 33.4Z"/>
+        <path d="M119.4 12.5C112.9 12.5 108.3 17.2 108.3 23.5C108.3 29.8 112.9 34.5 119.4 34.5C125.9 34.5 130.5 29.8 130.5 23.5C130.5 17.2 125.9 12.5 119.4 12.5ZM119.4 18.0C122.6 18.0 124.9 20.3 124.9 23.5C124.9 26.7 122.6 29.0 119.4 29.0C116.2 29.0 113.9 26.7 113.9 23.5C113.9 20.3 116.2 18.0 119.4 18.0Z"/>
+        <path d="M133.0 33.4V22.9C133.0 16.7 137.0 12.5 142.8 12.5C146.1 12.5 148.6 13.8 150.4 15.9C152.2 13.8 154.7 12.5 158.0 12.5C163.8 12.5 167.8 16.7 167.8 22.9V33.4C167.8 33.8 167.6 34.0 167.2 34.0H162.7C162.3 34.0 162.1 33.8 162.1 33.4V23.0C162.1 19.8 160.6 18.0 158.0 18.0C155.4 18.0 153.3 19.8 153.3 23.0V33.4C153.3 33.8 153.1 34.0 152.7 34.0H148.2C147.8 34.0 147.6 33.8 147.6 33.4V23.0C147.6 19.8 145.4 18.0 142.8 18.0C140.2 18.0 138.7 19.8 138.7 23.0V33.4C138.7 33.8 138.5 34.0 138.1 34.0H133.6C133.2 34.0 133.0 33.8 133.0 33.4Z"/>
+      </g>
+      <path fill="#087fa9" d="M183.6 11.7C176.8 11.7 171.9 16.5 171.9 23.1C171.9 29.6 176.8 34.0 183.6 34.0H194.6C195.0 34.0 195.2 33.8 195.2 33.4V23.1C195.2 16.5 190.3 11.7 183.6 11.7ZM183.6 17.3C187.1 17.3 189.5 19.7 189.5 23.1V28.5H183.6C180.1 28.5 177.6 26.3 177.6 23.1C177.6 19.7 180.1 17.3 183.6 17.3Z"/>
+    </g>
+  </g>
+</svg>
