@@ -10,7 +10,7 @@ Propose it, apply it, verify it, archive it.
 
 OhMyOrch brings a repeatable delivery loop to Claude Code. Each READY story in your `SPECS.md` backlog becomes one OpenSpec change. The main session proposes the change, applies its tasks, verifies the result, archives it, and marks the story DONE. The next action is always derived from project files, so you can see what is finished, what is pending, and where to resume.
 
-OhMyOrch **0.1.0** is the version in this repository; it is not tagged, and the last tagged release is 0.0.1. The walkthrough video above was recorded for 0.0.1 and predates the propose, apply, verify, archive flow this guide describes. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.
+OhMyOrch **0.1.0** is the version in this repository and its last tagged release; 0.0.1 was the first. The walkthrough video above was recorded for 0.0.1 and predates the propose, apply, verify, archive flow this guide describes. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.
 
 ## Why the loop is useful
 

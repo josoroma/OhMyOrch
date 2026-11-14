@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 — 2026-11-12 (untagged)
+## 0.1.0 — 2026-11-14
 
 Breaking simplification: delivery now follows the upstream OpenSpec 1.13.2 flow and nothing else. Each READY story in SPECS is one OpenSpec change that the main session takes through propose, apply, verify and archive; then the story is marked DONE.
 

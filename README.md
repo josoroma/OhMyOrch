@@ -45,7 +45,7 @@ The next action is derived from `SPECS.md` and the change directory on every cal
 
 ## Try it locally
 
-**0.1.0 is the current source version; it is not tagged. The last tagged release is 0.0.1.** For a local preview, run from this repository:
+**0.1.0 is the current version and the last tagged release.** For a local preview, run from this repository:
 
 ```bash
 claude --plugin-dir ./plugins/ohmyorch

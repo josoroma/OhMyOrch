@@ -2,7 +2,7 @@
 
 OhMyOrch delivers a SPECS backlog with OpenSpec: each READY story is one change that moves through propose, apply, verify and archive. Its installed code stays in Claude's plugin cache; documents and workflow state stay in your project.
 
-Version `0.1.0` is the plugin source in this repository; it is not tagged, and the last tagged release is `0.0.1`. Marketplace installation, cache updates and uninstall were exercised on Claude Code 2.1.314 for this version, and on 2.1.285 and 2.1.292 with the previous one. Live delegated-agent identity and full story lifecycle tests remain gates for public packaged artifacts and support claims. The owner has not selected the distribution license. See the repository's implementation evidence for the scope of validation.
+Version `0.1.0` is the plugin in this repository and its last tagged release; `0.0.1` was the first. Marketplace installation, cache updates and uninstall were exercised on Claude Code 2.1.314 for this version, and on 2.1.285 and 2.1.292 with the previous one. Live delegated-agent identity and full story lifecycle tests remain gates for public packaged artifacts and support claims. The owner has not selected the distribution license. See the repository's implementation evidence for the scope of validation.
 
 ## Install
 
