@@ -69,6 +69,9 @@ env/
 .coverage
 htmlcov/
 
+# --- Local video production (films, their sources, renders and backups) ---
+docs/videos/
+
 # --- Logs & temp ---
 *.log
 logs/

@@ -1,119 +1,112 @@
-# CODEBASE — PocketTasks
+# CODEBASE — Currency Converter
 
-Analyzed revision: pockettasks-docs-v1
-Working tree: unknown — no separate PocketTasks Git checkout exists.
+Analyzed revision: fe7b6ae
+Working tree: clean
 
-This is a documentation-only example of the `ohmyorch:codebase-analyst` report
-format. It is not the result of an authenticated agent run or an audit of an
-implemented application. A normal `/ohmyorch:analyze-codebase` run skips creating
-CODEBASE.md when there is no meaningful application code; this file is included to
-show the schema requested for the example.
+This file describes the repository as it is at that revision. It follows the
+`ohmyorch:codebase-analyst` format used by `/ohmyorch:analyze-codebase`. It is a
+description of current state, not a source of product intent: that is [PRD.md](PRD.md)
+and [SPECS.md](SPECS.md).
+
+The converter it describes was built from those documents, one OpenSpec change per story,
+with `/ohmyorch:deliver`; the walkthrough video "OhMyOrch 03"
+shows the delivery. The code and the `openspec/` record it describes are in this folder.
 
 ## System Summary
 
-PocketTasks currently consists of the three example documents in this folder.
-The separate [SPECS viewer](../../SPECS-APP.hml) displays this backlog; it does not
-implement PocketTasks.
-There is no PocketTasks application source or user-facing implementation here.
-[PRD.md](PRD.md) describes desired behavior; [SPECS.md](SPECS.md) records two
-undelivered epics. Neither document is evidence that a feature exists.
+A command-line currency converter in Node.js with no dependencies. `./convert <amount>
+<from> <to>` gets the pair's rate from the Frankfurter API, keeps it in memory for the
+day, and prints the converted amount with the rate and its date.
 
 ## Repository Map
 
-| Path | Kind | What it contains |
-|---|---|---|
-| [PRD.md](PRD.md) | Product document | Illustrative brief and desired requirements. |
-| [CODEBASE.md](CODEBASE.md) | Context example | This description of the starting snapshot. |
-| [SPECS.md](SPECS.md) | Backlog | Two epics, two stories, acceptance criteria, and four tasks. |
-| [SPECS-APP.hml](../../SPECS-APP.hml) | Documentation viewer | Standalone HTML/JavaScript Kanban, epic hierarchy, and complete Markdown view. |
-
-PocketTasks source, tests, and build output are absent from
-this example folder. The surrounding repository contains the OhMyOrch plugin,
-which is a separate product.
+| Path | Role |
+|---|---|
+| `convert` | Executable entry point (`#!/usr/bin/env node`). |
+| `src/rates.js` | Gets a pair's rate from Frankfurter; keeps rates in memory by pair and day. |
+| `src/convert.js` | Converts and rounds to the cent; formats the printed result. |
+| `src/cli.js` | Parses `<amount> <from> <to>`, prints the result, returns the exit status. |
+| `tests/` | `node:test` tests and `stub-api.js`, a stand-in for the API. |
+| `openspec/specs/` | Merged specs: `exchange-rates`, `currency-conversion`. |
+| `openspec/changes/archive/` | The four archived changes, one per delivered story. |
+| `openspec/delivery/goal.md` | The last delivery goal (EPIC-2, BLOCKED). |
+| `PRD.md`, `SPECS.md` | Product documents. |
 
 ## Runtime and Tooling
 
-No PocketTasks runtime, dependency manifest, lockfile, or build configuration is
-present. The parent repository's Node/Python maintainer tools belong to OhMyOrch;
-they do not establish a PocketTasks stack.
-
-The documentation viewer embeds its CSS, JavaScript, and markdown-it 15.0.2
-(with dependency license notices). It reads the root SPECS.md over HTTP, falling
-back to this folder's SPECS.md when the root file is missing. A selector switches
-between these two sources; a file picker also accepts a local Markdown file. It never writes backlog status or task checkboxes.
-Only the viewer's theme preference is stored locally.
+- Node.js 20 or later (`package.json` `engines`), ES modules (`"type": "module"`).
+- No dependencies; the global `fetch` is used for HTTP.
+- Tests: `node --test` through `npm test`.
+- OpenSpec 1.13.2 project with the `spec-driven` schema (`openspec/config.yaml`).
 
 ## Architecture
 
-None identified. There are no implemented application modules to inspect.
+Three small modules. `createRates({ fetch, today })` in `src/rates.js` returns
+`getRate(base, quote)`; `fetch` and `today` are parameters so tests replace them.
+`convert()` in `src/convert.js` asks it for a rate unless both currencies are the same.
+`run()` in `src/cli.js` wires them for the command line.
 
 ## Entry Points
 
-None identified for PocketTasks. The documentation utility's entry point is
-[SPECS-APP.hml](../../SPECS-APP.hml). Its nonstandard extension must be served as
-`text/html`; run this from the repository root, beside package.json:
-
-```bash
-python3 -c 'import http.server,mimetypes; mimetypes.add_type("text/html",".hml"); http.server.test(HandlerClass=http.server.SimpleHTTPRequestHandler,port=8000,bind="127.0.0.1")'
-```
-
-Then open `http://127.0.0.1:8000/SPECS-APP.hml`. The default is root SPECS.md;
-if it does not exist, docs/SPECS-EXAMPLE/SPECS.md opens automatically. Use the
-**Specification file** selector to switch between the two. **Open SPECS.md** and
-file drop also accept a local Markdown file. Reload reads the selected source
-again. Relative references resolve from the loaded specification's own folder.
+- `./convert <amount> <from> <to>`: exit status 0 on success, 1 for an unknown currency,
+  2 for a missing argument.
+- `npm test`.
 
 ## Data and Persistence
 
-None identified. No task model, database, or storage implementation is present.
-The session-only policy in PRD.md is desired behavior, not an observation of code.
+Rates are held in a `Map` keyed by `<BASE>/<QUOTE>/<YYYY-MM-DD>` (local date) for the
+life of the process. No database and no files.
 
 ## External Integrations
 
-None identified in this sample. No application integration configuration exists.
+- Frankfurter v2: `GET https://api.frankfurter.dev/v2/rate/{BASE}/{QUOTE}`, no API key.
+  The response fields used are `rate` and `date`. HTTP 422 is read as an unknown
+  currency; any other non-2xx status raises an error that is not handled.
 
 ## Authentication and Authorization
 
-None identified in this sample. No application identity or authorization code exists.
+None.
 
 ## Existing Product Behavior
 
-No task creation, task completion, or task reopening has been implemented.
+- `./convert 20 USD EUR` prints `<amount> EUR (1 USD = <rate> EUR on <date>)`.
+- The same currency prints `<amount> <CODE> (same currency, no rate needed)` without
+  calling the API.
+- An unknown code prints `Unknown currency: <CODE>` and exits with status 1.
+- A failing or unreachable API raises an uncaught error (US-2.3 is not decided).
 
 ## Tests and Quality Gates
 
-No PocketTasks tests, test configuration, coverage results, or application CI are
-present. Gherkin in SPECS.md specifies future acceptance checks; it is not a PASS
-report. OhMyOrch's artifact validator checks document structure, not app behavior.
+12 tests in `tests/rates.test.js` and `tests/convert.test.js`, one per acceptance
+scenario of US-1.1, US-1.2, US-2.1 and US-2.2, against `tests/stub-api.js`. They make no
+network request. No linter or CI configuration is present.
 
 ## Common Commands
 
-No PocketTasks install, build, run, test, or lint commands are defined yet.
+```bash
+./convert 20 USD EUR
+npm test
+openspec list --specs
+```
 
 ## Conventions
 
-The example documents use stable requirement and story IDs, explicit context
-markers, and links between product intent, current state, and planned work.
-Application coding conventions are unknown because no source is present.
+Small functions with injected dependencies; one test per scenario, named after it;
+currency codes upper-cased at the boundary.
 
 ## Constraints and Technical Debt
 
-The `pockettasks-docs-v1` identifier names this teaching snapshot; it is not a Git
-SHA or a freshness proof for a consumer project. Do not reuse it as an analyzed
-revision after implementing the app. No implementation debt can be established
-without application code.
+- Behavior when the API fails is undefined until OQ-001 is answered.
+- The in-memory cache does not outlive a single run of `./convert`.
 
 ## Evidence Paths
 
-- [PRD.md](PRD.md#example-product-brief) — explicit example intent, not current functionality.
-- [SPECS.md](SPECS.md#work-item-status) — initial story states and unchecked tasks.
-- [This folder](.) — contains the example documents, not PocketTasks source; the viewer lives in the repository root.
+- `convert`, `src/rates.js`, `src/convert.js`, `src/cli.js`
+- `tests/rates.test.js`, `tests/convert.test.js`, `tests/stub-api.js`
+- `package.json`, `openspec/config.yaml`, `openspec/specs/*/spec.md`
 
 ## Unknowns
 
-- Application file layout and implementation stack: no application exists yet.
-- Test framework and execution commands: no application tooling exists yet.
-- PocketTasks browser compatibility and behavior: no PocketTasks browser test has run.
-
-Resolve these through planning and real implementation evidence. Refresh CODEBASE.md
-with `/ohmyorch:analyze-codebase` in the actual application checkout once code exists.
+- How the converter should behave when the API is unavailable (OQ-001).
+- Whether the default blended rates or one provider's rates are intended: the code uses
+  the API's default.

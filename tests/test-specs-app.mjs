@@ -29,16 +29,17 @@ const document = lines => lines.join('\n');
 
 test('example hierarchy, status, tasks and scenarios remain coherent', () => {
   const model = parse(sample);
-  assert.equal(model.title, 'PocketTasks');
+  assert.equal(model.title, 'Currency Converter');
   assert.equal(model.epics.length, 2);
-  assert.equal(model.stories.length, 2);
-  assert.equal(model.tasks.length, 4);
+  assert.equal(model.stories.length, 5);
+  assert.equal(model.tasks.length, 11);
   assert.equal(model.warnings.length, 0);
-  assert.deepEqual(Array.from(model.stories, story => story.status), ['READY', 'BLOCKED']);
-  assert.deepEqual(Array.from(model.stories, story => story.scenarios), [10, 5]);
-  assert.deepEqual(Array.from(model.stories[1].dependencies), ['US-1.1']);
-  assert.equal(model.tasks[3].id, 'US-2.1#2');
-  assert.equal(model.tasks[3].story.epic.id, 'EPIC-2');
+  assert.deepEqual(Array.from(model.stories, story => story.status), ['DONE', 'DONE', 'DONE', 'DONE', 'NEEDS CLARIFICATION']);
+  assert.deepEqual(Array.from(model.stories, story => story.scenarios), [3, 2, 4, 2, 1]);
+  assert.deepEqual(Array.from(model.stories, story => Array.from(story.dependencies)), [[], ['US-1.1'], ['US-1.1'], ['US-2.1'], []]);
+  assert.equal(model.tasks.filter(task => task.done).length, 10);
+  assert.equal(model.tasks[3].id, 'US-1.2#1');
+  assert.equal(model.tasks[3].story.epic.id, 'EPIC-1');
   assert.equal(model.raw, sample);
   assert.ok(model.headings.some(heading => heading.title === 'Global Business Rules'));
 });

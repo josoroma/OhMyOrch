@@ -1,247 +1,348 @@
-# SPECS — PocketTasks
+# SPECS — Currency Converter
 
-CODEBASE Context: consumed (pockettasks-docs-v1)
+CODEBASE Context: consumed (fe7b6ae)
 
 ## Table of Contents
 
-- [EPIC-1: Capture tasks](#epic-1-capture-tasks)
-  - [US-1.1: Add a task](#us-11-add-a-task)
-- [EPIC-2: Finish tasks](#epic-2-finish-tasks)
-  - [US-2.1: Complete and reopen a task](#us-21-complete-and-reopen-a-task)
+- [EPIC-1: Rates](#epic-1-rates)
+  - [US-1.1: Fetch a daily rate](#us-11-fetch-a-daily-rate)
+  - [US-1.2: Keep rates in memory](#us-12-keep-rates-in-memory)
+- [EPIC-2: Convert](#epic-2-convert)
+  - [US-2.1: Convert an amount](#us-21-convert-an-amount)
+  - [US-2.2: Show the rate and its date](#us-22-show-the-rate-and-its-date)
+  - [US-2.3: Handle an unavailable API](#us-23-handle-an-unavailable-api)
 
 ## Work Item Status
 
 | ID | Title | Status | Parent |
 |---|---|---|---|
-| EPIC-1 | Capture tasks | — | — |
-| US-1.1 | Add a task | READY | EPIC-1 |
-| US-1.1#1 | Implement task entry and ordered display | TODO | US-1.1 |
-| US-1.1#2 | Verify task-entry acceptance scenarios | TODO | US-1.1 |
-| EPIC-2 | Finish tasks | — | — |
-| US-2.1 | Complete and reopen a task | BLOCKED | EPIC-2 |
-| US-2.1#1 | Implement independent completion controls | TODO | US-2.1 |
-| US-2.1#2 | Verify completion and reopening scenarios | TODO | US-2.1 |
+| EPIC-1 | Rates | — | — |
+| US-1.1 | Fetch a daily rate | DONE | EPIC-1 |
+| US-1.1#1 | Fetch a pair's rate and its date | DONE | US-1.1 |
+| US-1.1#2 | Report an unknown currency | DONE | US-1.1 |
+| US-1.1#3 | Test against a stubbed API | DONE | US-1.1 |
+| US-1.2 | Keep rates in memory | DONE | EPIC-1 |
+| US-1.2#1 | Keep fetched rates by pair and day | DONE | US-1.2 |
+| US-1.2#2 | Count API calls in tests | DONE | US-1.2 |
+| EPIC-2 | Convert | — | — |
+| US-2.1 | Convert an amount | DONE | EPIC-2 |
+| US-2.1#1 | Convert and round to the cent | DONE | US-2.1 |
+| US-2.1#2 | Same currency without a rate | DONE | US-2.1 |
+| US-2.1#3 | Add the convert command | DONE | US-2.1 |
+| US-2.2 | Show the rate and its date | DONE | EPIC-2 |
+| US-2.2#1 | Print the rate and its date | DONE | US-2.2 |
+| US-2.2#2 | Update the output scenarios | DONE | US-2.2 |
+| US-2.3 | Handle an unavailable API | NEEDS CLARIFICATION | EPIC-2 |
+| US-2.3#1 | Implement the decided behavior | TODO | US-2.3 |
 
 ## Dependency Diagram
 
 ```mermaid
 flowchart TD
-  subgraph EPIC_1["EPIC-1: Capture tasks"]
-    US_1_1["US-1.1: Add a task"]
+  subgraph EPIC_1["EPIC-1: Rates"]
+    US_1_1["US-1.1: Fetch a daily rate"]
+    US_1_2["US-1.2: Keep rates in memory"]
   end
-  subgraph EPIC_2["EPIC-2: Finish tasks"]
-    US_2_1["US-2.1: Complete and reopen a task"]
+  subgraph EPIC_2["EPIC-2: Convert"]
+    US_2_1["US-2.1: Convert an amount"]
+    US_2_2["US-2.2: Show the rate and its date"]
+    US_2_3["US-2.3: Handle an unavailable API"]
   end
+  US_1_1 -.-> US_1_2
   US_1_1 -.-> US_2_1
+  US_2_1 -.-> US_2_2
 ```
 
 ```mermaid
 flowchart TD
   subgraph EPIC_1["EPIC-1 tasks"]
-    US_1_1["US-1.1: Add a task"]
-    T_1_1_1["US-1.1#1: Task entry and display"]
-    T_1_1_2["US-1.1#2: Acceptance checks"]
+    US_1_1["US-1.1: Fetch a daily rate"]
+    T_1_1_1["US-1.1#1: Fetch a pair's rate and its date"]
+    T_1_1_2["US-1.1#2: Report an unknown currency"]
+    T_1_1_3["US-1.1#3: Test against a stubbed API"]
+    US_1_2["US-1.2: Keep rates in memory"]
+    T_1_2_1["US-1.2#1: Keep fetched rates by pair and day"]
+    T_1_2_2["US-1.2#2: Count API calls in tests"]
     US_1_1 --> T_1_1_1
     US_1_1 --> T_1_1_2
+    US_1_1 --> T_1_1_3
+    US_1_2 --> T_1_2_1
+    US_1_2 --> T_1_2_2
   end
 ```
 
 ```mermaid
 flowchart TD
   subgraph EPIC_2["EPIC-2 tasks"]
-    US_2_1["US-2.1: Complete and reopen a task"]
-    T_2_1_1["US-2.1#1: Completion controls"]
-    T_2_1_2["US-2.1#2: Acceptance checks"]
+    US_2_1["US-2.1: Convert an amount"]
+    T_2_1_1["US-2.1#1: Convert and round to the cent"]
+    T_2_1_2["US-2.1#2: Same currency without a rate"]
+    T_2_1_3["US-2.1#3: Add the convert command"]
+    US_2_2["US-2.2: Show the rate and its date"]
+    T_2_2_1["US-2.2#1: Print the rate and its date"]
+    T_2_2_2["US-2.2#2: Update the output scenarios"]
+    US_2_3["US-2.3: Handle an unavailable API"]
+    T_2_3_1["US-2.3#1: Implement the decided behavior"]
     US_2_1 --> T_2_1_1
     US_2_1 --> T_2_1_2
+    US_2_1 --> T_2_1_3
+    US_2_2 --> T_2_2_1
+    US_2_2 --> T_2_2_2
+    US_2_3 --> T_2_3_1
   end
 ```
 
 ## Product Context
 
 This illustrative backlog follows `ohmyorch:spec-ingestor`, invoked through
-`/ohmyorch:ingest-spec`. Its source is [PRD.md](PRD.md), with descriptive context
-from [CODEBASE.md](CODEBASE.md). No feature, verdict, archive, or delivery result
-is claimed to exist.
+`/ohmyorch:ingest-spec`. Its source is [PRD.md](PRD.md). The project was greenfield when
+the stories were written; [CODEBASE.md](CODEBASE.md) now describes the delivered code.
+The converter was built from these documents, one OpenSpec change per story, with
+`/ohmyorch:deliver`; the walkthrough video "OhMyOrch 03"
+shows the delivery. Its code and its `openspec/` record, including the archived changes
+that the `Change:` lines name, are in this folder: see [README.md](README.md).
 
-The first story is READY within the example's defined scope. The second has complete
-criteria but is BLOCKED on US-1.1. After US-1.1 is delivered, archived, and marked
-DONE, the coordinator can promote US-2.1 to READY and refresh this status table.
-
-For a real trial, approve the brief and initialize a separate consumer project;
-use PRD.md and SPECS.md as its product documents. Treat this CODEBASE.md as a
-teaching sample, not a report of that checkout: a greenfield project has absent
-context, and an existing app needs actual analysis. Regenerate context markers and
-review readiness before starting `/ohmyorch:deliver EPIC-1`, then EPIC-2 when ready.
-Creating these examples does not activate delivery in the OhMyOrch publisher.
+The converter calls Frankfurter, a free exchange-rate API of daily reference rates from
+central banks, with no API key. Tests use a stubbed API so they are
+repeatable and run offline; only a conversion run by a person calls the real API.
 
 ## Goals
 
-Add tasks; complete or reopen them during one browser session.
+Convert an amount between two currencies at today's reference rate, show which rate
+was used and from which day, and call the API no more than needed.
 
 ## Non-Goals
 
-Accounts, saved data, synchronization, editing, deletion, filtering, due dates,
-notifications, and collaboration.
+A database or files, historical rates, accounts, API keys, and more than one pair per
+command.
 
 ## Actors
 
-One person using a mouse or keyboard.
+A person at a terminal, and the Frankfurter rate API.
 
 ## Global Business Rules
 
-- BR-001: Trim titles; reject an empty result with "Enter a task."
-- BR-002: Duplicate titles are separate tasks; preserve insertion order.
-- BR-003: Reloading resets the list.
+- BR-001: A currency code is three letters; input is case-insensitive and shown in
+  upper case.
+- BR-002: A converted amount is rounded to the nearest cent; a half cent rounds up.
+- BR-003: A rate fetched today is reused for the rest of the day while the program runs.
+- BR-004: Converting a currency to itself needs no rate.
 
 Source: [PRD product principles](PRD.md#6-product-principles).
 
 ## Non-Functional Requirements
 
-- NFR-001: One browser page; memory-only state; no login or remote services.
-- NFR-002: Labelled controls; Enter submits; Space toggles a focused checkbox.
+- NFR-001: Memory only: no database and no files.
+- NFR-002: No API key or account.
+- NFR-003: Tests use a stubbed API, run offline and are repeatable.
+- NFR-004: Node.js 20 or later with no dependencies.
 
 Source: [PRD non-functional requirements](PRD.md#9-non-functional-requirements).
 
-# EPIC-1: Capture tasks
+# EPIC-1: Rates
 
-Deliver task entry and an ordered list. Covers FR-001, BR-001–003, and NFR-001–002.
+Get today's rate for a currency pair and keep it for the day. Covers FR-001 to FR-003.
 
-### US-1.1: Add a task
+### US-1.1: Fetch a daily rate
 
-Status: READY
+Status: DONE
+Change: `openspec/changes/archive/2026-11-13-us-1-1-fetch-daily-rate/`
 
-As a person keeping a short task list
-I want to add tasks on one page
-So that I can remember what I intend to do.
+As a person converting money
+I want today's rate for a currency pair
+So that a conversion uses the current reference rate.
 
 Source:
-- [PRD functional requirements](PRD.md#8-functional-requirements), FR-001.
-- [PRD product principles](PRD.md#6-product-principles), BR-001, BR-002, BR-003.
-- [PRD non-functional requirements](PRD.md#9-non-functional-requirements), NFR-001, NFR-002.
-
-Codebase Context:
-- [Existing Product Behavior](CODEBASE.md#existing-product-behavior): task entry is not implemented.
+- [PRD functional requirements](PRD.md#8-functional-requirements), FR-001, FR-002.
+- [PRD constraints](PRD.md#11-constraints-and-dependencies), the Frankfurter v2 rate endpoint.
+- [PRD product principles](PRD.md#6-product-principles), BR-001.
 
 Acceptance Criteria:
 
 ```gherkin
-Scenario: Add a trimmed title
-  Given the list is empty and Task title contains "  Buy milk  "
-  When I click Add task
-  Then one Active task titled "Buy milk" appears with an unchecked checkbox
+Scenario: Fetch today's rate for a pair
+  Given the rate API returns 0.9022 for USD to EUR, dated 2026-11-14
+  When I ask for the USD to EUR rate
+  Then I get the rate 0.9022, dated 2026-11-14
 
-Scenario: Clear the input after adding
-  Given Task title contains "Buy milk"
-  When I click Add task
-  Then Task title is empty
+Scenario: Accept lower-case currency codes
+  Given the rate API returns 0.9022 for USD to EUR
+  When I ask for the usd to eur rate
+  Then the rate API is asked for USD to EUR
 
-Scenario: Reject an empty title
-  Given the list is empty and Task title is empty
-  When I click Add task
-  Then the validation message reads "Enter a task."
-
-Scenario: Do not create an empty task
-  Given the list is empty and Task title is empty
-  When I click Add task
-  Then the list stays empty
-
-Scenario: Reject a whitespace-only title
-  Given the list is empty and Task title contains only spaces
-  When I click Add task
-  Then the validation message reads "Enter a task."
-
-Scenario: Do not create a whitespace-only task
-  Given the list is empty and Task title contains only spaces
-  When I click Add task
-  Then the list stays empty
-
-Scenario: Append another task using the keyboard
-  Given "Buy milk" is listed and the focused Task title input contains "Read a book"
-  When I press Enter
-  Then "Read a book" appears after "Buy milk"
-
-Scenario: Allow duplicate titles
-  Given one task titled "Buy milk" is listed and Task title contains "Buy milk"
-  When I click Add task
-  Then two separate tasks titled "Buy milk" are listed
-
-Scenario: Display a title as plain text
-  Given Task title contains "<b>Read</b>"
-  When I click Add task
-  Then the task title displays the literal text "<b>Read</b>"
-
-Scenario: Reset the list on reload
-  Given the list contains "Buy milk"
-  When I reload the page
-  Then the list is empty
+Scenario: Report an unknown currency code
+  Given the rate API rejects XYZ as an invalid currency
+  When I ask for the USD to XYZ rate
+  Then I get the error "Unknown currency: XYZ"
+  And no rate is returned
 ```
 
 Dependencies:
-- None.
+- None
 
 Tasks:
-- [ ] Implement task entry and ordered display
-- [ ] Verify task-entry acceptance scenarios
+- [x] Fetch a pair's rate and its date from the Frankfurter v2 rate endpoint
+- [x] Report an invalid currency as "Unknown currency: <CODE>"
+- [x] Cover the scenarios with tests against a stubbed API
 
 Open Questions:
-- None within the example product brief.
+- None
 
-# EPIC-2: Finish tasks
+### US-1.2: Keep rates in memory
 
-Deliver completion and reopening. Covers FR-002, BR-002, and NFR-002.
+Status: DONE
+Change: `openspec/changes/archive/2026-11-13-us-1-2-keep-rates-memory/`
 
-### US-2.1: Complete and reopen a task
-
-Status: BLOCKED
-
-As a person working through my task list
-I want to complete and reopen individual tasks
-So that the list reflects what still needs attention.
+As a person converting money
+I want a rate I already fetched today to be reused
+So that the converter does not call the API again for the same pair.
 
 Source:
-- [PRD functional requirements](PRD.md#8-functional-requirements), FR-002.
-- [PRD product principles](PRD.md#6-product-principles), BR-002.
-- [PRD non-functional requirements](PRD.md#9-non-functional-requirements), NFR-002.
-
-Codebase Context:
-- [Existing Product Behavior](CODEBASE.md#existing-product-behavior): completion and reopening are not implemented.
+- [PRD functional requirements](PRD.md#8-functional-requirements), FR-003.
+- [PRD product principles](PRD.md#6-product-principles), BR-003.
+- [PRD non-functional requirements](PRD.md#9-non-functional-requirements), NFR-001.
 
 Acceptance Criteria:
 
 ```gherkin
-Scenario: Complete a task
-  Given "Buy milk" is unchecked and labelled Active
-  When I check its checkbox labelled "Buy milk"
-  Then that task is checked and labelled Done
+Scenario: Reuse a rate on the same day
+  Given the USD to EUR rate was fetched today
+  When I ask for the USD to EUR rate again the same day
+  Then the rate API has been called once
 
-Scenario: Leave an identical task unchanged
-  Given two separate Active tasks titled "Buy milk" are listed
-  When I check the first task's checkbox labelled "Buy milk"
-  Then the second task remains unchecked and labelled Active
-
-Scenario: Preserve task order after completion
-  Given "Buy milk" is listed before "Read a book"
-  When I check the checkbox for "Buy milk"
-  Then "Buy milk" is still listed before "Read a book"
-
-Scenario: Reopen a completed task
-  Given "Buy milk" is checked and labelled Done
-  When I uncheck its checkbox
-  Then the same task is unchecked and labelled Active
-
-Scenario: Complete a task using the keyboard
-  Given "Read a book" is Active and its labelled checkbox is focused
-  When I press Space
-  Then that checkbox is checked and the task is labelled Done
+Scenario: Fetch again on a new day
+  Given the USD to EUR rate was fetched yesterday
+  When I ask for the USD to EUR rate today
+  Then the rate API is called again
 ```
 
 Dependencies:
-- US-1.1 must be delivered, archived, and marked DONE before this story becomes READY.
+- US-1.1
 
 Tasks:
-- [ ] Implement independent completion controls
-- [ ] Verify completion and reopening scenarios
+- [x] Keep fetched rates in memory, by pair and day
+- [x] Count rate API calls in tests to show the second request uses memory
 
 Open Questions:
-- None. The blocker is the unfinished dependency, not a missing product decision.
+- None
+
+# EPIC-2: Convert
+
+Convert an amount and show where the rate comes from. Covers FR-004 to FR-006.
+
+### US-2.1: Convert an amount
+
+Status: DONE
+Change: `openspec/changes/archive/2026-11-13-us-2-1-convert-amount/`
+
+As a person converting money
+I want to convert an amount between two currencies
+So that I know what it is worth in the other currency.
+
+Source:
+- [PRD functional requirements](PRD.md#8-functional-requirements), FR-002, FR-004.
+- [PRD core workflow](PRD.md#7-core-workflow).
+- [PRD product principles](PRD.md#6-product-principles), BR-002, BR-004.
+
+Acceptance Criteria:
+
+```gherkin
+Scenario: Convert and round to the cent
+  Given the USD to EUR rate is 0.9022
+  When I run convert 20 USD EUR
+  Then it prints "18.04 EUR"
+
+Scenario: Round a half cent up
+  Given the USD to EUR rate is 0.90225
+  When I run convert 20 USD EUR
+  Then it prints "18.05 EUR"
+
+Scenario: Same currency needs no rate
+  Given the rate API is available
+  When I run convert 20 USD USD
+  Then it prints "20.00 USD"
+  And the rate API is not called
+
+Scenario: Unknown currency
+  Given the rate API rejects XYZ as an invalid currency
+  When I run convert 20 USD XYZ
+  Then it prints "Unknown currency: XYZ" and exits with status 1
+```
+
+Dependencies:
+- US-1.1
+
+Tasks:
+- [x] Convert an amount at the pair's rate, rounded to the cent
+- [x] Return the amount for the same currency without calling the rate API
+- [x] Add the command: convert <amount> <from> <to>
+
+Open Questions:
+- None
+
+### US-2.2: Show the rate and its date
+
+Status: DONE
+Change: `openspec/changes/archive/2026-11-13-us-2-2-show-rate-date/`
+
+As a person converting money
+I want to see the rate and its date with the result
+So that I know where the number comes from and how current it is.
+
+Source:
+- [PRD functional requirements](PRD.md#8-functional-requirements), FR-005, which changes the output required by FR-004.
+
+Acceptance Criteria:
+
+```gherkin
+Scenario: Show the rate and its date
+  Given the USD to EUR rate is 0.9022, dated 2026-11-14
+  When I run convert 20 USD EUR
+  Then it prints "18.04 EUR (1 USD = 0.9022 EUR on 2026-11-14)"
+
+Scenario: Same currency says no rate was used
+  Given the rate API is available
+  When I run convert 20 USD USD
+  Then it prints "20.00 USD (same currency, no rate needed)"
+```
+
+Dependencies:
+- US-2.1, whose conversion output this story changes
+
+Tasks:
+- [x] Print the rate and its date after the converted amount
+- [x] Update the conversion output scenarios and their tests
+
+Open Questions:
+- None
+
+### US-2.3: Handle an unavailable API
+
+Status: NEEDS CLARIFICATION
+
+As a person converting money
+I want a defined result when the rate API does not answer
+So that I know whether a number can be trusted.
+
+Source:
+- [PRD functional requirements](PRD.md#8-functional-requirements), FR-006.
+- [PRD open questions](PRD.md#13-open-questions), OQ-001.
+
+Acceptance Criteria:
+
+```gherkin
+Scenario: The rate API is unavailable
+  Given the rate API does not answer
+  When I run convert 20 USD EUR
+  Then the result is not decided yet (OQ-001)
+```
+
+Dependencies:
+- None
+
+Tasks:
+- [ ] Implement the decided behavior once OQ-001 is answered
+
+Open Questions:
+- OQ-001: When the API is unavailable, should the converter use the last known rate
+  (and say how old it is), or refuse with an error?

@@ -93,7 +93,7 @@ A change leaves only OpenSpec's own artifacts: no plan, review, test-report or s
 
 [SPECS-APP.hml](SPECS-APP.hml) turns your backlog into a Kanban board. Open a story to see its criteria, tasks, and dependencies, or switch to Document for the complete specification.
 
-![SPECS workspace showing ready and blocked stories](docs/images/specs-backlog-board.png)
+![SPECS workspace showing the currency converter example: four DONE stories and one that needs clarification](docs/images/specs-backlog-board.png)
 
 ### Setup and run
 
@@ -117,4 +117,4 @@ Switch between Stories, Tasks, and Epics; search or filter to focus on the work 
 
 Edit the Markdown file, then click **Reload**. The workspace is read only: it never changes delivery status. **Open SPECS.md** also lets you inspect another local backlog.
 
-The sample includes a matching [PRD](docs/SPECS-EXAMPLE/PRD.md) and [codebase context](docs/SPECS-EXAMPLE/CODEBASE.md).
+The example is a small currency converter, with a matching [PRD](docs/SPECS-EXAMPLE/PRD.md) and [codebase context](docs/SPECS-EXAMPLE/CODEBASE.md). It was delivered with `/ohmyorch:deliver`, one OpenSpec change per story, in the third how-to video; [its code and OpenSpec record](docs/SPECS-EXAMPLE/README.md) are kept beside it.
