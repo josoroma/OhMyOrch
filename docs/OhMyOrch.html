@@ -50,15 +50,30 @@
     <main id="guide" tabindex="-1">
       <article>
 <h1 id="ohmyorch">OhMyOrch</h1>
+<p><strong>Tutorial.</strong> Three short videos show OhMyOrch 0.1.0, from installing it to a delivered project. The source is on <a href="https://github.com/josoroma/OhMyOrch">GitHub</a>.</p>
+<h3 id="1-what-it-is-install-and-update">1. What it is, install and update</h3>
+<p>What OhMyOrch is, the four-step delivery loop and the two rules enforced by code; then how to install it, check it with doctor, and update the plugin and your project. About 2 minutes.</p>
 <figure class="video-feature">
-  <iframe src="https://www.youtube-nocookie.com/embed/vLKeNAXPPd8" title="From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained" width="960" height="540" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-  <figcaption><a href="https://www.youtube.com/watch?v=vLKeNAXPPd8">Watch on YouTube: From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained</a></figcaption>
+  <iframe src="https://www.youtube-nocookie.com/embed/TSdnfTWUTus" title="OhMyOrch 01: Spec-Driven Delivery for Claude Code (What It Is, Install, Update)" width="960" height="540" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <figcaption><a href="https://www.youtube.com/watch?v=TSdnfTWUTus">Watch on YouTube: OhMyOrch 01: Spec-Driven Delivery for Claude Code (What It Is, Install, Update)</a></figcaption>
+</figure>
+<h3 id="2-initialize-a-project-and-deliver-a-story">2. Initialize a project and deliver a story</h3>
+<p>From a real project to a delivered story: doctor, a previewed bootstrap, codebase analysis, approved intent turned into READY work, the four steps with their real commands, and the three authoring agents. About 3 minutes.</p>
+<figure class="video-feature">
+  <iframe src="https://www.youtube-nocookie.com/embed/f46U6owMHa0" title="OhMyOrch 02: Initialize a Project and Deliver a Story with Claude Code" width="960" height="540" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <figcaption><a href="https://www.youtube.com/watch?v=f46U6owMHa0">Watch on YouTube: OhMyOrch 02: Initialize a Project and Deliver a Story with Claude Code</a></figcaption>
+</figure>
+<h3 id="3-spec-driven-development-with-openspec">3. Spec-driven development with OpenSpec</h3>
+<p>A currency converter delivered story by story: OpenSpec deltas and merged specs, tests against a stubbed API, a requirement that changes, the SPECS workspace before and after, and a stop for a human decision. About 3.5 minutes.</p>
+<figure class="video-feature">
+  <iframe src="https://www.youtube-nocookie.com/embed/Bq3IIbin1Ow" title="OhMyOrch 03: Spec-Driven Development with OpenSpec, Building a Currency Converter" width="960" height="540" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <figcaption><a href="https://www.youtube.com/watch?v=Bq3IIbin1Ow">Watch on YouTube: OhMyOrch 03: Spec-Driven Development with OpenSpec, Building a Currency Converter</a></figcaption>
 </figure>
 <p><img src="images/OhMyOrch.png" alt="OhMyOrch: a cyan and violet loop connecting an agent, a specification, code, and approval" class="brand-image" decoding="async" width="1448" height="1086" fetchpriority="high"></p>
 <p><strong>Pick a READY story</strong></p>
 <p>Propose it, apply it, verify it, archive it.</p>
 <p>OhMyOrch brings a repeatable delivery loop to Claude Code. Each READY story in your <code>SPECS.md</code> backlog becomes one OpenSpec change. The main session proposes the change, applies its tasks, verifies the result, archives it, and marks the story DONE. The next action is always derived from project files, so you can see what is finished, what is pending, and where to resume.</p>
-<p>OhMyOrch <strong>0.1.0</strong> is the version in this repository and its last tagged release; 0.0.1 was the first. The walkthrough video above was recorded for 0.0.1 and predates the propose, apply, verify, archive flow this guide describes. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.</p>
+<p>OhMyOrch <strong>0.1.0</strong> is the version in this repository and its last tagged release; 0.0.1 was the first. The three videos above show this version. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.</p>
 <h2 id="why-the-loop-is-useful">Why the loop is useful</h2>
 <p>A large goal gets a small working unit: one independently verifiable story, one change, one next action. An epic becomes a sequence of those changes. Task focus still carries the parent story's acceptance criteria.</p>
 <p>The record is OpenSpec's own. A change holds <code>proposal.md</code>, delta <code>specs/</code>, <code>tasks.md</code> and, only when the change needs it, <code>design.md</code>. <code>tasks.md</code> is the only progress tracker: a task is ticked when it is really done.</p>

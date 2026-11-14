@@ -1,6 +1,24 @@
 # OhMyOrch
 
-[From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained](https://www.youtube.com/watch?v=vLKeNAXPPd8)
+**Tutorial.** Three short videos show OhMyOrch 0.1.0, from installing it to a delivered project. The source is on [GitHub](https://github.com/josoroma/OhMyOrch).
+
+### 1. What it is, install and update
+
+What OhMyOrch is, the four-step delivery loop and the two rules enforced by code; then how to install it, check it with doctor, and update the plugin and your project. About 2 minutes.
+
+[OhMyOrch 01: Spec-Driven Delivery for Claude Code (What It Is, Install, Update)](https://www.youtube.com/watch?v=TSdnfTWUTus)
+
+### 2. Initialize a project and deliver a story
+
+From a real project to a delivered story: doctor, a previewed bootstrap, codebase analysis, approved intent turned into READY work, the four steps with their real commands, and the three authoring agents. About 3 minutes.
+
+[OhMyOrch 02: Initialize a Project and Deliver a Story with Claude Code](https://www.youtube.com/watch?v=f46U6owMHa0)
+
+### 3. Spec-driven development with OpenSpec
+
+A currency converter delivered story by story: OpenSpec deltas and merged specs, tests against a stubbed API, a requirement that changes, the SPECS workspace before and after, and a stop for a human decision. About 3.5 minutes.
+
+[OhMyOrch 03: Spec-Driven Development with OpenSpec, Building a Currency Converter](https://www.youtube.com/watch?v=Bq3IIbin1Ow)
 
 ![OhMyOrch: a cyan and violet loop connecting an agent, a specification, code, and approval](images/OhMyOrch.png)
 
@@ -10,7 +28,7 @@ Propose it, apply it, verify it, archive it.
 
 OhMyOrch brings a repeatable delivery loop to Claude Code. Each READY story in your `SPECS.md` backlog becomes one OpenSpec change. The main session proposes the change, applies its tasks, verifies the result, archives it, and marks the story DONE. The next action is always derived from project files, so you can see what is finished, what is pending, and where to resume.
 
-OhMyOrch **0.1.0** is the version in this repository and its last tagged release; 0.0.1 was the first. The walkthrough video above was recorded for 0.0.1 and predates the propose, apply, verify, archive flow this guide describes. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.
+OhMyOrch **0.1.0** is the version in this repository and its last tagged release; 0.0.1 was the first. The three videos above show this version. Authenticated delegated-agent/full-delivery tests and the distribution license remain gates for public packaged artifacts and support claims. The features below describe the implemented plugin; examples illustrate the workflow rather than claiming a completed live run.
 
 ## Why the loop is useful
 
