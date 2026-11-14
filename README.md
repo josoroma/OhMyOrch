@@ -8,11 +8,19 @@ OhMyOrch is a Claude Code plugin that delivers a `SPECS.md` backlog with OpenSpe
 
 [Plugin handbook](plugins/ohmyorch/README.md) · [Installation & updates](docs/distribution.md)
 
-Watch the walkthrough, From Spec to Delivery. It was recorded for 0.0.1, before the flow became the four steps shown below.
+**Tutorial.** Three short videos show OhMyOrch 0.1.0, from installing it to a delivered project.
 
-[![Watch From Spec to Delivery: OpenSpec + OhMyOrch Workflow Explained on YouTube](https://img.youtube.com/vi/vLKeNAXPPd8/maxresdefault.jpg)](https://www.youtube.com/watch?v=vLKeNAXPPd8)
+**1. What it is, install and update.** What OhMyOrch is, the four-step delivery loop and the two rules enforced by code; then how to install it, check it with doctor, and update the plugin and your project. About 2 minutes.
 
-[**Watch the walkthrough: From Spec to Delivery**](https://www.youtube.com/watch?v=vLKeNAXPPd8)
+[![Watch OhMyOrch 01: Spec-Driven Delivery for Claude Code (What It Is, Install, Update) on YouTube](https://img.youtube.com/vi/TSdnfTWUTus/maxresdefault.jpg)](https://www.youtube.com/watch?v=TSdnfTWUTus)
+
+**2. Initialize a project and deliver a story.** From a real project to a delivered story: doctor, a previewed bootstrap, codebase analysis, approved intent turned into READY work, the four steps with their real commands, and the three authoring agents. About 3 minutes.
+
+[![Watch OhMyOrch 02: Initialize a Project and Deliver a Story with Claude Code on YouTube](https://img.youtube.com/vi/f46U6owMHa0/maxresdefault.jpg)](https://www.youtube.com/watch?v=f46U6owMHa0)
+
+**3. Spec-driven development with OpenSpec.** A currency converter delivered story by story: OpenSpec deltas and merged specs, tests against a stubbed API, a requirement that changes, the SPECS workspace before and after, and a stop for a human decision. About 3.5 minutes.
+
+[![Watch OhMyOrch 03: Spec-Driven Development with OpenSpec, Building a Currency Converter on YouTube](https://img.youtube.com/vi/Bq3IIbin1Ow/maxresdefault.jpg)](https://www.youtube.com/watch?v=Bq3IIbin1Ow)
 
 Give Claude a READY story. The main session proposes, applies, verifies and archives one OpenSpec change, then marks the story DONE.
 
@@ -117,4 +125,4 @@ Switch between Stories, Tasks, and Epics; search or filter to focus on the work 
 
 Edit the Markdown file, then click **Reload**. The workspace is read only: it never changes delivery status. **Open SPECS.md** also lets you inspect another local backlog.
 
-The example is a small currency converter, with a matching [PRD](docs/SPECS-EXAMPLE/PRD.md) and [codebase context](docs/SPECS-EXAMPLE/CODEBASE.md). It was delivered with `/ohmyorch:deliver`, one OpenSpec change per story, in the third how-to video; [its code and OpenSpec record](docs/SPECS-EXAMPLE/README.md) are kept beside it.
+The example is a small currency converter, with a matching [PRD](docs/SPECS-EXAMPLE/PRD.md) and [codebase context](docs/SPECS-EXAMPLE/CODEBASE.md). It was delivered with `/ohmyorch:deliver`, one OpenSpec change per story, in the [third how-to video](https://www.youtube.com/watch?v=Bq3IIbin1Ow); [its code and OpenSpec record](docs/SPECS-EXAMPLE/README.md) are kept beside it.
